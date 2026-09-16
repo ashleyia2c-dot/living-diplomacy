@@ -1,0 +1,24 @@
+{
+  "name": "wh3-llm-diplomacy",
+  "version": "0.39.8-inbox",
+  "private": true,
+  "type": "module",
+  "description": "Player2-powered LLM diplomacy bridge for Total War: WARHAMMER III",
+  "scripts": {
+    "start": "node src/companion.js",
+    "build:pack": "node scripts/build-pack.js",
+    "smoke:bridge": "node scripts/smoke-bridge.js",
+    "test": "node --test test/*.test.js",
+    "build:exe": "node scripts/build-companion-exe.js",
+    "build:release": "node scripts/build-release.js"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "fengari": "0.1.5",
+    "luaparse": "0.3.1",
+    "postject": "^1.0.0-alpha.6"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

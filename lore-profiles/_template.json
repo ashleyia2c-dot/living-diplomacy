@@ -1,0 +1,14 @@
+{
+  "canonNotes": [
+    "Resumen canónico breve del personaje y su situación política."
+  ],
+  "voiceNotes": [
+    "Tono, vocabulario, objetivos y cosas que nunca diría."
+  ],
+  "voiceGender": "male",
+  "voiceIds": [],
+  "ttsInstructions": "Dirección breve para la voz de Player2.",
+  "sources": [
+    "Nombre del libro, entrada del juego o URL oficial usada para el resumen."
+  ]
+}

@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!-- Minimal input-only template. This is the verified, editable control. -->
+<layout version="137" comment="Player2 diplomacy input" precache_condition="">
+  <hierarchy>
+    <root this="9AC91D2C-A12C-4938-947B-84F7BC6CA101">
+      <entry_box this="AB51E207-5106-45D5-BD11-A7A524216202"/>
+    </root>
+  </hierarchy>
+  <components>
+    <root this="9AC91D2C-A12C-4938-947B-84F7BC6CA101" id="root" tooltipslocalised="true" uniqueguid="9AC91D2C-A12C-4938-947B-84F7BC6CA101" currentstate="FDEF84E2-9E43-437A-AB97-2D2E47BD6303" defaultstate="FDEF84E2-9E43-437A-AB97-2D2E47BD6303"/>
+    <entry_box this="AB51E207-5106-45D5-BD11-A7A524216202" id="entry_box" offset="0.00,0.00" priority="100" tooltipslocalised="true" uniqueguid="AB51E207-5106-45D5-BD11-A7A524216202" currentstate="B011A6C3-AABE-4A74-BD48-D57404EAA404">
+      <callbackwithcontextlist><callback_with_context callback_id="TextInput"/></callbackwithcontextlist>
+      <userproperties><property name="use_long_validator" value=""/></userproperties>
+      <componentimages><component_image this="AE1273CC-8F9F-41D5-A9C1-864ADBFDD505" uniqueguid="AE1273CC-8F9F-41D5-A9C1-864ADBFDD505" imagepath="ui/skins/default/frame_text.png"/></componentimages>
+      <states>
+        <newstate this="B011A6C3-AABE-4A74-BD48-D57404EAA404" name="NewState" width="410" height="42" text="" textxoffset="10.00,10.00" textyoffset="10.00,10.00" texthbehaviour="Never split" textlocalised="true" textlabel="llmdip_entry_box" font_m_size="14" font_m_colour="#FFF8D7FF" font_m_leading="1" fontcat_name="fe_default_text" interactive="true" uniqueguid="B011A6C3-AABE-4A74-BD48-D57404EAA404">
+          <imagemetrics><image this="3C6E8BF4-5420-4318-9225-E4053B5D3606" uniqueguid="3C6E8BF4-5420-4318-9225-E4053B5D3606" componentimage="AE1273CC-8F9F-41D5-A9C1-864ADBFDD505" width="410" height="42" tile="true" margin="4.00,4.00,4.00,4.00"/></imagemetrics>
+        </newstate>
+      </states>
+    </entry_box>
+  </components>
+</layout>

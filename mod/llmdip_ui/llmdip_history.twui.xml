@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!-- Read-only, literal text panel. Kept separate from the verified input box
+     so the conversation can never displace the player's keyboard control. -->
+<layout version="137" comment="Player2 diplomacy history" precache_condition="">
+  <hierarchy>
+    <root this="55E3BE71-8E85-4490-AD52-249EDB194A06">
+      <entry_box this="E14E3D4A-AF22-4109-97E4-DDAA229B6C4E"/>
+    </root>
+  </hierarchy>
+  <components>
+    <root this="55E3BE71-8E85-4490-AD52-249EDB194A06" id="root" tooltipslocalised="true" uniqueguid="55E3BE71-8E85-4490-AD52-249EDB194A06" currentstate="3FF4D5A5-AFDF-4BAA-ADDF-D14D9B035C49" defaultstate="3FF4D5A5-AFDF-4BAA-ADDF-D14D9B035C49"/>
+    <entry_box this="E14E3D4A-AF22-4109-97E4-DDAA229B6C4E" id="history_text" offset="0.00,0.00" priority="100" tooltipslocalised="true" uniqueguid="E14E3D4A-AF22-4109-97E4-DDAA229B6C4E" currentstate="2AF08A6A-266A-41B1-BDBD-F2993488EB23">
+      <!-- A WH3 entry_box is not valid without its TextInput callback. The
+           previous read-only imitation rendered its frame but not state text,
+           and left invalid UI references during the vanilla panel teardown. -->
+      <callbackwithcontextlist><callback_with_context callback_id="TextInput"/></callbackwithcontextlist>
+      <componentimages><component_image this="0586E85C-728F-4EFC-8432-90E05D1BEC65" uniqueguid="0586E85C-728F-4EFC-8432-90E05D1BEC65" imagepath="ui/skins/default/frame_text.png"/></componentimages>
+      <states>
+        <newstate this="2AF08A6A-266A-41B1-BDBD-F2993488EB23" name="NewState" width="560" height="350" text="" textxoffset="12.00,60.00" textyoffset="10.00,8.00" texthbehaviour="Never split" textlocalised="true" textlabel="llmdip_history_text" font_m_size="14" font_m_colour="#FFF8D7FF" font_m_leading="2" fontcat_name="fe_default_text" interactive="true" uniqueguid="2AF08A6A-266A-41B1-BDBD-F2993488EB23">
+          <imagemetrics><image this="F2F1D7D8-5A92-4DC1-86FA-A297F9BFC2E3" uniqueguid="F2F1D7D8-5A92-4DC1-86FA-A297F9BFC2E3" componentimage="0586E85C-728F-4EFC-8432-90E05D1BEC65" width="560" height="350" tile="true" margin="4.00,4.00,4.00,4.00"/></imagemetrics>
+        </newstate>
+      </states>
+    </entry_box>
+  </components>
+</layout>
