@@ -62,3 +62,9 @@ npm run build:pack
 - AI is provided by [Player2](https://player2.game).
 
 This is an unofficial fan-made mod and is not affiliated with or endorsed by Creative Assembly, SEGA, Games Workshop or Player2.
+
+## License
+
+Copyright (c) 2026 the Living Diplomacy author. **All rights reserved.**
+
+This source code is published so that it can be reviewed. Being able to read it does not grant permission to use it. Copying, modifying, redistributing, re-uploading or using any part of this project, in whole or in part, requires prior written permission from the author.
