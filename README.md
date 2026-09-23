@@ -2,8 +2,21 @@
 
 Source code for the Living Diplomacy mod and its companion program.
 
-- **Nexus Mods:** https://www.nexusmods.com/totalwarwarhammer3/mods/400
 - **Steam Workshop:** https://steamcommunity.com/sharedfiles/filedetails/?id=3802515040
+- **Companion download:** https://github.com/ashleyia2c-dot/living-diplomacy/releases/latest
+
+## Install the Workshop edition
+
+The Workshop subscription installs the Warhammer III `.pack` only. AI conversations also need the separate, text-only Player2 companion.
+
+1. Subscribe to the Workshop item and enable it in the game launcher.
+2. Install and sign in to [Player2](https://player2.game).
+3. Install [Node.js 20 or newer](https://nodejs.org).
+4. On the [latest release page](https://github.com/ashleyia2c-dot/living-diplomacy/releases/latest), download the asset named `Player2-Diplomacy-WH3-Workshop-Companion-*.zip` from **Assets**. Do not use the automatically generated "Source code" archives as the installer.
+5. Extract the ZIP, run `INICIAR_PLAYER2.bat`, and leave its window open while playing. No `npm install` is needed.
+6. In a single-player campaign, open diplomacy with a faction and click the small hand icon beside the question mark.
+
+Do not install a second `llm_diplomacy.pack` manually when using Workshop. The BAT verifies that Steam has downloaded the compatible pack. This edition has text conversations only. See [`LEEME_WORKSHOP.txt`](LEEME_WORKSHOP.txt) for troubleshooting and alternative Steam library paths.
 
 ## What is in this repository
 
@@ -12,6 +25,7 @@ Source code for the Living Diplomacy mod and its companion program.
 | `mod/` | The game mod: campaign Lua scripts and UI templates packed into `llm_diplomacy.pack`. |
 | `src/` | The companion (Node.js). The released `WH3-LLM-Diplomacy-Companion.exe` is built from this. |
 | `scripts/` | Build scripts for the executable, the `.pack` and the release zip. |
+| `INICIAR_PLAYER2.bat`, `LEEME_WORKSHOP.txt` | Source and instructions for the Workshop companion release. |
 | `test/` | Automated tests for the companion and the Lua scripts. |
 | `lore-profiles/` | Optional lore notes used to shape faction leaders. |
 
@@ -25,9 +39,9 @@ Warhammer III scripts cannot open network connections, so the companion acts as 
 
 By default it only connects to `127.0.0.1`: the local Player2 app, and its own status page on `http://127.0.0.1:43127`. The only other destination in the code is an optional OpenAI-compatible provider that a user must configure explicitly in a `.env` file (`LLMDIP_PROVIDER=openai`); it is off by default.
 
-Conversation memory is stored as JSON in a `data/` folder next to the executable.
+Conversation memory is stored as JSON in a `data/` folder next to the companion.
 
-## Building the executable
+## Building the older executable (developer reference)
 
 Requirements: Windows and **Node.js 22 or newer**.
 
