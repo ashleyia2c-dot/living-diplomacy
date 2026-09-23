@@ -5,7 +5,7 @@ import { buildPersonality, buildSocialStyle } from "./personality.js";
 const SAFE = /^[a-z0-9_]{1,160}$/;
 
 function segment(value, field) {
-  if (!SAFE.test(value || "")) throw new Error(`${field} no es una key segura`);
+  if (!SAFE.test(value || "")) throw new Error(`${field} is not a safe key`);
   return value;
 }
 

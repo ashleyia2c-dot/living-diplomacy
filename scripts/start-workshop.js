@@ -11,30 +11,30 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const hash = file => crypto.createHash("sha256").update(fs.readFileSync(file)).digest("hex").toUpperCase();
 
 try {
-  if (Number(process.versions.node.split(".")[0]) < 20) throw new Error("Se necesita Node.js 20 o superior.");
+  if (Number(process.versions.node.split(".")[0]) < 20) throw new Error("Node.js 20 or newer is required.");
   const game = path.resolve(detectWh3Root());
   if (!fs.existsSync(path.join(game, "Warhammer3.exe"))) {
-    throw new Error("No encuentro Warhammer III. Define WH3_ROOT con la carpeta que contiene Warhammer3.exe.");
+    throw new Error("WARHAMMER III was not found. Set WH3_ROOT to the folder containing Warhammer3.exe.");
   }
   const workshopRoot = process.env.STEAM_WORKSHOP_ROOT ||
     path.join(path.resolve(game, "..", ".."), "workshop", "content", "1142710");
   if (!fs.existsSync(workshopRoot)) {
-    throw new Error(`No encuentro los mods de Workshop. Ruta buscada: ${workshopRoot}`);
+    throw new Error(`Steam Workshop files were not found at: ${workshopRoot}`);
   }
   const candidates = fs.readdirSync(workshopRoot, { withFileTypes: true })
     .filter(entry => entry.isDirectory())
     .map(entry => path.join(workshopRoot, entry.name, "llm_diplomacy.pack"))
     .filter(file => fs.existsSync(file));
   if (candidates.length === 0) {
-    throw new Error("No encuentro llm_diplomacy.pack en Workshop. Suscribete y espera la descarga de Steam.");
+    throw new Error("llm_diplomacy.pack was not found in Workshop. Subscribe and wait for Steam to finish downloading.");
   }
   const workshopPack = candidates.find(file => hash(file) === EXPECTED_PACK_SHA256);
-  if (!workshopPack) throw new Error(`El pack de Workshop aun no es esta version. Espera la actualizacion de Steam. SHA-256 requerido: ${EXPECTED_PACK_SHA256}`);
+  if (!workshopPack) throw new Error(`The Workshop pack is not yet this version. Wait for Steam to update it. Required SHA-256: ${EXPECTED_PACK_SHA256}`);
   const manualPack = path.join(game, "data", "llm_diplomacy.pack");
   if (fs.existsSync(manualPack)) {
-    console.warn(`AVISO: tambien hay un pack manual en ${manualPack}. Activa solo el de Workshop en el gestor de mods.`);
+    console.warn(`WARNING: a manual pack also exists at ${manualPack}. Enable only the Workshop version in the game launcher.`);
   }
-  console.log(`Workshop ${path.basename(path.dirname(workshopPack))}: pack verificado (${EXPECTED_PACK_SHA256}).`);
+  console.log(`Workshop ${path.basename(path.dirname(workshopPack))}: game pack verified (${EXPECTED_PACK_SHA256}).`);
   if (process.argv.includes("--check")) process.exit(0);
 
   const result = spawnSync(process.execPath, ["src/companion.js"], {

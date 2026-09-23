@@ -1,7 +1,7 @@
 import { compactAction, validateReaction } from "./protocol.js";
 
 export function luaString(value) {
-  if (typeof value !== "string") throw new Error("luaString solo acepta texto");
+  if (typeof value !== "string") throw new Error("luaString accepts text only");
   return `"${value
     .replace(/\\/g, "\\\\")
     .replace(/"/g, '\\"')

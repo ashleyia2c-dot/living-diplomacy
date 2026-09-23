@@ -42,7 +42,7 @@ function stopAfterGameExit() {
   gameRunning = isWarhammerRunning();
   if (gameRunning) { warhammerWasRunning = true; return; }
   if (warhammerWasRunning) {
-    console.log("Warhammer III se cerró; cerrando LLM Diplomacy Companion.");
+    console.log("WARHAMMER III has closed; shutting down Living Diplomacy Companion.");
     process.exit(0);
   }
 }
@@ -133,8 +133,8 @@ async function handleRequest(request) {
   await enqueueInbox(renderInbox({ requestId: request.requestId, ...parsed }));
   if (config.provider === "player2") player2Speak(config, parsed.narrative, profile).catch(error => console.warn(`Player2 TTS: ${error.message}`));
   console.log(`${request.interlocutor}: ${parsed.narrative}`);
-  console.log(`Propuesta: ${JSON.stringify(parsed.action)}`);
-  console.log(`Reacción diplomática: ${parsed.reaction.delta} (${parsed.reaction.reason})`);
+  console.log(`Proposal: ${JSON.stringify(parsed.action)}`);
+  console.log(`Diplomatic reaction: ${parsed.reaction.delta} (${parsed.reaction.reason})`);
 }
 
 async function handleControlLine(line) {
@@ -142,7 +142,7 @@ async function handleControlLine(line) {
   campaignInitSent = true;
   const campaignId = `c${crypto.randomUUID().replaceAll("-", "")}`;
   await enqueueInbox(externalCall("llmdip_external_initialize", [campaignId]));
-  console.log(`Campaña registrada: ${campaignId}`);
+  console.log(`Campaign registered: ${campaignId}`);
 }
 
 async function poll() {
@@ -160,7 +160,7 @@ async function poll() {
       offset = stale ? fs.statSync(logPath).size : 0;
       remainder = "";
       campaignInitSent = false;
-      console.log(`Log activo: ${activeLog}${stale ? " (historico anterior omitido)" : ""}`);
+      console.log(`Active log: ${activeLog}${stale ? " (previous session skipped)" : ""}`);
     }
     const stat = fs.statSync(logPath);
     if (stat.size < offset) { offset = 0; remainder = ""; }
@@ -178,11 +178,11 @@ async function poll() {
       await handleControlLine(line);
       let request;
       try { request = parseBridgeRequest(line); }
-      catch (error) { console.warn(`Petición ignorada: ${error.message}`); continue; }
+      catch (error) { console.warn(`Request ignored: ${error.message}`); continue; }
       if (request) {
         try { await handleRequest(request); }
         catch (error) {
-          console.warn(`No se pudo responder a ${request.requestId}: ${error.message}`);
+          console.warn(`Could not answer ${request.requestId}: ${error.message}`);
           memory.append(request, '', {type:'reject'}, {delta:0,reason:'neutral'});
           await enqueueInbox(`llmdip_request_failed(${luaString(request.requestId)})\n`);
         }
@@ -194,7 +194,7 @@ async function poll() {
 }
 
 const HTML = `<!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
 <title>WH3 LLM Diplomacy</title><style>
 body{font:16px system-ui;background:#17130f;color:#f1dfbd;max-width:820px;margin:30px auto;padding:0 18px}
 h1{font-family:Georgia,serif;color:#e2b866}label{display:block;margin-top:14px;color:#cdb98f}
@@ -202,21 +202,21 @@ input,textarea,button{box-sizing:border-box;width:100%;padding:11px;margin-top:5
 textarea{min-height:110px;resize:vertical}button{cursor:pointer;background:#79551d;font-weight:700}button:hover{background:#98702b}
 #events{white-space:pre-wrap;background:#100d0a;border:1px solid #433722;padding:14px;min-height:220px;margin-top:18px;border-radius:7px}
 .row{display:flex;gap:10px}.row button{width:auto}.hint{font-size:13px;color:#a99777}
-</style></head><body><h1>Diplomacia LLM — Warhammer III</h1>
-<p class="hint">Player2 genera el diálogo y la voz; Warhammer conserva el retrato, la facción y las acciones diplomáticas.</p>
-<label>Facción interlocutora</label><input id="target" value="wh_main_emp_empire">
-<label>Mensaje</label><textarea id="message">Karl Franz, deseo proponerte una alianza defensiva.</textarea>
-<button id="send">Enviar negociación</button>
-<button id="toggle">Agregar/quitar esta facción de contactos IA</button>
-<label>ID de propuesta para aceptar</label><div class="row"><input id="requestId"><button id="accept">Aceptar</button></div>
-<div id="events">Esperando al juego…</div>
+</style></head><body><h1>Living Diplomacy — WARHAMMER III</h1>
+<p class="hint">Player2 generates the dialogue and voice; WARHAMMER III handles faction portraits and diplomatic actions.</p>
+<label>Faction key</label><input id="target" value="wh_main_emp_empire">
+<label>Message</label><textarea id="message">Karl Franz, I would like to propose a defensive alliance.</textarea>
+<button id="send">Send message</button>
+<button id="toggle">Enable or disable this faction as an AI contact</button>
+<label>Proposal ID to accept</label><div class="row"><input id="requestId"><button id="accept">Accept</button></div>
+<div id="events">Waiting for the game...</div>
 <script>
 const events=document.querySelector('#events'), requestId=document.querySelector('#requestId');
 async function post(url,body){const r=await fetch(url,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});const j=await r.json();if(!r.ok)throw new Error(j.error||r.status);return j}
 document.querySelector('#send').onclick=async()=>{try{await post('/api/send',{target:document.querySelector('#target').value,message:document.querySelector('#message').value})}catch(e){alert(e.message)}};
 document.querySelector('#toggle').onclick=async()=>{try{await post('/api/toggle-contact',{target:document.querySelector('#target').value})}catch(e){alert(e.message)}};
 document.querySelector('#accept').onclick=async()=>{try{await post('/api/accept',{requestId:requestId.value})}catch(e){alert(e.message)}};
-async function refresh(){try{const r=await fetch('/api/events'),j=await r.json();events.textContent=j.events.map(e=>e.timestamp+'  '+e.type.toUpperCase()+'  '+e.requestId+'\n'+e.payload).join('\n\n')||'Esperando al juego…';const p=[...j.events].reverse().find(e=>e.type==='proposal');if(p&&!requestId.value)requestId.value=p.requestId}catch{}setTimeout(refresh,900)}refresh();
+async function refresh(){try{const r=await fetch('/api/events'),j=await r.json();events.textContent=j.events.map(e=>e.timestamp+'  '+e.type.toUpperCase()+'  '+e.requestId+'\n'+e.payload).join('\n\n')||'Waiting for the game...';const p=[...j.events].reverse().find(e=>e.type==='proposal');if(p&&!requestId.value)requestId.value=p.requestId}catch{}setTimeout(refresh,900)}refresh();
 </script></body></html>`;
 
 function readJson(request) {
@@ -224,10 +224,10 @@ function readJson(request) {
     let body = "";
     request.on("data", chunk => {
       body += chunk;
-      if (body.length > 8192) request.destroy(new Error("Petición demasiado grande"));
+      if (body.length > 8192) request.destroy(new Error("Request is too large"));
     });
     request.on("end", () => {
-      try { resolve(JSON.parse(body || "{}")); } catch { reject(new Error("JSON inválido")); }
+      try { resolve(JSON.parse(body || "{}")); } catch { reject(new Error("Invalid JSON")); }
     });
     request.on("error", reject);
   });
@@ -236,7 +236,7 @@ function readJson(request) {
 function externalCall(functionName, values) {
   const nonce = `x${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
   const args = [nonce, ...values].map(value => {
-    if (typeof value !== "string") throw new Error("Argumento externo inválido");
+    if (typeof value !== "string") throw new Error("Invalid external argument");
     return `"${value.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\r?\n/g, " ")}"`;
   });
   return `${functionName}(${args.join(", ")})\n`;
@@ -254,55 +254,55 @@ const webServer = http.createServer(async (request, response) => {
     if (request.method === "GET" && request.url === "/api/events") { sendJson(200, { events: uiEvents }); return; }
     if (request.method === "POST" && request.url === "/api/send") {
       const body = await readJson(request);
-      if (!/^[a-z0-9_]{1,160}$/.test(body.target || "")) throw new Error("Key de facción inválida");
-      if (typeof body.message !== "string" || !body.message.trim() || body.message.length > 1200) throw new Error("Mensaje vacío o demasiado largo");
+      if (!/^[a-z0-9_]{1,160}$/.test(body.target || "")) throw new Error("Invalid faction key");
+      if (typeof body.message !== "string" || !body.message.trim() || body.message.length > 1200) throw new Error("Message is empty or too long");
       await enqueueInbox(externalCall("llmdip_external_send", [body.target, body.message.trim()]));
       sendJson(202, { ok: true }); return;
     }
     if (request.method === "POST" && request.url === "/api/accept") {
       const body = await readJson(request);
-      if (!/^[a-z0-9_]{1,160}$/.test(body.requestId || "")) throw new Error("ID de propuesta inválido");
+      if (!/^[a-z0-9_]{1,160}$/.test(body.requestId || "")) throw new Error("Invalid proposal ID");
       await enqueueInbox(externalCall("llmdip_external_accept", [body.requestId]));
       sendJson(202, { ok: true }); return;
     }
     if (request.method === "POST" && request.url === "/api/toggle-contact") {
       const body = await readJson(request);
-      if (!/^[a-z0-9_]{1,160}$/.test(body.target || "")) throw new Error("Key de facción inválida");
+      if (!/^[a-z0-9_]{1,160}$/.test(body.target || "")) throw new Error("Invalid faction key");
       await enqueueInbox(externalCall("llmdip_external_toggle_contact", [body.target]));
       sendJson(202, { ok: true }); return;
     }
-    sendJson(404, { error: "No encontrado" });
+    sendJson(404, { error: "Not found" });
   } catch (error) { sendJson(400, { error: error.message }); }
 });
 
 webServer.once("error", error => {
   if (error?.code === "EADDRINUSE") {
-    console.log(`El Companion ya está activo en http://127.0.0.1:${config.port}. No abras una segunda instancia.`);
+    console.log(`The companion is already running at http://127.0.0.1:${config.port}. Do not start a second instance.`);
     process.exit(0);
   }
   throw error;
 });
 webServer.listen(config.port, "127.0.0.1", () => {
-  console.log(`LLM Diplomacy Companion v0.39.8 — chat aislado por facción — proveedor=${config.provider}`);
-  console.log(`Vigilando: ${config.scriptLog || "script_log_*.txt (automático)"}`);
+  console.log(`Living Diplomacy Companion v0.39.8 — separate chat for each faction — provider=${config.provider}`);
+  console.log(`Watching: ${config.scriptLog || "script_log_*.txt (automatic)"}`);
   if (config.provider === "player2") {
     if (!config.player2GameKey) {
-      console.warn("AVISO: falta el Game Client Id. Player2 no puede atribuir este tiempo de juego al mod.");
+      console.warn("WARNING: the Game Client ID is missing. Player2 cannot attribute play time to this mod.");
     }
-    connectPlayer2(config).then(value => console.log(`Player2 ${value.version}: ${value.apiBase}`)).catch(error => console.warn(`Player2 no disponible: ${error.message}`));
+    connectPlayer2(config).then(value => console.log(`Player2 ${value.version}: ${value.apiBase}`)).catch(error => console.warn(`Player2 unavailable: ${error.message}`));
   }
   if (!wh3RootLooksValid(config.wh3Root)) {
-    console.warn("AVISO: no encuentro Total War: WARHAMMER III en " + config.wh3Root);
-    console.warn("       Crea un archivo .env junto a este ejecutable con la linea:");
-    console.warn("       WH3_ROOT=D:/ruta/a/Total War WARHAMMER III");
+    console.warn("WARNING: Total War: WARHAMMER III was not found at " + config.wh3Root);
+    console.warn("       Set WH3_ROOT to the folder containing Warhammer3.exe, for example:");
+    console.warn("       WH3_ROOT=D:/SteamLibrary/steamapps/common/Total War WARHAMMER III");
   }
   // De paso que se limpia el inbox, se le dice al mod en que idioma va el juego.
   // Si no llega, el Lua se queda en ingles en vez de en blanco.
   atomicWrite(config.inboxFile,
     "-- LLM Diplomacy Companion\n" +
     "llmdip_set_language(" + JSON.stringify(config.uiLanguage) + ")\n");
-  console.log(`Idioma de respaldo: ${config.language} (${config.uiLanguage}). Las cartas usan el idioma que indique el juego.`);
-  console.log(`Chat local: http://127.0.0.1:${config.port}`);
+  console.log(`Fallback language: ${config.language} (${config.uiLanguage}). Letters follow the game's language setting.`);
+  console.log(`Local chat: http://127.0.0.1:${config.port}`);
 });
 setInterval(poll, config.pollMs);
 setInterval(stopAfterGameExit, 3000);
@@ -313,4 +313,4 @@ function heartbeat() { if (gameRunning) void player2Heartbeat(config); }
 if (config.provider === "player2") { setInterval(heartbeat, HEARTBEAT_MS); heartbeat(); }
 
 // Sin top-level await, el bundle CommonJS del ejecutable empaquetado sigue siendo valido.
-poll().catch(error => console.warn("Primer sondeo fallido: " + error.message));
+poll().catch(error => console.warn("Initial poll failed: " + error.message));

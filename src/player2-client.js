@@ -5,7 +5,7 @@ let cachedConnection;
 
 const HEALTH_TIMEOUT_MS = 10000;
 const PLAYER2_CLOSED =
-  "Player2 no esta abierto. Abre la app Player2, inicia sesion y vuelve a intentarlo.";
+  "Player2 is not open. Open the Player2 app, sign in, and try again.";
 
 // Player2 borra api.port al cerrar limpiamente, asi que su ausencia indica que la app
 // no esta corriendo. Un cierre sucio puede dejarlo atras, por eso esto solo decide el
@@ -63,7 +63,7 @@ export async function connectPlayer2(config, fetchImpl = fetch) {
     if (config.player2Profile) {
       const profiles = await readJson(await fetchImpl(`${root}/v1/ai_profiles`, { headers: headers(config), signal: AbortSignal.timeout(10000) }), "Player2 profiles");
       const wanted = profiles.find(item => item.name === config.player2Profile || item.id === config.player2Profile);
-      if (!wanted?.base_url) throw new Error(`Player2 no tiene el perfil '${config.player2Profile}'`);
+      if (!wanted?.base_url) throw new Error(`Player2 does not have the '${config.player2Profile}' profile`);
       apiBase = trimSlash(wanted.base_url);
     }
     return { root, apiBase, version: health.client_version || "unknown" };
@@ -101,8 +101,8 @@ export async function player2Chat(config, messages, fetchImpl = fetch) {
   });
   const payload = await readJson(response, "Player2 chat");
   const text = payload?.choices?.[0]?.message?.content;
-  if (typeof text !== "string") throw new Error("Player2 no devolvió choices[0].message.content");
-  return { text, model: payload.model || "modelo seleccionado en Player2", connection };
+  if (typeof text !== "string") throw new Error("Player2 did not return choices[0].message.content");
+  return { text, model: payload.model || "model selected in Player2", connection };
 }
 
 export async function player2Speak(config, text, profile = {}, fetchImpl = fetch) {

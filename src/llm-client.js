@@ -137,7 +137,7 @@ ${request.mode === 'proactive' ? stripFixedLanguage(request.message) : request.m
 export async function callLlm(config, request, history = [], profile = {}) {
   const messages = buildMessages(request, history, profile, languageForRequest(request, config));
   if (config.provider === "player2") return (await player2Chat(config, messages)).text;
-  if (!config.apiKey && !config.baseUrl.startsWith("http://127.0.0.1") && !config.baseUrl.startsWith("http://localhost")) throw new Error("Falta LLMDIP_API_KEY en .env");
+  if (!config.apiKey && !config.baseUrl.startsWith("http://127.0.0.1") && !config.baseUrl.startsWith("http://localhost")) throw new Error("LLMDIP_API_KEY is missing from .env");
   const response = await fetch(`${config.baseUrl}/chat/completions`, {
     method: "POST", signal: AbortSignal.timeout(60000),
     headers: { "content-type": "application/json", ...(config.apiKey ? { authorization: `Bearer ${config.apiKey}` } : {}) },
@@ -146,7 +146,7 @@ export async function callLlm(config, request, history = [], profile = {}) {
   if (!response.ok) throw new Error(`LLM HTTP ${response.status}: ${(await response.text()).slice(0, 300)}`);
   const payload = await response.json();
   const text = payload?.choices?.[0]?.message?.content;
-  if (typeof text !== "string") throw new Error("El proveedor no devolvió choices[0].message.content");
+  if (typeof text !== "string") throw new Error("The provider did not return choices[0].message.content");
   return text;
 }
 

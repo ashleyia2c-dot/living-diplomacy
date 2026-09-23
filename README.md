@@ -13,10 +13,10 @@ The Workshop subscription installs the Warhammer III `.pack` only. AI conversati
 2. Install and sign in to [Player2](https://player2.game).
 3. Install [Node.js 20 or newer](https://nodejs.org).
 4. On the [latest release page](https://github.com/ashleyia2c-dot/living-diplomacy/releases/latest), download the asset named `Player2-Diplomacy-WH3-Workshop-Companion-*.zip` from **Assets**. Do not use the automatically generated "Source code" archives as the installer.
-5. Extract the ZIP, run `INICIAR_PLAYER2.bat`, and leave its window open while playing. No `npm install` is needed.
+5. Extract the ZIP, run `START_PLAYER2.bat`, and leave its window open while playing. No `npm install` is needed.
 6. In a single-player campaign, open diplomacy with a faction and click the small hand icon beside the question mark.
 
-Do not install a second `llm_diplomacy.pack` manually when using Workshop. The BAT verifies that Steam has downloaded the compatible pack. This edition has text conversations only. See [`LEEME_WORKSHOP.txt`](LEEME_WORKSHOP.txt) for troubleshooting and alternative Steam library paths.
+Do not install a second `llm_diplomacy.pack` manually when using Workshop. No other mods are required. The BAT verifies that Steam has downloaded the compatible pack. This edition has text conversations only. See [`README_WORKSHOP.txt`](README_WORKSHOP.txt) for troubleshooting and alternative Steam library paths.
 
 ## What is in this repository
 
@@ -25,7 +25,7 @@ Do not install a second `llm_diplomacy.pack` manually when using Workshop. The B
 | `mod/` | The game mod: campaign Lua scripts and UI templates packed into `llm_diplomacy.pack`. |
 | `src/` | The companion (Node.js). The released `WH3-LLM-Diplomacy-Companion.exe` is built from this. |
 | `scripts/` | Build scripts for the executable, the `.pack` and the release zip. |
-| `INICIAR_PLAYER2.bat`, `LEEME_WORKSHOP.txt` | Source and instructions for the Workshop companion release. |
+| `START_PLAYER2.bat`, `README_WORKSHOP.txt` | Source and instructions for the Workshop companion release. |
 | `test/` | Automated tests for the companion and the Lua scripts. |
 | `lore-profiles/` | Optional lore notes used to shape faction leaders. |
 

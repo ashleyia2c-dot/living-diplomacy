@@ -159,7 +159,7 @@ export function getConfig() {
   loadDotEnv();
   const wh3Root = detectWh3Root();
   const provider = (process.env.LLMDIP_PROVIDER || "player2").toLowerCase();
-  if (!new Set(["player2", "openai"]).has(provider)) throw new Error("LLMDIP_PROVIDER debe ser player2 u openai");
+  if (!new Set(["player2", "openai"]).has(provider)) throw new Error("LLMDIP_PROVIDER must be player2 or openai");
   return {
     provider,
     player2Url: (process.env.LLMDIP_PLAYER2_URL || "").replace(/\/$/, ""),

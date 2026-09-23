@@ -1,8 +1,8 @@
-# Perfiles de lore
+# Lore profiles
 
-El companion busca primero `<faction_key>.json` y después `<leader_subtype_key>.json`.
-Al primer contacto copia el perfil a `data/campaigns/<campaign>/<faction>/leaders/<leader-subtype>.json`.
-Así un cambio de líder crea una voz nueva sin borrar los recuerdos diplomáticos de la facción.
+The companion checks `<faction_key>.json` first, then `<leader_subtype_key>.json`.
+On first contact, it copies the profile to `data/campaigns/<campaign>/<faction>/leaders/<leader-subtype>.json`.
+This lets a new leader have a distinct voice without erasing the faction's diplomatic memories.
 
-Usa resúmenes breves y fuentes canónicas. No copies páginas enteras ni texto protegido.
-`canonNotes` contiene hechos; `voiceNotes`, forma de hablar, prioridades y tabúes.
+Use brief summaries and canonical sources. Do not copy entire pages or protected text.
+`canonNotes` contains facts; `voiceNotes` describes speaking style, priorities, and taboos.
