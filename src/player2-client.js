@@ -7,9 +7,9 @@ const HEALTH_TIMEOUT_MS = 10000;
 const PLAYER2_CLOSED =
   "Player2 is not open. Open the Player2 app, sign in, and try again.";
 
-// Player2 borra api.port al cerrar limpiamente, asi que su ausencia indica que la app
-// no esta corriendo. Un cierre sucio puede dejarlo atras, por eso esto solo decide el
-// mensaje de error: se intenta el puerto por defecto de todas formas.
+// Player2 deletes api.port when it closes cleanly, so its absence means the app is
+// not running. An unclean exit can leave it behind, so this only decides the error
+// message: the default port is tried anyway.
 export function player2AppDetected(config = {}) {
   if (config.player2Url) return true;
   try { return fs.readFileSync(player2PortFile(config.appData), "utf8").trim().length > 0; }
@@ -55,7 +55,7 @@ export async function connectPlayer2(config, fetchImpl = fetch) {
         headers: headers(config), signal: AbortSignal.timeout(HEALTH_TIMEOUT_MS)
       }), "Player2 health");
     } catch (error) {
-      // Con la app cerrada el fallo es un rechazo de conexion, no un fallo del mod.
+      // With the app closed the failure is a refused connection, not a mod failure.
       if (!player2AppDetected(config)) throw new Error(PLAYER2_CLOSED);
       throw error;
     }
@@ -73,9 +73,9 @@ export async function connectPlayer2(config, fetchImpl = fetch) {
 
 export function resetPlayer2Connection() { cachedConnection = undefined; }
 
-// Player2 calcula el time-spent de cada juego con estos pings, y el time-spent es parte
-// de como reparte su programa de ingresos: su documentacion pide uno cada 60 segundos.
-// Sin game key la peticion funciona igual, pero no se atribuye a nadie.
+// Player2 computes each game's time spent from these pings, and time spent is part of
+// how its revenue programme pays out: its documentation asks for one every 60 seconds.
+// Without a game key the request still works, but is attributed to nobody.
 export async function player2Heartbeat(config, fetchImpl = fetch) {
   try {
     const connection = await connectPlayer2(config, fetchImpl);
@@ -85,7 +85,7 @@ export async function player2Heartbeat(config, fetchImpl = fetch) {
     if (!response.ok) throw new Error(`Player2 health HTTP ${response.status}`);
     return true;
   } catch {
-    // Player2 puede haberse reiniciado en otro puerto: la conexion cacheada ya no sirve.
+    // Player2 may have restarted on another port: the cached connection is no longer valid.
     resetPlayer2Connection();
     return false;
   }

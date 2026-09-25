@@ -1,4 +1,4 @@
-// Companion para el articulo Workshop existente. Nunca instala ni modifica el pack.
+// Companion launcher for the existing Workshop item. It never installs or modifies the pack.
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";

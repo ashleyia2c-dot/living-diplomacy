@@ -57,31 +57,31 @@ Required relationship tag:
 Never output Lua, JSON, code fences, extra tags, or actions outside these lists.
 If required game-state data or an internal key is missing, reject or make a verbal counteroffer.`;
 
-// Codigos que manda el mod en ui_language, los mismos de su tabla de textos.
+// Codes the mod sends in ui_language, the same as its text table.
 const GAME_LANGUAGE_NAMES = {
   en: "English", es: "Spanish", fr: "French", de: "German", it: "Italian",
   ru: "Russian", pl: "Polish", cs: "Czech", tr: "Turkish", ko: "Korean",
   pt: "Brazilian Portuguese", zh: "Simplified Chinese", tw: "Traditional Chinese"
 };
 
-// Orden: lo que fuerce el jugador en LLMDIP_LANGUAGE, luego el idioma que el mod ha
-// confirmado dentro del juego, y solo en ultimo caso lo que deduzca el companion. Las
-// preferencias del juego pueden estar en blanco, y entonces el idioma de Windows no
-// dice nada del idioma real de la partida.
+// Order: whatever the player forces in LLMDIP_LANGUAGE, then the language the mod has
+// confirmed inside the game, and only as a last resort what the companion infers. The
+// game preferences can be blank, and then the Windows language says nothing about the
+// language actually used in the campaign.
 export function languageForRequest(request, config = {}) {
   if (process.env.LLMDIP_LANGUAGE) return process.env.LLMDIP_LANGUAGE;
   return GAME_LANGUAGE_NAMES[request?.fields?.ui_language] || config.language || "English";
 }
 
-// El idioma solo afecta a las cartas proactivas: al responder, el modelo imita el
-// idioma del jugador, que es mas fiable que cualquier deteccion que hagamos nosotros.
+// The language only affects proactive letters: when replying, the model mirrors the
+// player's language, which is more reliable than any detection done here.
 export function systemPromptFor(language) {
   return SYSTEM_PROMPT.replace("{{LANGUAGE}}", language || "English");
 }
 
-// Un pack anterior escribia "Write 30-80 words in Spanish." dentro de la propia
-// peticion proactiva, contradiciendo el idioma del sistema. El pack del Workshop y el
-// companion pueden actualizarse por separado, asi que se neutraliza aqui tambien.
+// An older pack wrote "Write 30-80 words in Spanish." into the proactive request
+// itself, contradicting the system language. The Workshop pack and the companion can
+// be updated separately, so it is neutralised here as well.
 export function stripFixedLanguage(message) {
   return String(message ?? "").replace(/Write 30-80 words in [A-Za-z ]+\./g, "Write 30-80 words.");
 }

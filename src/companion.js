@@ -13,7 +13,7 @@ import { connectPlayer2, player2Heartbeat, player2Speak } from "./player2-client
 
 const config = getConfig();
 
-// Player2 pide un ping de salud por minuto para medir el time-spent del mod.
+// Player2 asks for one health ping per minute to measure the mod's time spent.
 const HEARTBEAT_MS = 60_000;
 const memory = new MemoryStore(config.dataDir);
 const handled = new Set();
@@ -151,10 +151,10 @@ async function poll() {
   busy = true;
   try {
     if (logPath !== activeLog) {
-      // Con el juego cerrado, el log mas reciente es el de la partida ANTERIOR: leerlo
-      // entero reproduce peticiones ya vividas y quema joules del jugador en cada
-      // arranque. Con el juego abierto esas mismas lineas son peticiones vivas que
-      // nadie ha contestado todavia (el companion acaba de entrar), asi que si se leen.
+      // With the game closed, the newest log belongs to the PREVIOUS session: reading it
+      // in full replays old requests and spends the player's joules on every start.
+      // With the game open, those same lines are live requests nobody has answered yet
+      // (the companion has only just started), so they are read.
       const stale = activeLog === "" && !gameRunning;
       activeLog = logPath;
       offset = stale ? fs.statSync(logPath).size : 0;
@@ -296,8 +296,8 @@ webServer.listen(config.port, "127.0.0.1", () => {
     console.warn("       Set WH3_ROOT to the folder containing Warhammer3.exe, for example:");
     console.warn("       WH3_ROOT=D:/SteamLibrary/steamapps/common/Total War WARHAMMER III");
   }
-  // De paso que se limpia el inbox, se le dice al mod en que idioma va el juego.
-  // Si no llega, el Lua se queda en ingles en vez de en blanco.
+  // While the inbox is being cleared, tell the mod which language the game uses.
+  // If this never arrives, the Lua falls back to English instead of blank text.
   atomicWrite(config.inboxFile,
     "-- LLM Diplomacy Companion\n" +
     "llmdip_set_language(" + JSON.stringify(config.uiLanguage) + ")\n");
@@ -307,10 +307,10 @@ webServer.listen(config.port, "127.0.0.1", () => {
 setInterval(poll, config.pollMs);
 setInterval(stopAfterGameExit, 3000);
 
-// Atribucion: solo se cuenta el tiempo con Warhammer abierto, para no inflar el
-// time-spent con el companion ocioso esperando a que arranque la partida.
+// Attribution: time only counts while Warhammer is open, so the idle companion
+// waiting for a campaign to start does not inflate the time spent.
 function heartbeat() { if (gameRunning) void player2Heartbeat(config); }
 if (config.provider === "player2") { setInterval(heartbeat, HEARTBEAT_MS); heartbeat(); }
 
-// Sin top-level await, el bundle CommonJS del ejecutable empaquetado sigue siendo valido.
+// Without top-level await, the CommonJS bundle of the packaged executable stays valid.
 poll().catch(error => console.warn("Initial poll failed: " + error.message));

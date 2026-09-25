@@ -2,15 +2,15 @@ import fs from "node:fs";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 
-// Player2 Game Client Id. Se obtiene en https://player2.game/profile/developer
-// (crea el juego; no hace falta publicarlo para que la atribucion funcione).
-// NO es un secreto: viaja dentro del ejecutable, igual que en sus SDK de Unity/Godot.
-// Es el fallback de produccion: si el jugador borra o edita el .env, la atribucion
-// sigue viva. LLMDIP_PLAYER2_GAME_KEY lo sobreescribe para pruebas.
+// Player2 Game Client Id, from https://player2.game/profile/developer
+// (create the game there; it does not need to be published for attribution to work).
+// It is NOT a secret: it ships inside the build, as in Player2's Unity/Godot SDKs.
+// It is the production fallback, so attribution survives a deleted or edited .env.
+// LLMDIP_PLAYER2_GAME_KEY overrides it for testing.
 export const PLAYER2_GAME_CLIENT_ID = "01a0a8a9-8c98-7b76-8a12-b6a532ac0cb7";
 
-// Ejecutado como .exe empaquetado, cwd es donde el jugador hizo doble clic.
-// Anclamos .env y data/ junto al ejecutable para que no dependan del cwd.
+// As a packaged .exe, cwd is wherever the player double-clicked.
+// .env and data/ are anchored next to the program so they do not depend on cwd.
 function baseDir() {
   try {
     const sea = process.getBuiltinModule?.("node:sea");
@@ -57,8 +57,8 @@ function steamRootsFromRegistry() {
   return roots;
 }
 
-// Una biblioteca de Steam puede estar en cualquier disco y la gente mueve los juegos
-// grandes fuera de C:. libraryfolders.vdf es la lista autoritativa de bibliotecas.
+// A Steam library can be on any drive, and people move large games off C:.
+// libraryfolders.vdf is the authoritative list of libraries.
 function librariesFrom(steamRoot) {
   try {
     const file = path.join(steamRoot, "steamapps", "libraryfolders.vdf");
@@ -67,8 +67,8 @@ function librariesFrom(steamRoot) {
   } catch { return []; }
 }
 
-// Publicar significa correr en PCs ajenos: una ruta fija a C:\Program Files solo acierta
-// en las instalaciones por defecto.
+// Published builds run on other people's PCs: a fixed path under C:\Program Files
+// only matches default installations.
 export function detectWh3Root() {
   if (process.env.WH3_ROOT) return process.env.WH3_ROOT;
   const steamRoots = [
@@ -92,19 +92,19 @@ export function wh3RootLooksValid(root) {
   try { return fs.existsSync(path.join(root, "Warhammer3.exe")); } catch { return false; }
 }
 
-// Warhammer III se juega en 13 idiomas. Las RESPUESTAS ya salen en el idioma del
-// jugador porque el prompt las hace imitar su mensaje; las cartas PROACTIVAS no
-// tienen mensaje que imitar, asi que hay que decirle al modelo en cual escribirlas.
+// Warhammer III is played in 13 languages. REPLIES already come in the player's
+// language because the prompt makes them mirror the player's message; PROACTIVE
+// letters have no message to mirror, so the model must be told which language to use.
 const LANGUAGE_NAMES = {
   en: "English", es: "Spanish", fr: "French", de: "German", it: "Italian",
   ru: "Russian", pl: "Polish", cs: "Czech", tr: "Turkish", ko: "Korean",
   ja: "Japanese", nl: "Dutch", sv: "Swedish", uk: "Ukrainian"
 };
 
-// Warhammer III guarda SU idioma en las preferencias del usuario, y puede no ser el
-// de Windows: mucha gente juega en ingles con el sistema en otro idioma. Esta es la
-// fuente correcta; el locale del sistema solo entra si el juego lo deja en blanco.
-// Ojo: el juego usa sus propios codigos (sp/ge/kr/cz/br) ademas de los estandar.
+// Warhammer III stores ITS language in the user preferences, which may differ from
+// Windows: many people play in English on a system in another language. This is the
+// right source; the system locale is only used if the game leaves it blank.
+// Note: the game uses its own codes (sp/ge/kr/cz/br) besides the standard ones.
 const GAME_LANGUAGE_CODES = {
   en: "English", fr: "French", it: "Italian", ru: "Russian", pl: "Polish",
   tr: "Turkish", es: "Spanish", sp: "Spanish", de: "German", ge: "German",
@@ -142,8 +142,8 @@ export function detectLanguage() {
   } catch { return "English"; }
 }
 
-// Codigos de la tabla de textos del mod (mod/script/campaign/mod/llm_diplomacy.lua).
-// Un idioma sin tabla cae a ingles dentro del propio Lua, no hace falta filtrarlo aqui.
+// Codes of the mod's text table (mod/script/campaign/mod/llm_diplomacy.lua).
+// A language without a table falls back to English inside the Lua itself.
 const UI_LANGUAGE_CODES = {
   English: "en", Spanish: "es", French: "fr", German: "de", Italian: "it",
   Russian: "ru", Polish: "pl", Czech: "cs", Turkish: "tr", Korean: "ko",
