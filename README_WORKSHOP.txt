@@ -21,7 +21,7 @@ If Steam has not downloaded the compatible version yet, wait for its update.
 Read-only check: node scripts\start-workshop.js --check
 
 Required Workshop pack SHA-256:
-8748BA673E4EF85525E776DEA093673C8FE6A4A1F300D95B5F99265BF8C863CC
+E0D1F297583413517CEB81FA9BD74FDD7FF7ACB08C6035586481788E7AB0CA16
 
 The companion stores conversation data in its local data folder. Player2
 processes AI requests. Review Player2's privacy settings and terms before

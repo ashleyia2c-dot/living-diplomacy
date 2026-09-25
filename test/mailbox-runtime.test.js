@@ -50,8 +50,18 @@ function widget(id,parent)
  function w:CreateComponent(id,template)
   local child=widget(id,self); child.template=template
   if template=='ui/templates/square_medium_text_button' then widget('button_txt',child) end
+  if template=='llmdip_ui/llmdip_chat' then widget('entry_box',child) end
+  if template=='llmdip_ui/llmdip_shell' then
+   widget('header_title',child); widget('header_meta',child); widget('header_attitude',child)
+   local card=widget('proposal_card',child)
+   widget('proposal_title',card); widget('proposal_detail',card)
+  end
   if template=='llmdip_ui/llmdip_history' then
    widget('history_text',child)
+   child.SetStateText=function() error('Do not write to a non-text container') end
+  end
+  if template=='llmdip_ui/llmdip_bubble' then
+   widget('bubble_text',child)
    child.SetStateText=function() error('Do not write to a non-text container') end
   end
   return child
@@ -60,9 +70,11 @@ function widget(id,parent)
  function w:SetStateText(v) self.text=v end
  function w:SetTooltipText(v) self.tooltip=v end
  function w:Bounds() return 1920,1080 end
+ function w:Position() return self.x or 0,self.y or 0 end
  for _,name in ipairs({'SetCanResizeWidth','SetCanResizeHeight','Resize','SetImagePath','SetDockingPoint','SetDockOffset','SetInteractive','PropagatePriority','MoveTo','RegisterTopMost','RemoveTopMost'}) do w[name]=function() end end
  function w:SetDockingPoint(value) self.dock=value end
  function w:SetDockOffset(x,y) self.x=x; self.y=y end
+ function w:MoveTo(x,y) self.x=x; self.y=y end
  function w:PropagatePriority(value) self.priority=value end
  function w:Resize(width,height) self.width=width; self.height=height end
  function w:SetInteractive(value) self.interactive=value end
@@ -140,7 +152,7 @@ test('mail entry has readable child label, explicit top-left docking and priorit
  first[1](); llmdip_mail_tick()
  local b=widgets.llmdip39_mail_button
  assert(b.template=='ui/templates/square_medium_text_button')
- assert(b.dock==1 and b.x==190 and b.y==82 and b.priority==200)
+ assert(b.dock==1 and b.x==190 and b.y==123 and b.priority==200)
  assert(b.width==180 and b.height==36 and b.interactive)
  assert(b.children.button_txt.text==llmdip_t('ai_messages_button')..'0)' and not b.children.button_txt.interactive)
  llmdip_mail_receive('r1',{interlocutor='ai',turn=1},'Carta','reject')
@@ -152,7 +164,8 @@ test('faction menu uses text template children and is placed below the map entri
   factions_met=function() return {num_items=function() return 1 end,item_at=function() return {
    name=function() return 'ai' end,is_human=function() return false end,is_dead=function() return false end} end} end} end
  fire('llmdip_ui_clicks','llmdip_menu_button')
- assert(widgets.llmdip_close.dock==1 and widgets.llmdip_close.x==20 and widgets.llmdip_close.y==126)
+ assert(widgets.llmdip_close.dock==1 and widgets.llmdip_close.x==270 and widgets.llmdip_close.y==170)
+ assert(widgets.llmdip_close.width==325)
  assert(widgets.llmdip_close.children.button_txt.text==llmdip_t('menu_close'))
  fire('llmdip_ui_clicks','llmdip_all_races')
  assert(widgets.llmdip_contact_ai.children.button_txt.text==llmdip_t('contact_off')..'ai')
@@ -297,6 +310,121 @@ test('la etiqueta viva del juego tiene prioridad sobre la tabla',()=>run(read('l
  common={get_localised_string=function() return 'Pozornost celkem:' end}
  assert(attitude_from_tooltip('Pozornost celkem: 33')==33)
 `));
+test('the editable box stops before the buttons, which sit outside it inside the row',()=>run(read('llm_diplomacy_ui.lua'),`
+ -- In game the chat component IS the entry box; its width is the wrap width.
+ -- Buttons dock to its right edge with positive offsets (outside the box).
+ local chat,history,shell=ensure_owned_ui()
+ local send=chat.children.llmdip_diplomacy_send
+ local accept=chat.children.llmdip_diplomacy_accept
+ local close=chat.children.llmdip_diplomacy_close
+ assert(chat.parent==root and history.parent==root and shell.parent==root)
+ local function right(button) return chat.width+button.x end
+ local function left(button) return right(button)-button.width end
+ assert(chat.width==552 and right(close)==636 and right(send)==594,'no proposal '..chat.width..' '..send.x..' '..close.x)
+ assert(left(send)>chat.width and left(close)>right(send),'buttons overlap the box or each other')
+ -- A proposal puts Accept/Reject on its card; the row keeps send and close.
+ state.proposal='military_access,mutual'; refresh_owned_ui()
+ assert(state.card_buttons_ok and chat.width==552 and not accept.visible and right(send)==594)
+ -- If the card buttons could not be built, the row accept button returns.
+ state.card_buttons_ok=false; refresh_owned_ui()
+ assert(chat.width==510 and accept.visible and right(accept)==552 and right(send)==594 and right(close)==636)
+ assert(left(accept)>chat.width and left(send)>right(accept) and left(close)>right(send))
+ state.proposal=nil; refresh_owned_ui()
+ assert(chat.width==552 and not accept.visible and right(send)==594)
+`));
+test('pending proposal has a read-only card and a shorter but fully scrollable history',()=>run(read('llm_diplomacy_ui.lua'),String.raw`
+ llmdip_set_language('es')
+ state.target='ai'; state.visible=true
+ state.inbox.ai={history={'Player2: '..string.rep('Hablaremos de nuestras fronteras. ',30)}}
+ local chat,history,shell=ensure_owned_ui()
+ local card=shell.children.proposal_card
+ refresh_owned_ui()
+ assert(history.height==380 and history.children.history_text.height==380 and not card.visible)
+ assert(history_capacity()==15)
+ assert(string.match(history.children.history_text.text,'%[%[col:yellow%]%]'..llmdip_t('conversation')..'%[%[/col%]%]'))
+ state.proposal='military_access,mutual'; refresh_owned_ui()
+ assert(history.height==310 and history.children.history_text.height==310 and card.visible)
+ assert(history_capacity()==12)
+ -- Agreement first, "pending proposal" underneath; Accept/Reject on the card.
+ assert(card.children.proposal_title.text=='Acceso militar mutuo')
+ assert(card.children.proposal_detail.text==llmdip_t('pending_proposal'))
+ assert(state.card_buttons_ok==true)
+ assert(card.children.llmdip_proposal_accept.children.button_txt.text==llmdip_t('accept_button'))
+ assert(card.children.llmdip_proposal_decline.children.button_txt.text==llmdip_t('decline_button'))
+ assert(card.children.proposal_title.width+54<=640-2*124-10,'Card text runs under its buttons')
+ local minimum,maximum=history_scroll_bounds('ai')
+ local all=history_body_lines('ai')
+ local seen={}
+ for offset=minimum,maximum do
+  state.history_offset=offset
+  local shown_page=history_display('ai')
+  local rows=0
+  for line in string.gmatch(shown_page,'[^\n]+') do
+   rows=rows+1; seen[line]=true
+  end
+  assert(rows<=14)
+ end
+ for i=1,#all do assert(seen[all[i]],'Pending proposal hides history line '..i) end
+ state.history_offset=maximum
+ local shown=history_display('ai')
+ assert(not string.find(shown,llmdip_t('lines_hint'),1))
+ assert(string.find(shown,' / ',1))
+ state.proposal=nil; refresh_owned_ui()
+ assert(history.height==380 and history.children.history_text.height==380 and not card.visible)
+`));
+test('experimental bubbles reuse owned components and never replace the editable input',()=>run(read('llm_diplomacy_ui.lua'),String.raw`
+ state.visible=true; state.target='ai'
+ state.header_portrait='ui/portraits/katarin.png'; state.header_player_flag='ui/flags/vmp/mon_64.png'
+ local you=llmdip_t('you')
+ state.inbox.ai={history={you..': Buenas tardes.','Player2: La Madre Patria escucha.',llmdip_t('speaker_system')..': Acuerdo ejecutado.'}}
+ local chat,history=ensure_owned_ui(); refresh_owned_ui(); local input=chat.children.entry_box
+ state.history_offset=history_scroll_bounds('ai')
+ render_history_bubbles('ai')
+ assert(history.children.history_text.text:match(llmdip_t('conversation')),'Missing caption: '..tostring(history.children.history_text.text))
+ assert(not history.children.history_text.text:match('Madre Patria'),'Fallback: '..tostring(history.children.history_text.text))
+ local first=root.children.llmdip_diplomacy_bubble_1
+ local second=root.children.llmdip_diplomacy_bubble_2
+ local third=root.children.llmdip_diplomacy_bubble_3
+ assert(first and second and third,'Expected 3 bubbles; got '..tostring(first)..' '..tostring(second)..' '..tostring(third)..' field='..tostring(history.children.history_text.text))
+ assert(first.parent==root and first.template=='llmdip_ui/llmdip_bubble','Wrong ownership')
+ -- Player cards end at the right edge, rival cards start at the left, system
+ -- cards are centred; none reaches the arrow gutter (x >= 598).
+ assert(first.x+first.width==538 and second.x==60,'Unexpected bubble positions '..tostring(first.x)..'+'..tostring(first.width)..','..tostring(second.x))
+ -- No icon may be created at the UI root: that crashed the game twice (24-09).
+ assert(root.children.llmdip_diplomacy_icon_1==nil and root.children.msg_icon_1==nil,'Icons must not be created at root')
+ assert(math.abs((third.x+third.width/2)-299)<=1,'System card not centred '..tostring(third.x)..'+'..tostring(third.width))
+ for _,card in ipairs({first,second,third}) do assert(card.x>=8 and card.x+card.width<=590,'Card enters the arrow gutter') end
+ assert(first.priority==250,'Card below the history')
+ assert(first.children.bubble_text.text:match('Buenas tardes'),'First bubble: '..tostring(first.children.bubble_text.text))
+ assert(second.children.bubble_text.text:match('Madre Patria'),'Second bubble: '..tostring(second.children.bubble_text.text))
+ assert(third.children.bubble_text.text:match('Acuerdo ejecutado'),'Third bubble: '..tostring(third.children.bubble_text.text))
+ assert(input==chat.children.entry_box and input.interactive,'Input changed')
+ render_history_bubbles('ai')
+ assert(first==root.children.llmdip_diplomacy_bubble_1,'Bubble recreated')
+ state.inbox.ai.history={you..': Otra carta.'}
+ render_history_bubbles('ai')
+ assert(first.visible and not second.visible and not third.visible,'Unused bubbles visible')
+ assert(first.children.bubble_text.text:match('Otra carta'),'Replacement text missing')
+`));
+test('bubble pagination reaches the last line in normal and proposal heights without fallback',()=>run(read('llm_diplomacy_ui.lua'),String.raw`
+ state.visible=true; state.target='ai'
+ state.inbox.ai={history={'Player2: '..string.rep('Proteged Kislev de los enemigos del norte. ',40)..' FIN_DEL_MENSAJE'}}
+ local _,history=ensure_owned_ui()
+ for mode=1,2 do
+  state.proposal=mode==2 and 'military_access,mutual' or nil
+  local minimum,maximum=history_scroll_bounds('ai')
+  for offset=minimum,maximum do
+   state.history_offset=offset; render_history_bubbles('ai')
+   assert(not history.children.history_text.text:match('Proteged'), 'Fallback at '..offset)
+   local seen=false
+   for i=1,BUBBLE_LIMIT do
+    local bubble=root.children[BUBBLE_ID_PREFIX..i]
+    if bubble and bubble.visible and bubble.children.bubble_text.text:match('FIN_DEL_MENSAJE') then seen=true end
+   end
+   if offset==maximum then assert(seen,'Final message not visible in bubble') end
+  end
+ end
+`));
 test('chat pagination reaches every line, including final deal text, without exceeding display budget',()=>run(read('llm_diplomacy_ui.lua'),String.raw`
  state.target='ai'
  local long='Player2: '..string.rep('Exijo una alianza y respeto. ',100)..' ÚLTIMA_FRASE'
@@ -317,8 +445,84 @@ test('chat pagination reaches every line, including final deal text, without exc
  assert(string.match(history_display('ai'),'FINAL_PROPUESTA'))
  for i=1,maximum-minimum+5 do fire('llmdip_contextual_clicks','llmdip_diplomacy_history_prev') end
  assert(state.history_offset==minimum)
- assert(widgets.llmdip_diplomacy_history.children.history_text.width==560)
- assert(widgets.llmdip_diplomacy_history.children.history_text.height==350)
+ assert(widgets.llmdip_diplomacy_history.children.history_text.width==640)
+ assert(widgets.llmdip_diplomacy_history.children.history_text.height==380)
+`));
+
+test('chat display styles speakers without contaminating saved conversation text',()=>run(read('llm_diplomacy_ui.lua'),String.raw`
+ state.target='ai'
+ local you=llmdip_t('you'); local system=llmdip_t('speaker_system')
+ state.inbox.ai={
+  header_ai_speaker='Zarina Katarin',header_player_speaker='Vlad von Carstein',
+  history={you..': hola','Player2: La Madre Patria escucha.',system..': Acuerdo ejecutado.'}
+ }
+ local original=table.concat(state.inbox.ai.history,'|')
+ local lines,latest=history_body_lines('ai')
+ local shown=table.concat(lines,'\n')
+ local player_margin=string.rep(' ',PLAYER_INDENT)
+ assert(string.match(shown,player_margin..'%[%[col:green%]%]'..you..' · Vlad von Carstein:%[%[/col%]%]\n'..player_margin..'%[%[col:green%]%]  hola%[%[/col%]%]'),shown)
+ assert(string.match(shown,'%[%[col:yellow%]%]Zarina Katarin:%[%[/col%]%]\n  La Madre Patria escucha%.'))
+ assert(string.match(shown,'%[%[col:grey%]%]'..system..':%[%[/col%]%]\n%[%[col:grey%]%]  Acuerdo ejecutado%.'))
+ assert(lines[latest]=='[[col:grey]]'..system..':[[/col]]')
+ assert(lines[latest-1]==' ')
+ assert(table.concat(state.inbox.ai.history,'|')==original)
+`));
+test('outgoing inset remains within the history width even for long UTF-8 text',()=>run(read('llm_diplomacy_ui.lua'),String.raw`
+ state.inbox.ai={history={llmdip_t('you')..': '..string.rep('La Madre Patria y Sylvania conversarán. ',18)}}
+ local lines=history_body_lines('ai')
+ local body_count=0
+ for i=1,#lines do
+  local plain=string.gsub(lines[i],'%[%[.-%]%]','')
+  if string.match(plain,'^'..string.rep(' ',PLAYER_INDENT+2)) then
+   body_count=body_count+1
+   local width=0
+   for char in string.gmatch(plain,'[%z\1-\127\194-\244][\128-\191]*') do width=width+history_char_width(char) end
+   assert(width<=HISTORY_TEXT_WIDTH,'Outgoing line exceeds viewport: '..width)
+  end
+ end
+ assert(body_count>3)
+`));
+
+test('proposal history uses a readable agreement name without changing stored action keys',()=>run(read('llm_diplomacy_ui.lua'),String.raw`
+ llmdip_set_language('es')
+ state.target='ai'
+ local raw=llmdip_t('speaker_proposal')..': military_access,mutual. Reacción al aceptar: mejora leve.'
+ state.inbox.ai={attitude_label='Neutral',history={raw}}
+ local shown=history_display('ai')
+ assert(string.match(shown,'Acceso militar mutuo'))
+ assert(not string.match(shown,'military_access,mutual'))
+ assert(not string.match(shown,'Relación:'))
+ assert(state.inbox.ai.history[1]==raw)
+ assert(llmdip_action_label('offer_gold,100')=='Regalo de oro (100)')
+ assert(llmdip_action_label('military_access,interlocutor_to_player')=='Ellos te conceden acceso militar')
+ assert(llmdip_action_label('military_access,player_to_interlocutor')=='Tú les concedes acceso militar')
+ local actions={'declare_war','make_peace','alliance,defensive','alliance,military',
+  'trade_agreement','military_access,mutual','military_access,interlocutor_to_player',
+  'military_access,player_to_interlocutor','transfer_region,wh3_main_example,player',
+  'vassalize,player','vassalize,interlocutor','offer_gold,100','request_gold,100',
+  'favor,defend,100,none'}
+ for _,code in ipairs({'en','es','fr','de','it','ru','pl','cs','tr','ko','pt','zh','tw'}) do
+  llmdip_set_language(code)
+  for _,action in ipairs(actions) do
+   local label=llmdip_action_label(action)
+   assert(label~='' and label~=action,code..': '..action)
+  end
+ end
+`));
+
+test('the header separates attitude from traits and restores the right faction on switching',()=>run(read('llm_diplomacy_ui.lua'),String.raw`
+ common={get_context_value=function() return 'La Corte de Hielo' end}
+ cm.get_faction=function() return {is_null_interface=function() return false end} end
+ cm.get_local_faction=function() return {is_null_interface=function() return false end} end
+ set_up(capture_header,'leader_name_for_faction',function() return 'Zarina Katarin' end)
+ state.attitude_value=-14; state.attitude_label='Neutral'
+ state.personality_attributes='Leal a la Madre Patria:Purgador'
+ capture_header('kislev')
+ assert(state.header_title=='Zarina Katarin — La Corte de Hielo')
+ assert(state.header_meta=='Leal a la Madre Patria · Purgador')
+ assert(state.header_attitude=='Neutral · -14')
+ select_target('otro'); assert(state.header_attitude=='')
+ select_target('kislev'); assert(state.header_attitude=='Neutral · -14')
 `));
 
 test('chat wrapping preserves UTF-8 and splits unusually long words without losing text',()=>run(read('llm_diplomacy_ui.lua'),String.raw`
@@ -336,7 +540,7 @@ test('chat uses the available width rather than an arbitrary 32-character column
  assert(#rows[1]>50)
  local width=0; for char in string.gmatch(rows[1],'[%z\1-\127\194-\244][\128-\191]*') do width=width+history_char_width(char) end
  assert(width>HISTORY_TEXT_WIDTH*0.85 and width<=HISTORY_TEXT_WIDTH)
- assert(HISTORY_TOTAL_LINES==16)
+ assert(HISTORY_TOTAL_LINES==17)
 `));
 
 test('chat wrapping keeps ordinary words together instead of orphaning a final word',()=>run(read('llm_diplomacy_ui.lua'),String.raw`
@@ -368,7 +572,7 @@ test('faction entry has its own visible label and cannot overlap the mail entry'
  end
  assert(create); create()
  local b=widgets.llmdip_menu_button
- assert(b.parent==root and b.dock==1 and b.x==20 and b.y==82 and b.priority==200)
+ assert(b.parent==root and b.dock==1 and b.x==20 and b.y==123 and b.priority==200)
  assert(b.children.button_txt.text==llmdip_t('ai_factions_button') and b.visible)
  assert(b.x+b.width<190)
 `));
@@ -482,3 +686,67 @@ test('letter memory does not invent player words; silence keeps the timeline con
   assert.deepEqual(store.history({...r,memoryParent:'root'}),[]);
  } finally {fs.rmSync(dir,{recursive:true});}
 });
+
+test('card Reject declines the pending offer without executing it, and Accept still accepts',()=>run(read('llm_diplomacy_ui.lua'),String.raw`
+ llmdip_set_language('es')
+ local declined, accepted = {}, {}
+ llmdip_decline=function(id) declined[#declined+1]=id; return true end
+ llmdip_accept=function(id) accepted[#accepted+1]=id; return true end
+ state.target='ai'; state.visible=true
+ state.inbox.ai={history={'Player2: Te ofrezco paso libre.'},proposal='military_access,mutual',request='r1'}
+ state.request_id='r1'; state.proposal='military_access,mutual'
+ local chat,history,shell=ensure_owned_ui(); refresh_owned_ui()
+ local card=shell.children.proposal_card
+ assert(card.visible)
+ fire('llmdip_contextual_clicks','llmdip_proposal_decline')
+ assert(#declined==1 and declined[1]=='r1' and #accepted==0,'Reject must decline r1 only')
+ assert(state.proposal==nil and state.inbox.ai.proposal==nil and not card.visible)
+ local last=state.inbox.ai.history[#state.inbox.ai.history]
+ assert(last==llmdip_t('speaker_system')..': '..llmdip_t('proposal_declined'),'Missing note: '..tostring(last))
+ state.request_id='r2'; state.proposal='trade_agreement'; refresh_owned_ui()
+ fire('llmdip_contextual_clicks','llmdip_proposal_accept')
+ assert(#accepted==1 and accepted[1]=='r2' and #declined==1)
+`));
+
+test('player lines with an accented label are recognised even with a character-indexed string.sub',()=>run(read('llm_diplomacy_ui.lua'),String.raw`
+ -- In game "Tú: ..." lines were never recognised as the player's (24-09): the
+ -- old byte-length prefix check failed once string.sub counted characters.
+ string.sub=function(s,i,j)
+  local chars={}
+  for c in string.gmatch(s,'[%z\1-\127\194-\244][\128-\191]*') do chars[#chars+1]=c end
+  j=j or #chars
+  if i<0 then i=#chars+i+1 end
+  if j<0 then j=#chars+j+1 end
+  if i<1 then i=1 end
+  if j>#chars then j=#chars end
+  if i>j then return '' end
+  return table.concat(chars,'',i,j)
+ end
+ llmdip_set_language('es')
+ state.target='ai'
+ state.inbox.ai={history={llmdip_t('you')..': no rompí ninguna alianza','Player2: Lo sé.'}}
+ local lines=history_body_lines('ai')
+ assert(lines[1]:match('%[%[col:green%]%]'..llmdip_t('you')..':'),'Player header missing: '..tostring(lines[1]))
+ assert(lines[2]:match('no rompí ninguna alianza'),'Player body lost its first letters: '..tostring(lines[2]))
+ assert(not table.concat(lines,'|'):match(llmdip_t('you')..': no'),'Raw unparsed player line shown')
+`));
+
+test('portrait and crest slots come from the shell and sit beside their cards',()=>run(read('llm_diplomacy_ui.lua'),String.raw`
+ state.visible=true; state.target='ai'
+ state.header_portrait='ui/portraits/katarin.png'; state.header_player_flag='ui/flags/vmp/mon_64.png'; state.header_has_portrait=true
+ local you=llmdip_t('you')
+ state.inbox.ai={history={you..': Buenas tardes.','Player2: La Madre Patria escucha.',llmdip_t('speaker_system')..': Acuerdo ejecutado.'}}
+ local chat,history,shell=ensure_owned_ui()
+ for i=1,16 do widget('msg_icon_'..i,shell); widget('msg_portrait_'..i,shell) end
+ refresh_owned_ui(); render_history_bubbles('ai')
+ local first,second=root.children.llmdip_diplomacy_bubble_1,root.children.llmdip_diplomacy_bubble_2
+ local icon1,icon3=shell.children.msg_icon_1,shell.children.msg_icon_3
+ local crest2,portrait2=shell.children.msg_icon_2,shell.children.msg_portrait_2
+ assert(icon1.visible and icon1.x==546 and icon1.y==first.y,'Player crest '..tostring(icon1.x))
+ assert(not shell.children.msg_portrait_1.visible,'Player must not use a portrait slot')
+ assert(portrait2.visible and portrait2.x==8 and portrait2.y==second.y and not crest2.visible,'Rival portrait slot '..tostring(portrait2.x))
+ assert(not icon3.visible and not shell.children.msg_portrait_3.visible,'System line must have no icon')
+ assert(first.height>=44 and second.height>=44,'Card shorter than its icon')
+ hide_dialog()
+ assert(not icon1.visible and not portrait2.visible,'Icons must hide with the dialog')
+`));

@@ -193,7 +193,11 @@ export class MemoryStore {
       leaderSubtype: identity.leaderSubtype || "unknown",
       culture: identity.culture || "unknown",
       subculture: identity.subculture || "unknown",
-      personality: current?.personality || buildPersonality(identity, request.interlocutor),
+      // The archetype text is refreshed on every request so improved wording reaches
+      // leaders saved before it; the numeric temperament stays as stored.
+      personality: current?.personality
+        ? { ...current.personality, archetype: buildPersonality(identity, request.interlocutor).archetype }
+        : buildPersonality(identity, request.interlocutor),
       socialStyle: current?.socialStyle?.signature === buildSocialStyle(identity, request.interlocutor).signature
         ? current.socialStyle : buildSocialStyle(identity, request.interlocutor),
       canonNotes: Array.isArray(current?.canonNotes) ? current.canonNotes : (Array.isArray(curated.canonNotes) ? curated.canonNotes : []),

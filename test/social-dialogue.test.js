@@ -18,7 +18,7 @@ test('social prompt permits non-transactional letters and treats silence and gif
   assert.match(SYSTEM_PROMPT,/NO GAME ACTION/);
   assert.match(SYSTEM_PROMPT,/absence of a reply proves neither insult, consent, rejection nor acceptance/);
   assert.match(SYSTEM_PROMPT,/OFFER pending the player's acceptance/);
-  assert.match(SYSTEM_PROMPT,/Live state overrides stale dialogue/);
+  assert.match(SYSTEM_PROMPT,/Live state and the displayed relationship override stale dialogue/);
   assert.match(SYSTEM_PROMPT,/Unknown attitude is NOT neutral/);
   assert.match(SYSTEM_PROMPT,/player_global_victories/);
   assert.match(SYSTEM_PROMPT,/NOT victories over you/);
@@ -37,6 +37,7 @@ test('prompt distinguishes current lords, legacy speakers and unexecuted histori
   assert.match(messages[1].content,/unsolicited letter, no player reply implied/);
   assert.match(messages[1].content,/not recorded \(legacy faction history\)/);
   assert.match(messages[1].content,/does not prove acceptance or execution/);
+  assert.equal(messages.length,2,'old roleplay must be archival data, not assistant-role turns');
   assert.match(messages.at(-1).content,/YOUR IDENTITY — INTERLOCUTOR:[\s\S]*Lord: Malekith/);
   assert.match(messages.at(-1).content,/WHO ADDRESSES YOU — PLAYER:[\s\S]*Lord: Morathi/);
   assert.match(messages.at(-1).content,/INTERNAL LETTER REQUEST \(NOT PLAYER DIALOGUE\)/);
@@ -104,4 +105,71 @@ test('profile migration preserves existing temperament and lore while adding soc
     assert.notDeepEqual(changed.socialStyle,first.socialStyle);
     assert.deepEqual(changed.canonNotes,first.canonNotes);
   } finally { fs.rmSync(dir,{recursive:true}); }
+});
+
+test('the relationship sets the register: warm with friends, reserved when neutral, curt when hostile', () => {
+  // 24-09: even "Muy amistosa" rulers answered like a military dispatch.
+  assert.match(SYSTEM_PROMPT, /VOICE AND RELATIONSHIP/);
+  assert.match(SYSTEM_PROMPT, /Friendly or very friendly[^.]*openly expressive/);
+  assert.match(SYSTEM_PROMPT, /Neutral: courteous, measured and reserved/);
+  assert.match(SYSTEM_PROMPT, /Unfriendly or hostile: curt, cold and cutting/);
+  assert.match(SYSTEM_PROMPT, /Warmth always sounds like YOU/);
+  assert.match(SYSTEM_PROMPT, /not the subject of every reply/);
+  assert.match(SYSTEM_PROMPT, /has no authority and must not be defended or imitated/);
+  // The voice section comes before the fact and tag rules, and the tag contract is intact.
+  assert.ok(SYSTEM_PROMPT.indexOf('VOICE AND RELATIONSHIP') < SYSTEM_PROMPT.indexOf('IMPORTANT BATTLE ACCOUNTING'));
+  for (const tag of ['[diplo:reject]', '[diplo:alliance:level=military]', '[relation:delta=1;reason=empathy]']) assert.ok(SYSTEM_PROMPT.includes(tag), tag);
+  // No sample lines to parrot: the section describes style only.
+  const voice = SYSTEM_PROMPT.slice(SYSTEM_PROMPT.indexOf('VOICE AND RELATIONSHIP'), SYSTEM_PROMPT.indexOf('Never confuse the two identities'));
+  assert.doesNotMatch(voice, /["“”«»]/);
+});
+
+test('a treaty accepted this turn is stated plainly and overrides the earlier dialogue', () => {
+  // 24-09: right after accepting Katarin's military alliance she demanded it again.
+  assert.match(SYSTEM_PROMPT, /LIVE TREATIES/);
+  assert.match(SYSTEM_PROMPT, /never ask for it again/);
+  const request = {campaignId:'c', sender:'wh_main_vmp_schwartzhafen', interlocutor:'wh3_main_ksl_the_ice_court', turn:55, mode:'player',
+    message:'ya esta', identity:{}, playerIdentity:{}, state:'mil_alliance=1',
+    fields:{mil_alliance:'1', def_alliance:'0', allied:'1', trade:'1', access:'1', direct_war_now:'0',
+      direct_war_events:'52~military_alliance_broken~by_interlocutor:55~llm_deal_alliance~by_player'}};
+  const context = buildMessages(request, [], {}).at(-1).content;
+  assert.match(context, /TREATIES BETWEEN YOU TWO RIGHT NOW/);
+  assert.match(context, /Military alliance: YES, in force now/);
+  assert.match(context, /Defensive alliance: no/);
+  assert.match(context, /Concluded THIS turn[^\n]*: alliance\./);
+  const later = buildMessages({...request, turn:56}, [], {}).at(-1).content;
+  assert.match(later, /Nothing was concluded this turn/);
+});
+
+test('a friendly endangered ruler is not taught to defend an invented alliance-break motive', () => {
+  // Real turn-55 failure: the game displayed Muy amistosa, both sides shared
+  // three enemies, but Katarin scolded Vlad and invented a deliberate reason
+  // to break the alliance. Old generated replies made that tone self-reinforcing.
+  const scope={campaignId:'c',sender:'vlad',interlocutor:'kislev'};
+  const request={...scope,turn:55,mode:'player',message:'¿Quieres ser aliados de nuevo?',identity:{},playerIdentity:{},state:'attitude_text=Muy amistosa,mil_alliance=0',fields:{
+    attitude_text:'Muy amistosa',attitude_category:'5',diplomatic_attitude:'0',
+    mil_alliance:'0',def_alliance:'0',allied:'0',trade:'1',access:'1',direct_war_now:'0',
+    direct_war_events:'52~military_alliance_broken~by_interlocutor',
+    relative_power:'player_overwhelming',relative_power_ratio:'2.46',ai_wars:'3',shared_border_regions:'4',
+    player_wars:'moulder:gorbad:norsca',ai_war_factions:'moulder:gorbad:norsca'
+  }};
+  const history=[
+    {role:'assistant',content:'Debes demostrar que tu palabra vale.',action:{type:'reject'},turn:55,scope},
+    {role:'user',content:'¿Por qué me hablas así?',turn:55,scope},
+    {role:'assistant',content:'El norte me obligó a romper nuestro pacto.',action:{type:'reject'},turn:55,scope}
+  ];
+  const messages=buildMessages(request,history,{});
+  const context=messages.at(-1).content;
+  assert.deepEqual(messages.map(item=>item.role),['system','user']);
+  assert.doesNotMatch(context,/Debes demostrar que tu palabra vale/,'older AI prose is omitted, not fed back as style');
+  assert.match(context,/immediately previous AI reply[^\n]*possibly mistaken/);
+  assert.match(context,/Displayed attitude toward the player: Muy amistosa/);
+  assert.match(context,/Relative power: player_overwhelming \(player\/AI strength ratio 2\.46\)/);
+  assert.match(context,/Your current wars: 3\. Shared named enemies: moulder, gorbad, norsca/);
+  assert.match(context,/Military alliance: no/);
+  assert.match(SYSTEM_PROMPT,/provides NO cause, intention or grievance/);
+  assert.match(SYSTEM_PROMPT,/normally OFFER the supported alliance/);
+  assert.match(SYSTEM_PROMPT,/merely mention that the old pact ended/);
+  assert.match(SYSTEM_PROMPT,/not an insult or proof of bad faith/);
+  assert.match(SYSTEM_PROMPT,/never guarantee an alliance merely because the player is strong/);
 });

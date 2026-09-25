@@ -154,10 +154,10 @@ function llmdip_mail_tick()
         b = UIComponent(parent:CreateComponent(BUTTON, "ui/templates/square_medium_text_button"))
         if not live(b) then return end
         b:SetCanResizeWidth(true); b:SetCanResizeHeight(true); b:Resize(180,36)
-        b:SetDockingPoint(1); b:SetDockOffset(190,82)
+        b:SetDockingPoint(1); b:SetDockOffset(190,123)
         b:PropagatePriority(200); b:SetInteractive(true)
         if not find("button_txt", b) then error("Falta button_txt en el botón de mensajes") end
-        out("[LLMDIP] MAIL_BUTTON_CREATED|top_left|190|82|0.39.8")
+        out("[LLMDIP] MAIL_BUTTON_CREATED|top_left|190|123|0.39.8")
     end
     -- Persistent root ownership, like the existing LLM contact button. Do not
     -- insert a new child in the engine-owned menu_bar/buttongroup layout.

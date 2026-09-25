@@ -36,3 +36,10 @@ test("existing leader profiles migrate without losing authored lore", () => {
   assert.ok(profile.personality?.axes);
   fs.rmSync(root, { recursive: true, force: true });
 });
+
+test('every archetype says how the culture treats friends as well as how it rules', () => {
+  for (const culture of ['wh_main_sc_vmp_vampire_counts', 'wh3_main_sc_ksl_kislev', 'wh_main_sc_dwf_dwarfs', 'unknown_culture']) {
+    const { archetype } = buildPersonality({ culture, subculture: culture }, 'some_faction');
+    assert.match(archetype, /friend|favour|allies|mates/, culture + ': ' + archetype);
+  }
+});

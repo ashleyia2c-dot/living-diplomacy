@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!-- Independent read-only message card. It must not reuse the parent history
+     layout: recursive TWUI instantiation omits the nested text child in WH3. -->
+<layout version="137" comment="Player2 diplomacy message card" precache_condition="">
+  <hierarchy>
+    <root this="572DFB46-0D2A-4F8B-A20D-3DF1F83F2490">
+      <entry_box this="CD52E1C8-DC88-4AE5-8ED9-7DC39A31E132"/>
+    </root>
+  </hierarchy>
+  <components>
+    <root this="572DFB46-0D2A-4F8B-A20D-3DF1F83F2490" id="root" tooltipslocalised="true" uniqueguid="572DFB46-0D2A-4F8B-A20D-3DF1F83F2490" currentstate="D5A64A3D-F1F6-414D-8547-4E52F0E40C39" defaultstate="D5A64A3D-F1F6-414D-8547-4E52F0E40C39"/>
+    <entry_box this="CD52E1C8-DC88-4AE5-8ED9-7DC39A31E132" id="bubble_text" offset="0.00,0.00" priority="100" tooltipslocalised="true" uniqueguid="CD52E1C8-DC88-4AE5-8ED9-7DC39A31E132" currentstate="C65754DD-473A-439D-B131-E103C47407FE">
+      <callbackwithcontextlist><callback_with_context callback_id="TextInput"/></callbackwithcontextlist>
+      <componentimages><component_image this="90707E38-5127-43D7-9223-1C9A3177B72C" uniqueguid="90707E38-5127-43D7-9223-1C9A3177B72C" imagepath="ui/skins/default/frame_text.png"/></componentimages>
+      <states>
+        <newstate this="C65754DD-473A-439D-B131-E103C47407FE" name="NewState" width="600" height="48" text="" textxoffset="12.00,12.00" textyoffset="6.00,6.00" texthbehaviour="Never split" textlocalised="true" textlabel="llmdip_bubble_text" font_m_size="14" font_m_colour="#FFF8D7FF" font_m_leading="2" fontcat_name="fe_default_text" interactive="true" uniqueguid="C65754DD-473A-439D-B131-E103C47407FE">
+          <imagemetrics><image this="883DD143-A9F2-48B6-866D-B43C751E0CE2" uniqueguid="883DD143-A9F2-48B6-866D-B43C751E0CE2" componentimage="90707E38-5127-43D7-9223-1C9A3177B72C" width="600" height="48" tile="true" margin="4.00,4.00,4.00,4.00"/></imagemetrics>
+        </newstate>
+      </states>
+    </entry_box>
+  </components>
+</layout>

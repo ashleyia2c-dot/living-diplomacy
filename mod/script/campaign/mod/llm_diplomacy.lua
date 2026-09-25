@@ -229,7 +229,9 @@ local function direct_diplomacy_events(first_key, second_key)
         if turn and kind and proposer and recipient and
             ((proposer == first_key and recipient == second_key) or
              (proposer == second_key and recipient == first_key)) then
-            local item = turn .. "~" .. kind
+            -- Keep who started it. Without it the model read "52~military_alliance_broken"
+            -- as the player's betrayal when the game recorded Kislev ending the treaty.
+            local item = turn .. "~" .. kind .. "~by_" .. (proposer == first_key and "player" or "interlocutor")
             if not seen[item] then seen[item] = true; result[#result + 1] = item end
         end
     end
@@ -606,6 +608,23 @@ function llmdip_accept(request_id)
     return ok
 end
 
+-- The player turns an offer down from the proposal card. Until now a pending
+-- offer just waited to be superseded or to expire. Nothing is executed, but
+-- the save records it like vanilla's offer_rejected (proposer first), so the
+-- lord's later prompts know the offer was refused.
+function llmdip_decline(request_id)
+    if not player_phase then return false end
+    if not valid_key(request_id) then return false end
+    local proposal = pending[request_id]
+    if not proposal or not proposal.action or proposal.action[1] == "reject" then return false end
+    record_diplomatic_event("llm_offer_declined", cm:get_faction(proposal.interlocutor), cm:get_faction(proposal.player))
+    out("[LLMDIP] DECLINED|" .. request_id)
+    pending[request_id] = nil
+    save_pending()
+    if llmdip_mail_supersede then llmdip_mail_supersede(request_id) end
+    return true
+end
+
 function llmdip_external_initialize(nonce, id)
     if not valid_key(nonce) or consumed_external[nonce] or not valid_key(id) then return false end
     consumed_external[nonce] = true
@@ -856,8 +875,9 @@ end
 local function show_contact_menu()
     destroy_menu(); menu_open = true
     local player = local_faction()
-    local x, y, per_page = 20, 126, 8
-    make_button("llmdip_close", llmdip_t("menu_close"), x, y, 450)
+    -- Keep the filter list beside the left diplomacy portrait, not across it.
+    local x, y, width, per_page = 270, 170, 325, 8
+    make_button("llmdip_close", llmdip_t("menu_close"), x, y, width)
     local met, candidates, groups = player:factions_met(), {}, {}
     for i = 0, met:num_items() - 1 do
         local faction = met:item_at(i)
@@ -877,34 +897,34 @@ local function show_contact_menu()
     end
     if not menu_race then
         for _, group in pairs(groups) do candidates[#candidates + 1] = group end
-        make_button("llmdip_all_races", llmdip_t("see_all_factions"), x, y + 42, 450)
+        make_button("llmdip_all_races", llmdip_t("see_all_factions"), x, y + 42, width)
     else
-        make_button("llmdip_races_back", llmdip_t("back_to_races"), x, y + 42, 450)
+        make_button("llmdip_races_back", llmdip_t("back_to_races"), x, y + 42, width)
     end
     table.sort(candidates, function(a,b) if a.name == b.name then return a.key < b.key end return a.name < b.name end)
     local pages = math.max(1, math.ceil(#candidates / per_page))
     menu_page = math.max(1, math.min(menu_page, pages))
     local title = not menu_race and llmdip_t("races") or (menu_race == "all" and llmdip_t("all_factions") or (groups[menu_race] and groups[menu_race].name or llmdip_t("no_factions")))
-    local heading = make_button("llmdip_filter_title", title .. " — " .. menu_page .. "/" .. pages, x, y + 84, 450)
+    local heading = make_button("llmdip_filter_title", title .. " — " .. menu_page .. "/" .. pages, x, y + 84, width)
     if heading then heading:SetInteractive(false) end
     local first = (menu_page - 1) * per_page + 1
     for i = first, math.min(#candidates, first + per_page - 1) do
         local key, name = candidates[i].key, candidates[i].name
         if not menu_race then
             local group = candidates[i]
-            make_button("llmdip_race_" .. key, name .. " (" .. group.enabled .. "/" .. group.count .. llmdip_t("enabled_suffix"), x, y + 126 + 38 * (i - first), 450)
+            make_button("llmdip_race_" .. key, name .. " (" .. group.enabled .. "/" .. group.count .. llmdip_t("enabled_suffix"), x, y + 126 + 38 * (i - first), width)
         else
             local mark = contact_enabled(player:name(), key) and llmdip_t("contact_on") or llmdip_t("contact_off")
-            local button = make_button("llmdip_contact_" .. key, mark .. name, x, y + 126 + 38 * (i - first), 450)
+            local button = make_button("llmdip_contact_" .. key, mark .. name, x, y + 126 + 38 * (i - first), width)
             if button then button:SetTooltipText(name .. "\n" .. key, true) end
         end
     end
     if #candidates == 0 then
-        local empty = make_button("llmdip_filter_empty", llmdip_t("no_known_factions"), x, y + 126, 450)
+        local empty = make_button("llmdip_filter_empty", llmdip_t("no_known_factions"), x, y + 126, width)
         if empty then empty:SetInteractive(false) end
     end
-    if first > 1 then make_button("llmdip_prev", llmdip_t("prev_page_btn"), x, y + 462, 215) end
-    if first + per_page <= #candidates then make_button("llmdip_next", llmdip_t("next_page_btn"), x + 235, y + 462, 215) end
+    if first > 1 then make_button("llmdip_prev", llmdip_t("prev_page_btn"), x, y + 462, 155) end
+    if first + per_page <= #candidates then make_button("llmdip_next", llmdip_t("next_page_btn"), x + 170, y + 462, 155) end
 end
 
 local function create_menu_button()
@@ -912,13 +932,13 @@ local function create_menu_button()
         local root = core:get_ui_root()
         local button = core:get_or_create_component("llmdip_menu_button", "ui/templates/square_medium_text_button", root)
         button:SetCanResizeWidth(true); button:SetCanResizeHeight(true); button:Resize(160, 36)
-        button:SetDockingPoint(1); button:SetDockOffset(20, 82)
+        button:SetDockingPoint(1); button:SetDockOffset(20, 123)
         button:PropagatePriority(200); button:SetInteractive(true)
         local label = find_uicomponent(button, "button_txt")
         if not label then error("Falta button_txt en el botón de facciones") end
         label:SetStateText(llmdip_t("ai_factions_button")); label:SetInteractive(false)
         button:SetTooltipText(llmdip_t("toggle_factions"), true); button:SetVisible(true)
-        out("[LLMDIP] CONTACT_BUTTON_READY|top_left|20|82|0.39.8")
+        out("[LLMDIP] CONTACT_BUTTON_READY|top_left|20|123|0.39.8")
     end)
     if not ok then out("[LLMDIP] CONTACT_BUTTON_ERROR|" .. tostring(err)) end
 end

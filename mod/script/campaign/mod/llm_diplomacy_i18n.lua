@@ -23,6 +23,9 @@ UI_TEXT.en = {
     next_page_btn = "next >",
     send_tooltip = "Send to Player2",
     accept_tooltip = "Accept proposal",
+    accept_button = "Accept",
+    decline_button = "Reject",
+    proposal_declined = "Proposal rejected.",
     thinking = "Thinking...",
     applying_proposal = "\nApplying proposal...",
     proposal_prefix = "\nProposal: ",
@@ -99,6 +102,9 @@ UI_TEXT.es = {
     next_page_btn = "siguientes >",
     send_tooltip = "Enviar a Player2",
     accept_tooltip = "Aceptar propuesta",
+    accept_button = "Aceptar",
+    decline_button = "Rechazar",
+    proposal_declined = "Propuesta rechazada.",
     thinking = "Pensando...",
     applying_proposal = "\nAplicando propuesta...",
     proposal_prefix = "\nPropuesta: ",
@@ -176,6 +182,9 @@ UI_TEXT.fr = {
     next_page_btn = "suivantes >",
     send_tooltip = "Envoyer à Player2",
     accept_tooltip = "Accepter la proposition",
+    accept_button = "Accepter",
+    decline_button = "Refuser",
+    proposal_declined = "Proposition refusée.",
     thinking = "Réflexion...",
     applying_proposal = "\nApplication de la proposition...",
     proposal_prefix = "\nProposition : ",
@@ -252,6 +261,9 @@ UI_TEXT.de = {
     next_page_btn = "weiter >",
     send_tooltip = "An Player2 senden",
     accept_tooltip = "Vorschlag annehmen",
+    accept_button = "Annehmen",
+    decline_button = "Ablehnen",
+    proposal_declined = "Vorschlag abgelehnt.",
     thinking = "Denkt nach...",
     applying_proposal = "\nVorschlag wird angewendet...",
     proposal_prefix = "\nVorschlag: ",
@@ -328,6 +340,9 @@ UI_TEXT.it = {
     next_page_btn = "successive >",
     send_tooltip = "Invia a Player2",
     accept_tooltip = "Accetta la proposta",
+    accept_button = "Accetta",
+    decline_button = "Rifiuta",
+    proposal_declined = "Proposta rifiutata.",
     thinking = "Sta pensando...",
     applying_proposal = "\nApplicazione della proposta...",
     proposal_prefix = "\nProposta: ",
@@ -404,6 +419,9 @@ UI_TEXT.ru = {
     next_page_btn = "далее >",
     send_tooltip = "Отправить в Player2",
     accept_tooltip = "Принять предложение",
+    accept_button = "Принять",
+    decline_button = "Отклонить",
+    proposal_declined = "Предложение отклонено.",
     thinking = "Думает...",
     applying_proposal = "\nПрименение предложения...",
     proposal_prefix = "\nПредложение: ",
@@ -480,6 +498,9 @@ UI_TEXT.pl = {
     next_page_btn = "następne >",
     send_tooltip = "Wyślij do Player2",
     accept_tooltip = "Przyjmij propozycję",
+    accept_button = "Przyjmij",
+    decline_button = "Odrzuć",
+    proposal_declined = "Propozycja odrzucona.",
     thinking = "Myśli...",
     applying_proposal = "\nWprowadzanie propozycji...",
     proposal_prefix = "\nPropozycja: ",
@@ -556,6 +577,9 @@ UI_TEXT.cs = {
     next_page_btn = "další >",
     send_tooltip = "Odeslat do Player2",
     accept_tooltip = "Přijmout návrh",
+    accept_button = "Přijmout",
+    decline_button = "Odmítnout",
+    proposal_declined = "Návrh odmítnut.",
     thinking = "Přemýšlí...",
     applying_proposal = "\nUplatňuji návrh...",
     proposal_prefix = "\nNávrh: ",
@@ -632,6 +656,9 @@ UI_TEXT.tr = {
     next_page_btn = "sonraki >",
     send_tooltip = "Player2 uygulamasına gönder",
     accept_tooltip = "Teklifi kabul et",
+    accept_button = "Kabul et",
+    decline_button = "Reddet",
+    proposal_declined = "Teklif reddedildi.",
     thinking = "Düşünüyor...",
     applying_proposal = "\nTeklif uygulanıyor...",
     proposal_prefix = "\nTeklif: ",
@@ -708,6 +735,9 @@ UI_TEXT.ko = {
     next_page_btn = "다음 >",
     send_tooltip = "Player2로 보내기",
     accept_tooltip = "제안 수락",
+    accept_button = "수락",
+    decline_button = "거절",
+    proposal_declined = "제안을 거절했습니다.",
     thinking = "생각 중...",
     applying_proposal = "\n제안 적용 중...",
     proposal_prefix = "\n제안: ",
@@ -784,6 +814,9 @@ UI_TEXT.pt = {
     next_page_btn = "próximas >",
     send_tooltip = "Enviar ao Player2",
     accept_tooltip = "Aceitar proposta",
+    accept_button = "Aceitar",
+    decline_button = "Recusar",
+    proposal_declined = "Proposta recusada.",
     thinking = "Pensando...",
     applying_proposal = "\nAplicando proposta...",
     proposal_prefix = "\nProposta: ",
@@ -860,6 +893,9 @@ UI_TEXT.zh = {
     next_page_btn = "下一页 >",
     send_tooltip = "发送给 Player2",
     accept_tooltip = "接受提议",
+    accept_button = "接受",
+    decline_button = "拒绝",
+    proposal_declined = "已拒绝提议。",
     thinking = "思考中……",
     applying_proposal = "\n正在执行提议……",
     proposal_prefix = "\n提议：",
@@ -936,6 +972,9 @@ UI_TEXT.tw = {
     next_page_btn = "下一頁 >",
     send_tooltip = "傳送給 Player2",
     accept_tooltip = "接受提議",
+    accept_button = "接受",
+    decline_button = "拒絕",
+    proposal_declined = "已拒絕提議。",
     thinking = "思考中……",
     applying_proposal = "\n正在執行提議……",
     proposal_prefix = "\n提議：",
@@ -1004,6 +1043,33 @@ UI_TEXT.tw = {
     open_diplomacy_hint = "開啟它的外交介面並點擊「對話」"
 }
 
+-- Nombres visibles de las acciones. El protocolo sigue usando sus claves
+-- compactas originales; esta tabla solo pinta el historial de diplomacia.
+local PROPOSAL_ORDER = {
+    "declare_war", "make_peace", "alliance_defensive", "alliance_military",
+    "trade_agreement", "military_access_mutual",
+    "military_access_interlocutor_to_player", "military_access_player_to_interlocutor",
+    "transfer_region", "vassalize_player", "vassalize_interlocutor",
+    "offer_gold", "request_gold", "favor"
+}
+local PROPOSAL_INDEX = {}
+for i = 1, #PROPOSAL_ORDER do PROPOSAL_INDEX[PROPOSAL_ORDER[i]] = i end
+local PROPOSAL_LABELS = {
+    en = {"Declaration of war", "Peace treaty", "Defensive alliance", "Military alliance", "Trade agreement", "Mutual military access", "They grant you military access", "You grant them military access", "Region transfer", "They become your vassal", "You become their vassal", "Gold gift", "Gold payment requested", "Paid favour"},
+    es = {"Declaración de guerra", "Tratado de paz", "Alianza defensiva", "Alianza militar", "Acuerdo comercial", "Acceso militar mutuo", "Ellos te conceden acceso militar", "Tú les concedes acceso militar", "Cesión de región", "Ellos se convierten en tus vasallos", "Te conviertes en su vasallo", "Regalo de oro", "Pago de oro solicitado", "Favor remunerado"},
+    fr = {"Déclaration de guerre", "Traité de paix", "Alliance défensive", "Alliance militaire", "Accord commercial", "Accès militaire mutuel", "Ils vous accordent l'accès militaire", "Vous leur accordez l'accès militaire", "Transfert de région", "Ils deviennent vos vassaux", "Vous devenez leur vassal", "Don d'or", "Paiement en or demandé", "Service rémunéré"},
+    de = {"Kriegserklärung", "Friedensvertrag", "Defensivbündnis", "Militärbündnis", "Handelsabkommen", "Gegenseitiges Militärzugangsrecht", "Sie gewähren dir Militärzugang", "Du gewährst ihnen Militärzugang", "Regionsübertragung", "Sie werden deine Vasallen", "Du wirst ihr Vasall", "Goldgeschenk", "Geforderte Goldzahlung", "Bezahlter Gefallen"},
+    it = {"Dichiarazione di guerra", "Trattato di pace", "Alleanza difensiva", "Alleanza militare", "Accordo commerciale", "Accesso militare reciproco", "Ti concedono l'accesso militare", "Concedi loro l'accesso militare", "Trasferimento di regione", "Diventano tuoi vassalli", "Diventi loro vassallo", "Dono in oro", "Pagamento in oro richiesto", "Favore retribuito"},
+    ru = {"Объявление войны", "Мирный договор", "Оборонительный союз", "Военный союз", "Торговое соглашение", "Взаимный военный доступ", "Они дают вам военный доступ", "Вы даёте им военный доступ", "Передача региона", "Они становятся вашими вассалами", "Вы становитесь их вассалом", "Дар золотом", "Требование золота", "Оплаченная услуга"},
+    pl = {"Wypowiedzenie wojny", "Traktat pokojowy", "Sojusz obronny", "Sojusz wojskowy", "Umowa handlowa", "Wzajemny dostęp wojskowy", "Udzielają ci dostępu wojskowego", "Udzielasz im dostępu wojskowego", "Przekazanie regionu", "Stają się twoimi wasalami", "Stajesz się ich wasalem", "Dar w złocie", "Żądana zapłata w złocie", "Płatna przysługa"},
+    cs = {"Vyhlášení války", "Mírová smlouva", "Obranné spojenectví", "Vojenské spojenectví", "Obchodní dohoda", "Vzájemný vojenský přístup", "Udělují ti vojenský přístup", "Uděluješ jim vojenský přístup", "Předání regionu", "Stanou se tvými vazaly", "Staneš se jejich vazalem", "Dar ve zlatě", "Požadovaná platba ve zlatě", "Placená služba"},
+    tr = {"Savaş ilanı", "Barış antlaşması", "Savunma ittifakı", "Askerî ittifak", "Ticaret anlaşması", "Karşılıklı askerî geçiş", "Sana askerî geçiş hakkı veriyorlar", "Onlara askerî geçiş hakkı veriyorsun", "Bölge devri", "Senin vasalın oluyorlar", "Onların vasalı oluyorsun", "Altın hediyesi", "Talep edilen altın ödemesi", "Ücretli iyilik"},
+    ko = {"선전 포고", "평화 조약", "방어 동맹", "군사 동맹", "무역 협정", "상호 군사 통행권", "상대가 당신에게 군사 통행권 부여", "당신이 상대에게 군사 통행권 부여", "지역 양도", "상대가 당신의 봉신이 됨", "당신이 상대의 봉신이 됨", "금 선물", "요구한 금 지불", "대가를 받는 부탁"},
+    pt = {"Declaração de guerra", "Tratado de paz", "Aliança defensiva", "Aliança militar", "Acordo comercial", "Acesso militar mútuo", "Eles concedem acesso militar a você", "Você concede acesso militar a eles", "Transferência de região", "Eles se tornam seus vassalos", "Você se torna vassalo deles", "Presente em ouro", "Pagamento em ouro solicitado", "Favor remunerado"},
+    zh = {"宣战", "和平条约", "防御同盟", "军事同盟", "贸易协定", "相互军事通行权", "对方授予你军事通行权", "你授予对方军事通行权", "地区转让", "对方成为你的附庸", "你成为对方的附庸", "赠送黄金", "要求支付黄金", "有偿请求"},
+    tw = {"宣戰", "和平條約", "防禦同盟", "軍事同盟", "貿易協定", "相互軍事通行權", "對方授予你軍事通行權", "你授予對方軍事通行權", "地區轉讓", "對方成為你的附庸", "你成為對方的附庸", "贈送黃金", "要求支付黃金", "有償請求"}
+}
+
 -- El idioma de la interfaz se le pregunta al propio juego: se pide una cadena vanilla
 -- cuya traduccion oficial conocemos en los 13 idiomas (sacada de sus packs de
 -- localizacion) y se compara. Asi no depende de que el companion este abierto, y un
@@ -1066,4 +1132,25 @@ function llmdip_t(key)
     if value == nil then value = UI_TEXT.en[key] end
     if value == nil then return key end
     return value
+end
+
+function llmdip_action_label(compact)
+    local parts = {}
+    for part in string.gmatch(tostring(compact or ""), "[^,]+") do parts[#parts + 1] = part end
+    local action = parts[1]
+    if action == "alliance" or action == "military_access" or action == "vassalize" then
+        action = action .. "_" .. tostring(parts[2] or "")
+    end
+    local labels = PROPOSAL_LABELS[llmdip_language()] or PROPOSAL_LABELS.en
+    local index = PROPOSAL_INDEX[action]
+    local label = index and labels[index] or nil
+    if not label then return tostring(compact or "") end
+    if action == "offer_gold" or action == "request_gold" then
+        return label .. " (" .. tostring(parts[2] or "?") .. ")"
+    elseif action == "transfer_region" then
+        return label .. " (" .. tostring(parts[2] or "?") .. ")"
+    elseif action == "favor" then
+        return label .. " (" .. tostring(parts[2] or "?") .. ", " .. tostring(parts[3] or "?") .. ")"
+    end
+    return label
 end

@@ -16,8 +16,8 @@
       <callbackwithcontextlist><callback_with_context callback_id="TextInput"/></callbackwithcontextlist>
       <componentimages><component_image this="0586E85C-728F-4EFC-8432-90E05D1BEC65" uniqueguid="0586E85C-728F-4EFC-8432-90E05D1BEC65" imagepath="ui/skins/default/frame_text.png"/></componentimages>
       <states>
-        <newstate this="2AF08A6A-266A-41B1-BDBD-F2993488EB23" name="NewState" width="560" height="350" text="" textxoffset="12.00,60.00" textyoffset="10.00,8.00" texthbehaviour="Never split" textlocalised="true" textlabel="llmdip_history_text" font_m_size="14" font_m_colour="#FFF8D7FF" font_m_leading="2" fontcat_name="fe_default_text" interactive="true" uniqueguid="2AF08A6A-266A-41B1-BDBD-F2993488EB23">
-          <imagemetrics><image this="F2F1D7D8-5A92-4DC1-86FA-A297F9BFC2E3" uniqueguid="F2F1D7D8-5A92-4DC1-86FA-A297F9BFC2E3" componentimage="0586E85C-728F-4EFC-8432-90E05D1BEC65" width="560" height="350" tile="true" margin="4.00,4.00,4.00,4.00"/></imagemetrics>
+        <newstate this="2AF08A6A-266A-41B1-BDBD-F2993488EB23" name="NewState" width="640" height="380" text="" textxoffset="12.00,60.00" textyoffset="10.00,8.00" texthbehaviour="Never split" textlocalised="true" textlabel="llmdip_history_text" font_m_size="14" font_m_colour="#FFF8D7FF" font_m_leading="2" fontcat_name="fe_default_text" interactive="true" uniqueguid="2AF08A6A-266A-41B1-BDBD-F2993488EB23">
+          <imagemetrics><image this="F2F1D7D8-5A92-4DC1-86FA-A297F9BFC2E3" uniqueguid="F2F1D7D8-5A92-4DC1-86FA-A297F9BFC2E3" componentimage="0586E85C-728F-4EFC-8432-90E05D1BEC65" width="640" height="380" tile="true" margin="4.00,4.00,4.00,4.00"/></imagemetrics>
         </newstate>
       </states>
     </entry_box>

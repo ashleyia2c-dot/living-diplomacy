@@ -1,5 +1,10 @@
 <?xml version="1.0"?>
-<!-- Minimal input-only template. This is the verified, editable control. -->
+<!-- Minimal input-only template. This is the verified, editable control.
+     Single line on purpose: WH3's TextInput computes the caret and its
+     horizontal scroll as one line, so word wrap only moved the glyphs (24-09:
+     caret stuck at the end of line 1, first letters scrolled away). The box
+     is narrower than the row and the buttons sit outside it, so text scrolls
+     inside the frame instead of running under them. -->
 <layout version="137" comment="Player2 diplomacy input" precache_condition="">
   <hierarchy>
     <root this="9AC91D2C-A12C-4938-947B-84F7BC6CA101">
@@ -13,8 +18,8 @@
       <userproperties><property name="use_long_validator" value=""/></userproperties>
       <componentimages><component_image this="AE1273CC-8F9F-41D5-A9C1-864ADBFDD505" uniqueguid="AE1273CC-8F9F-41D5-A9C1-864ADBFDD505" imagepath="ui/skins/default/frame_text.png"/></componentimages>
       <states>
-        <newstate this="B011A6C3-AABE-4A74-BD48-D57404EAA404" name="NewState" width="410" height="42" text="" textxoffset="10.00,10.00" textyoffset="10.00,10.00" texthbehaviour="Never split" textlocalised="true" textlabel="llmdip_entry_box" font_m_size="14" font_m_colour="#FFF8D7FF" font_m_leading="1" fontcat_name="fe_default_text" interactive="true" uniqueguid="B011A6C3-AABE-4A74-BD48-D57404EAA404">
-          <imagemetrics><image this="3C6E8BF4-5420-4318-9225-E4053B5D3606" uniqueguid="3C6E8BF4-5420-4318-9225-E4053B5D3606" componentimage="AE1273CC-8F9F-41D5-A9C1-864ADBFDD505" width="410" height="42" tile="true" margin="4.00,4.00,4.00,4.00"/></imagemetrics>
+        <newstate this="B011A6C3-AABE-4A74-BD48-D57404EAA404" name="NewState" width="510" height="42" text="" textxoffset="10.00,10.00" textyoffset="10.00,10.00" texthbehaviour="Never split" textlocalised="true" textlabel="llmdip_entry_box" font_m_size="14" font_m_colour="#FFF8D7FF" font_m_leading="1" fontcat_name="fe_default_text" interactive="true" uniqueguid="B011A6C3-AABE-4A74-BD48-D57404EAA404">
+          <imagemetrics><image this="3C6E8BF4-5420-4318-9225-E4053B5D3606" uniqueguid="3C6E8BF4-5420-4318-9225-E4053B5D3606" componentimage="AE1273CC-8F9F-41D5-A9C1-864ADBFDD505" width="510" height="42" tile="true" margin="4.00,4.00,4.00,4.00"/></imagemetrics>
         </newstate>
       </states>
     </entry_box>

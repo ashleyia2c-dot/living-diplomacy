@@ -283,7 +283,7 @@ webServer.once("error", error => {
   throw error;
 });
 webServer.listen(config.port, "127.0.0.1", () => {
-  console.log(`Living Diplomacy Companion v0.39.8 — separate chat for each faction — provider=${config.provider}`);
+  console.log(`Living Diplomacy Companion v0.41.1 — separate chat for each faction — provider=${config.provider}`);
   console.log(`Watching: ${config.scriptLog || "script_log_*.txt (automatic)"}`);
   if (config.provider === "player2") {
     if (!config.player2GameKey) {

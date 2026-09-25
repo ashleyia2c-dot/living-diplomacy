@@ -17,6 +17,8 @@ const luaSource = path.join(modDir, "script", "campaign", "mod", "llm_diplomacy.
 const luaUiSource = path.join(modDir, "script", "campaign", "mod", "llm_diplomacy_ui.lua");
 const overlayTemplate = path.join(modDir, "llmdip_ui", "llmdip_chat.twui.xml");
 const historyTemplate = path.join(modDir, "llmdip_ui", "llmdip_history.twui.xml");
+const bubbleTemplate = path.join(modDir, "llmdip_ui", "llmdip_bubble.twui.xml");
+const shellTemplate = path.join(modDir, "llmdip_ui", "llmdip_shell.twui.xml");
 const loggingMarker = path.join(modDir, "script", "enable_console_logging");
 const output = process.env.LLMDIP_PACK_OUT ? path.resolve(process.env.LLMDIP_PACK_OUT) : path.join(root, "dist", "llm_diplomacy.pack");
 let child;
@@ -104,7 +106,7 @@ async function main() {
 
   await tool("add_packed_files", {
     pack_key: packKey,
-    source_paths: [luaSource, luaUiSource, overlayTemplate, historyTemplate, loggingMarker,
+    source_paths: [luaSource, luaUiSource, overlayTemplate, historyTemplate, bubbleTemplate, shellTemplate, loggingMarker,
       path.join(modDir, "script/campaign/mod/llm_diplomacy_mailbox.lua"),
       path.join(modDir, "script/campaign/mod/llm_diplomacy_i18n.lua")],
     destination_paths: JSON.stringify([
@@ -112,6 +114,8 @@ async function main() {
       { File: "script/campaign/mod/llm_diplomacy_ui.lua" },
       { File: "llmdip_ui/llmdip_chat.twui.xml" },
       { File: "llmdip_ui/llmdip_history.twui.xml" },
+      { File: "llmdip_ui/llmdip_bubble.twui.xml" },
+      { File: "llmdip_ui/llmdip_shell.twui.xml" },
       { File: "script/enable_console_logging" },
       { File: "script/campaign/mod/llm_diplomacy_mailbox.lua" },
       { File: "script/campaign/mod/llm_diplomacy_i18n.lua" }

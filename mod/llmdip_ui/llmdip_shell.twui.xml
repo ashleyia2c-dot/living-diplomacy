@@ -1,0 +1,243 @@
+<?xml version="1.0"?>
+<!-- Visual shell only. The proven history and editable input remain separate
+     root-owned components layered above this frame. -->
+<layout version="137" comment="Player2 diplomacy conversation shell" precache_condition="">
+  <hierarchy>
+    <root this="A40A0001-7A10-4DA0-A040-000000000001">
+      <panel_frame this="A40A0002-7A10-4DA0-A040-000000000002">
+        <header_crest this="A40A000A-7A10-4DA0-A040-00000000000A"/>
+        <msg_icon_1 this="73BDE534-C6A8-45B6-9334-8FAA0BE66656"/>
+        <msg_icon_2 this="18A8288A-4AA8-423C-90AF-E09AF74DFA7B"/>
+        <msg_icon_3 this="70F8D5CA-1806-4045-A546-09C104C18157"/>
+        <msg_icon_4 this="708456A7-7BC2-47D0-AB33-9B294AE8D59D"/>
+        <msg_icon_5 this="D7AF668D-5A4B-46B7-B982-7C5F19577C0D"/>
+        <msg_icon_6 this="C32D5FAA-D6EB-468C-A572-CD8080793A1F"/>
+        <msg_icon_7 this="88BCEA76-451D-493D-B173-6EDAEFF8B074"/>
+        <msg_icon_8 this="E0259360-AC2B-47DA-A65D-01B57936FE5B"/>
+        <msg_icon_9 this="3FCE4098-88B9-466C-9CA1-F13BA3DD3EE6"/>
+        <msg_icon_10 this="9AA94C17-A1B3-45AF-B3F8-4C45AE003C4A"/>
+        <msg_icon_11 this="4688ED3D-509B-47F4-A402-0C6B9B19AC2B"/>
+        <msg_icon_12 this="B08F89ED-3013-4DC0-89D4-F7972AD0266E"/>
+        <msg_icon_13 this="4A5C0FD5-529B-44CC-8957-55D026831328"/>
+        <msg_icon_14 this="1CDEF7DC-F7C3-4F4A-A928-34396565E520"/>
+        <msg_icon_15 this="2B2F9986-63E8-4A83-8CB6-45EB405FD69B"/>
+        <msg_icon_16 this="9699469A-1E0D-4ABF-AF3C-92C1BF31C167"/>
+        <msg_portrait_1 this="B25DC91B-306A-4F6D-8D54-85DDCFFB97EF"/>
+        <msg_portrait_2 this="DE12B8D6-CC48-4BA1-ACD8-1C3144A38B73"/>
+        <msg_portrait_3 this="2B68BA8F-77A1-4B25-A377-9E338C007539"/>
+        <msg_portrait_4 this="EC62F590-BD28-44A4-AA33-561E3F22D073"/>
+        <msg_portrait_5 this="A8C625F3-F1A2-4025-AB6D-D6089CE7C393"/>
+        <msg_portrait_6 this="1E6ECF1A-5A13-4147-B638-2140A5F26230"/>
+        <msg_portrait_7 this="60DF04D4-BE33-4235-BB35-29BF31C4848C"/>
+        <msg_portrait_8 this="B4EA72FE-06BD-4B75-A9F2-2DD8632721FC"/>
+        <msg_portrait_9 this="03AA2ADA-5778-4359-860F-F693D2DCEAAC"/>
+        <msg_portrait_10 this="E6174C0B-5731-464B-9F12-E7682BDD2039"/>
+        <msg_portrait_11 this="EA29A113-E03C-4864-91E0-CFAECA6D1899"/>
+        <msg_portrait_12 this="54843A94-C6FD-470A-84F0-FCBE71471E04"/>
+        <msg_portrait_13 this="2AE6B579-5E1F-430C-A6B9-F4307D4D1DC2"/>
+        <msg_portrait_14 this="90D00FD7-7D37-407F-BCA6-A33325C4C6FC"/>
+        <msg_portrait_15 this="2E8272EF-F40E-4EC5-986C-7C9CF90820C5"/>
+        <msg_portrait_16 this="28E5CF03-5F0B-416D-AE91-4A6B9536C116"/>
+        <header_title this="A40A0003-7A10-4DA0-A040-000000000003"/>
+        <header_meta this="A40A0004-7A10-4DA0-A040-000000000004"/>
+        <header_attitude this="A40A0005-7A10-4DA0-A040-000000000005"/>
+        <proposal_card this="A40A0006-7A10-4DA0-A040-000000000006">
+          <proposal_icon this="A40A0009-7A10-4DA0-A040-000000000009"/>
+          <proposal_title this="A40A0007-7A10-4DA0-A040-000000000007"/>
+          <proposal_detail this="A40A0008-7A10-4DA0-A040-000000000008"/>
+        </proposal_card>
+      </panel_frame>
+    </root>
+  </hierarchy>
+  <components>
+    <root this="A40A0001-7A10-4DA0-A040-000000000001" id="root" tooltipslocalised="true" uniqueguid="A40A0001-7A10-4DA0-A040-000000000001" currentstate="A40A0011-7A10-4DA0-A040-000000000011" defaultstate="A40A0011-7A10-4DA0-A040-000000000011">
+      <states>
+        <newstate this="A40A0011-7A10-4DA0-A040-000000000011" name="NewState" width="680" height="500" texthbehaviour="Never split" interactive="false" uniqueguid="A40A0011-7A10-4DA0-A040-000000000011"/>
+      </states>
+    </root>
+    <panel_frame this="A40A0002-7A10-4DA0-A040-000000000002" id="panel_frame" offset="0.00,0.00" priority="20" tooltipslocalised="true" uniqueguid="A40A0002-7A10-4DA0-A040-000000000002" currentstate="A40A0012-7A10-4DA0-A040-000000000012" defaultstate="A40A0012-7A10-4DA0-A040-000000000012">
+      <componentimages>
+        <component_image this="A40A0021-7A10-4DA0-A040-000000000021" uniqueguid="A40A0021-7A10-4DA0-A040-000000000021" imagepath="ui/skins/default/panel_back_tile.png"/>
+        <component_image this="A40A0022-7A10-4DA0-A040-000000000022" uniqueguid="A40A0022-7A10-4DA0-A040-000000000022" imagepath="ui/skins/default/panel_back_border.png"/>
+      </componentimages>
+      <states>
+        <newstate this="A40A0012-7A10-4DA0-A040-000000000012" name="NewState" width="680" height="500" texthbehaviour="Never split" font_m_size="14" font_m_colour="#FFF8D7FF" font_m_leading="2" fontcat_name="ingame_text_warhammer3" interactive="false" uniqueguid="A40A0012-7A10-4DA0-A040-000000000012">
+          <imagemetrics>
+            <image this="A40A0031-7A10-4DA0-A040-000000000031" uniqueguid="A40A0031-7A10-4DA0-A040-000000000031" componentimage="A40A0021-7A10-4DA0-A040-000000000021" offset="4.00,4.00" width="672" height="492" tile="true" dockpoint="Center" margin="16.00,16.00,16.00,16.00"/>
+            <image this="A40A0032-7A10-4DA0-A040-000000000032" uniqueguid="A40A0032-7A10-4DA0-A040-000000000032" componentimage="A40A0022-7A10-4DA0-A040-000000000022" width="680" height="500" tile="true" margin="30.00,30.00,30.00,30.00"/>
+          </imagemetrics>
+        </newstate>
+      </states>
+    </panel_frame>
+    <header_crest this="A40A000A-7A10-4DA0-A040-00000000000A" id="header_crest" offset="20.00,8.00" priority="85" tooltipslocalised="true" uniqueguid="A40A000A-7A10-4DA0-A040-00000000000A" currentstate="A40A001A-7A10-4DA0-A040-00000000001A" defaultstate="A40A001A-7A10-4DA0-A040-00000000001A">
+      <componentimages><component_image this="A40A002A-7A10-4DA0-A040-00000000002A" uniqueguid="A40A002A-7A10-4DA0-A040-00000000002A" imagepath="ui/skins/default/icon_diplomacy.png"/></componentimages>
+      <states><newstate this="A40A001A-7A10-4DA0-A040-00000000001A" name="NewState" width="44" height="44" interactive="false" uniqueguid="A40A001A-7A10-4DA0-A040-00000000001A"><imagemetrics><image this="A40A003A-7A10-4DA0-A040-00000000003A" uniqueguid="A40A003A-7A10-4DA0-A040-00000000003A" componentimage="A40A002A-7A10-4DA0-A040-00000000002A" width="44" height="44"/></imagemetrics></newstate></states>
+    </header_crest>
+    <msg_icon_1 this="73BDE534-C6A8-45B6-9334-8FAA0BE66656" id="msg_icon_1" offset="0.00,0.00" priority="85" visible="false" tooltipslocalised="true" uniqueguid="73BDE534-C6A8-45B6-9334-8FAA0BE66656" currentstate="594EC1A7-AC63-4171-A0B8-49AA56F83901" defaultstate="594EC1A7-AC63-4171-A0B8-49AA56F83901">
+      <componentimages><component_image this="DFCF1832-B163-4A78-8C7D-4387318AAAE0" uniqueguid="DFCF1832-B163-4A78-8C7D-4387318AAAE0" imagepath="ui/skins/default/icon_diplomacy.png"/></componentimages>
+      <states><newstate this="594EC1A7-AC63-4171-A0B8-49AA56F83901" name="NewState" width="40" height="40" interactive="false" uniqueguid="594EC1A7-AC63-4171-A0B8-49AA56F83901"><imagemetrics><image this="82D8C57D-B3AE-48EE-9641-92010FFA03DB" uniqueguid="82D8C57D-B3AE-48EE-9641-92010FFA03DB" componentimage="DFCF1832-B163-4A78-8C7D-4387318AAAE0" width="40" height="40"/></imagemetrics></newstate></states>
+    </msg_icon_1>
+    <msg_icon_2 this="18A8288A-4AA8-423C-90AF-E09AF74DFA7B" id="msg_icon_2" offset="0.00,0.00" priority="85" visible="false" tooltipslocalised="true" uniqueguid="18A8288A-4AA8-423C-90AF-E09AF74DFA7B" currentstate="4BF47515-203C-4857-BFE7-49FA294DD53D" defaultstate="4BF47515-203C-4857-BFE7-49FA294DD53D">
+      <componentimages><component_image this="8EE51D00-B9A2-4B15-8C23-159BE93A5A33" uniqueguid="8EE51D00-B9A2-4B15-8C23-159BE93A5A33" imagepath="ui/skins/default/icon_diplomacy.png"/></componentimages>
+      <states><newstate this="4BF47515-203C-4857-BFE7-49FA294DD53D" name="NewState" width="40" height="40" interactive="false" uniqueguid="4BF47515-203C-4857-BFE7-49FA294DD53D"><imagemetrics><image this="A5BB2D99-F166-4CF5-9F17-9D2FC04569E7" uniqueguid="A5BB2D99-F166-4CF5-9F17-9D2FC04569E7" componentimage="8EE51D00-B9A2-4B15-8C23-159BE93A5A33" width="40" height="40"/></imagemetrics></newstate></states>
+    </msg_icon_2>
+    <msg_icon_3 this="70F8D5CA-1806-4045-A546-09C104C18157" id="msg_icon_3" offset="0.00,0.00" priority="85" visible="false" tooltipslocalised="true" uniqueguid="70F8D5CA-1806-4045-A546-09C104C18157" currentstate="B4BD9BF4-37D1-4D24-BC49-35D1F2B7FDA6" defaultstate="B4BD9BF4-37D1-4D24-BC49-35D1F2B7FDA6">
+      <componentimages><component_image this="ED97A83E-F3CC-4DA2-8C94-318628AAE01F" uniqueguid="ED97A83E-F3CC-4DA2-8C94-318628AAE01F" imagepath="ui/skins/default/icon_diplomacy.png"/></componentimages>
+      <states><newstate this="B4BD9BF4-37D1-4D24-BC49-35D1F2B7FDA6" name="NewState" width="40" height="40" interactive="false" uniqueguid="B4BD9BF4-37D1-4D24-BC49-35D1F2B7FDA6"><imagemetrics><image this="C329A94E-E2F3-4DA7-B9B6-4E25EE071B24" uniqueguid="C329A94E-E2F3-4DA7-B9B6-4E25EE071B24" componentimage="ED97A83E-F3CC-4DA2-8C94-318628AAE01F" width="40" height="40"/></imagemetrics></newstate></states>
+    </msg_icon_3>
+    <msg_icon_4 this="708456A7-7BC2-47D0-AB33-9B294AE8D59D" id="msg_icon_4" offset="0.00,0.00" priority="85" visible="false" tooltipslocalised="true" uniqueguid="708456A7-7BC2-47D0-AB33-9B294AE8D59D" currentstate="12CC5C97-A08E-4250-8568-70F0AAB44A26" defaultstate="12CC5C97-A08E-4250-8568-70F0AAB44A26">
+      <componentimages><component_image this="EEFBFB39-47C0-4E3A-BF4C-C49D2C737300" uniqueguid="EEFBFB39-47C0-4E3A-BF4C-C49D2C737300" imagepath="ui/skins/default/icon_diplomacy.png"/></componentimages>
+      <states><newstate this="12CC5C97-A08E-4250-8568-70F0AAB44A26" name="NewState" width="40" height="40" interactive="false" uniqueguid="12CC5C97-A08E-4250-8568-70F0AAB44A26"><imagemetrics><image this="61A5C979-CD3A-47EF-B8CC-2370DA0318A0" uniqueguid="61A5C979-CD3A-47EF-B8CC-2370DA0318A0" componentimage="EEFBFB39-47C0-4E3A-BF4C-C49D2C737300" width="40" height="40"/></imagemetrics></newstate></states>
+    </msg_icon_4>
+    <msg_icon_5 this="D7AF668D-5A4B-46B7-B982-7C5F19577C0D" id="msg_icon_5" offset="0.00,0.00" priority="85" visible="false" tooltipslocalised="true" uniqueguid="D7AF668D-5A4B-46B7-B982-7C5F19577C0D" currentstate="526EFE0D-A70E-4A74-89F4-A992F529A404" defaultstate="526EFE0D-A70E-4A74-89F4-A992F529A404">
+      <componentimages><component_image this="79C22F81-E45A-4863-A9E4-1B31F5926407" uniqueguid="79C22F81-E45A-4863-A9E4-1B31F5926407" imagepath="ui/skins/default/icon_diplomacy.png"/></componentimages>
+      <states><newstate this="526EFE0D-A70E-4A74-89F4-A992F529A404" name="NewState" width="40" height="40" interactive="false" uniqueguid="526EFE0D-A70E-4A74-89F4-A992F529A404"><imagemetrics><image this="2D47CF82-2072-4ED5-BB5C-B3EB9EA8B470" uniqueguid="2D47CF82-2072-4ED5-BB5C-B3EB9EA8B470" componentimage="79C22F81-E45A-4863-A9E4-1B31F5926407" width="40" height="40"/></imagemetrics></newstate></states>
+    </msg_icon_5>
+    <msg_icon_6 this="C32D5FAA-D6EB-468C-A572-CD8080793A1F" id="msg_icon_6" offset="0.00,0.00" priority="85" visible="false" tooltipslocalised="true" uniqueguid="C32D5FAA-D6EB-468C-A572-CD8080793A1F" currentstate="CF01EB06-2211-4BA9-A791-EF2D7ECA7E43" defaultstate="CF01EB06-2211-4BA9-A791-EF2D7ECA7E43">
+      <componentimages><component_image this="3945E68F-8973-48B1-AF4A-108755D60F81" uniqueguid="3945E68F-8973-48B1-AF4A-108755D60F81" imagepath="ui/skins/default/icon_diplomacy.png"/></componentimages>
+      <states><newstate this="CF01EB06-2211-4BA9-A791-EF2D7ECA7E43" name="NewState" width="40" height="40" interactive="false" uniqueguid="CF01EB06-2211-4BA9-A791-EF2D7ECA7E43"><imagemetrics><image this="98A9D3C7-DB0A-4919-BD73-495FD4B3F99C" uniqueguid="98A9D3C7-DB0A-4919-BD73-495FD4B3F99C" componentimage="3945E68F-8973-48B1-AF4A-108755D60F81" width="40" height="40"/></imagemetrics></newstate></states>
+    </msg_icon_6>
+    <msg_icon_7 this="88BCEA76-451D-493D-B173-6EDAEFF8B074" id="msg_icon_7" offset="0.00,0.00" priority="85" visible="false" tooltipslocalised="true" uniqueguid="88BCEA76-451D-493D-B173-6EDAEFF8B074" currentstate="B3A7089E-8A79-410C-A735-13B010F902D0" defaultstate="B3A7089E-8A79-410C-A735-13B010F902D0">
+      <componentimages><component_image this="624A5B77-18ED-405B-8E20-6D988F4B546C" uniqueguid="624A5B77-18ED-405B-8E20-6D988F4B546C" imagepath="ui/skins/default/icon_diplomacy.png"/></componentimages>
+      <states><newstate this="B3A7089E-8A79-410C-A735-13B010F902D0" name="NewState" width="40" height="40" interactive="false" uniqueguid="B3A7089E-8A79-410C-A735-13B010F902D0"><imagemetrics><image this="C0142B43-D7EF-4C69-8140-4DE24DE4CE6D" uniqueguid="C0142B43-D7EF-4C69-8140-4DE24DE4CE6D" componentimage="624A5B77-18ED-405B-8E20-6D988F4B546C" width="40" height="40"/></imagemetrics></newstate></states>
+    </msg_icon_7>
+    <msg_icon_8 this="E0259360-AC2B-47DA-A65D-01B57936FE5B" id="msg_icon_8" offset="0.00,0.00" priority="85" visible="false" tooltipslocalised="true" uniqueguid="E0259360-AC2B-47DA-A65D-01B57936FE5B" currentstate="BC7FBBB4-D017-4FCE-BD9E-916D1563BA92" defaultstate="BC7FBBB4-D017-4FCE-BD9E-916D1563BA92">
+      <componentimages><component_image this="3C5D271B-1B90-4752-927A-73C78076B443" uniqueguid="3C5D271B-1B90-4752-927A-73C78076B443" imagepath="ui/skins/default/icon_diplomacy.png"/></componentimages>
+      <states><newstate this="BC7FBBB4-D017-4FCE-BD9E-916D1563BA92" name="NewState" width="40" height="40" interactive="false" uniqueguid="BC7FBBB4-D017-4FCE-BD9E-916D1563BA92"><imagemetrics><image this="535293FB-0A45-40A1-9F52-5BE1A1762CF5" uniqueguid="535293FB-0A45-40A1-9F52-5BE1A1762CF5" componentimage="3C5D271B-1B90-4752-927A-73C78076B443" width="40" height="40"/></imagemetrics></newstate></states>
+    </msg_icon_8>
+    <msg_icon_9 this="3FCE4098-88B9-466C-9CA1-F13BA3DD3EE6" id="msg_icon_9" offset="0.00,0.00" priority="85" visible="false" tooltipslocalised="true" uniqueguid="3FCE4098-88B9-466C-9CA1-F13BA3DD3EE6" currentstate="491F49A1-C56C-4AEF-9EA5-E32CB12AF95D" defaultstate="491F49A1-C56C-4AEF-9EA5-E32CB12AF95D">
+      <componentimages><component_image this="F2622A1D-30F9-4D26-B618-0BD4B7BCFC5E" uniqueguid="F2622A1D-30F9-4D26-B618-0BD4B7BCFC5E" imagepath="ui/skins/default/icon_diplomacy.png"/></componentimages>
+      <states><newstate this="491F49A1-C56C-4AEF-9EA5-E32CB12AF95D" name="NewState" width="40" height="40" interactive="false" uniqueguid="491F49A1-C56C-4AEF-9EA5-E32CB12AF95D"><imagemetrics><image this="3BADAB05-B094-41FE-A5AF-28556599173B" uniqueguid="3BADAB05-B094-41FE-A5AF-28556599173B" componentimage="F2622A1D-30F9-4D26-B618-0BD4B7BCFC5E" width="40" height="40"/></imagemetrics></newstate></states>
+    </msg_icon_9>
+    <msg_icon_10 this="9AA94C17-A1B3-45AF-B3F8-4C45AE003C4A" id="msg_icon_10" offset="0.00,0.00" priority="85" visible="false" tooltipslocalised="true" uniqueguid="9AA94C17-A1B3-45AF-B3F8-4C45AE003C4A" currentstate="2295710A-0FB5-4737-AC5E-4A2B3F248E57" defaultstate="2295710A-0FB5-4737-AC5E-4A2B3F248E57">
+      <componentimages><component_image this="D11AC0C3-8B79-41AC-9D7A-A0EA628658C7" uniqueguid="D11AC0C3-8B79-41AC-9D7A-A0EA628658C7" imagepath="ui/skins/default/icon_diplomacy.png"/></componentimages>
+      <states><newstate this="2295710A-0FB5-4737-AC5E-4A2B3F248E57" name="NewState" width="40" height="40" interactive="false" uniqueguid="2295710A-0FB5-4737-AC5E-4A2B3F248E57"><imagemetrics><image this="178789DA-A242-477E-B488-D8F8E8A5DDED" uniqueguid="178789DA-A242-477E-B488-D8F8E8A5DDED" componentimage="D11AC0C3-8B79-41AC-9D7A-A0EA628658C7" width="40" height="40"/></imagemetrics></newstate></states>
+    </msg_icon_10>
+    <msg_icon_11 this="4688ED3D-509B-47F4-A402-0C6B9B19AC2B" id="msg_icon_11" offset="0.00,0.00" priority="85" visible="false" tooltipslocalised="true" uniqueguid="4688ED3D-509B-47F4-A402-0C6B9B19AC2B" currentstate="AA6D3265-442C-4E3B-9522-C5CDB2FED510" defaultstate="AA6D3265-442C-4E3B-9522-C5CDB2FED510">
+      <componentimages><component_image this="6F02ECA9-FFCF-4F53-B940-18BBA646EF02" uniqueguid="6F02ECA9-FFCF-4F53-B940-18BBA646EF02" imagepath="ui/skins/default/icon_diplomacy.png"/></componentimages>
+      <states><newstate this="AA6D3265-442C-4E3B-9522-C5CDB2FED510" name="NewState" width="40" height="40" interactive="false" uniqueguid="AA6D3265-442C-4E3B-9522-C5CDB2FED510"><imagemetrics><image this="2C70B422-64BC-4512-83FD-83100CA7D90B" uniqueguid="2C70B422-64BC-4512-83FD-83100CA7D90B" componentimage="6F02ECA9-FFCF-4F53-B940-18BBA646EF02" width="40" height="40"/></imagemetrics></newstate></states>
+    </msg_icon_11>
+    <msg_icon_12 this="B08F89ED-3013-4DC0-89D4-F7972AD0266E" id="msg_icon_12" offset="0.00,0.00" priority="85" visible="false" tooltipslocalised="true" uniqueguid="B08F89ED-3013-4DC0-89D4-F7972AD0266E" currentstate="1A426C29-2FD4-4D81-9626-8B49F240D58E" defaultstate="1A426C29-2FD4-4D81-9626-8B49F240D58E">
+      <componentimages><component_image this="0484A0D0-3025-4FFB-B4C3-C7597031B737" uniqueguid="0484A0D0-3025-4FFB-B4C3-C7597031B737" imagepath="ui/skins/default/icon_diplomacy.png"/></componentimages>
+      <states><newstate this="1A426C29-2FD4-4D81-9626-8B49F240D58E" name="NewState" width="40" height="40" interactive="false" uniqueguid="1A426C29-2FD4-4D81-9626-8B49F240D58E"><imagemetrics><image this="9CE85114-540B-49CC-B3C1-4219CFF63B06" uniqueguid="9CE85114-540B-49CC-B3C1-4219CFF63B06" componentimage="0484A0D0-3025-4FFB-B4C3-C7597031B737" width="40" height="40"/></imagemetrics></newstate></states>
+    </msg_icon_12>
+    <msg_icon_13 this="4A5C0FD5-529B-44CC-8957-55D026831328" id="msg_icon_13" offset="0.00,0.00" priority="85" visible="false" tooltipslocalised="true" uniqueguid="4A5C0FD5-529B-44CC-8957-55D026831328" currentstate="BAA52864-7646-4A17-8529-8961F90ED661" defaultstate="BAA52864-7646-4A17-8529-8961F90ED661">
+      <componentimages><component_image this="9F476FFC-4483-4333-8F53-96C59E83FF33" uniqueguid="9F476FFC-4483-4333-8F53-96C59E83FF33" imagepath="ui/skins/default/icon_diplomacy.png"/></componentimages>
+      <states><newstate this="BAA52864-7646-4A17-8529-8961F90ED661" name="NewState" width="40" height="40" interactive="false" uniqueguid="BAA52864-7646-4A17-8529-8961F90ED661"><imagemetrics><image this="A677C9B1-0F55-40E7-B40A-9EAF790132FE" uniqueguid="A677C9B1-0F55-40E7-B40A-9EAF790132FE" componentimage="9F476FFC-4483-4333-8F53-96C59E83FF33" width="40" height="40"/></imagemetrics></newstate></states>
+    </msg_icon_13>
+    <msg_icon_14 this="1CDEF7DC-F7C3-4F4A-A928-34396565E520" id="msg_icon_14" offset="0.00,0.00" priority="85" visible="false" tooltipslocalised="true" uniqueguid="1CDEF7DC-F7C3-4F4A-A928-34396565E520" currentstate="4B102017-1AC5-4D25-9FE1-6FEEAB7F554B" defaultstate="4B102017-1AC5-4D25-9FE1-6FEEAB7F554B">
+      <componentimages><component_image this="6711E311-248F-445C-A9AC-3BAC9E34E548" uniqueguid="6711E311-248F-445C-A9AC-3BAC9E34E548" imagepath="ui/skins/default/icon_diplomacy.png"/></componentimages>
+      <states><newstate this="4B102017-1AC5-4D25-9FE1-6FEEAB7F554B" name="NewState" width="40" height="40" interactive="false" uniqueguid="4B102017-1AC5-4D25-9FE1-6FEEAB7F554B"><imagemetrics><image this="B7D38FA2-9919-4D5F-AE97-274F97BC5178" uniqueguid="B7D38FA2-9919-4D5F-AE97-274F97BC5178" componentimage="6711E311-248F-445C-A9AC-3BAC9E34E548" width="40" height="40"/></imagemetrics></newstate></states>
+    </msg_icon_14>
+    <msg_icon_15 this="2B2F9986-63E8-4A83-8CB6-45EB405FD69B" id="msg_icon_15" offset="0.00,0.00" priority="85" visible="false" tooltipslocalised="true" uniqueguid="2B2F9986-63E8-4A83-8CB6-45EB405FD69B" currentstate="0DEECA21-CFA2-4415-94B2-24FD97865C28" defaultstate="0DEECA21-CFA2-4415-94B2-24FD97865C28">
+      <componentimages><component_image this="2CE2A4E7-B189-4F13-826F-F46046C10EB4" uniqueguid="2CE2A4E7-B189-4F13-826F-F46046C10EB4" imagepath="ui/skins/default/icon_diplomacy.png"/></componentimages>
+      <states><newstate this="0DEECA21-CFA2-4415-94B2-24FD97865C28" name="NewState" width="40" height="40" interactive="false" uniqueguid="0DEECA21-CFA2-4415-94B2-24FD97865C28"><imagemetrics><image this="9524F13D-8115-4B07-8F3F-F08343836733" uniqueguid="9524F13D-8115-4B07-8F3F-F08343836733" componentimage="2CE2A4E7-B189-4F13-826F-F46046C10EB4" width="40" height="40"/></imagemetrics></newstate></states>
+    </msg_icon_15>
+    <msg_icon_16 this="9699469A-1E0D-4ABF-AF3C-92C1BF31C167" id="msg_icon_16" offset="0.00,0.00" priority="85" visible="false" tooltipslocalised="true" uniqueguid="9699469A-1E0D-4ABF-AF3C-92C1BF31C167" currentstate="D5153093-6E5F-4DC0-AB88-F83114CDEE41" defaultstate="D5153093-6E5F-4DC0-AB88-F83114CDEE41">
+      <componentimages><component_image this="1C4AD189-684D-4993-90EA-AC30BBF018DE" uniqueguid="1C4AD189-684D-4993-90EA-AC30BBF018DE" imagepath="ui/skins/default/icon_diplomacy.png"/></componentimages>
+      <states><newstate this="D5153093-6E5F-4DC0-AB88-F83114CDEE41" name="NewState" width="40" height="40" interactive="false" uniqueguid="D5153093-6E5F-4DC0-AB88-F83114CDEE41"><imagemetrics><image this="98258860-795D-41B5-BDA6-9C0F05AE427A" uniqueguid="98258860-795D-41B5-BDA6-9C0F05AE427A" componentimage="1C4AD189-684D-4993-90EA-AC30BBF018DE" width="40" height="40"/></imagemetrics></newstate></states>
+    </msg_icon_16>
+    <msg_portrait_1 this="B25DC91B-306A-4F6D-8D54-85DDCFFB97EF" id="msg_portrait_1" offset="0.00,0.00" priority="85" visible="false" allowhorizontalresize="false" allowverticalresize="false" clipimagestocomponent="true" tooltipslocalised="true" uniqueguid="B25DC91B-306A-4F6D-8D54-85DDCFFB97EF" currentstate="897BB424-91BA-4A1D-B547-CA78E6B52625" defaultstate="897BB424-91BA-4A1D-B547-CA78E6B52625">
+      <componentimages><component_image this="B1E577A8-7450-4DF2-B4CA-5F5515E8C0A7" uniqueguid="B1E577A8-7450-4DF2-B4CA-5F5515E8C0A7" imagepath="ui/skins/default/portrait_ph.png"/></componentimages>
+      <states><newstate this="897BB424-91BA-4A1D-B547-CA78E6B52625" name="NewState" width="44" height="44" interactive="false" uniqueguid="897BB424-91BA-4A1D-B547-CA78E6B52625"><imagemetrics><image this="34CDD2CA-6D4C-46E0-8A75-8AA30D3C6B9E" uniqueguid="34CDD2CA-6D4C-46E0-8A75-8AA30D3C6B9E" componentimage="B1E577A8-7450-4DF2-B4CA-5F5515E8C0A7" offset="-33.00,-8.00" width="110" height="60"/></imagemetrics></newstate></states>
+    </msg_portrait_1>
+    <msg_portrait_2 this="DE12B8D6-CC48-4BA1-ACD8-1C3144A38B73" id="msg_portrait_2" offset="0.00,0.00" priority="85" visible="false" allowhorizontalresize="false" allowverticalresize="false" clipimagestocomponent="true" tooltipslocalised="true" uniqueguid="DE12B8D6-CC48-4BA1-ACD8-1C3144A38B73" currentstate="7DCF91F3-3E0B-405A-B1CB-E82A04F2710C" defaultstate="7DCF91F3-3E0B-405A-B1CB-E82A04F2710C">
+      <componentimages><component_image this="AFF7021D-4EA5-45F6-A485-BABD7D66F478" uniqueguid="AFF7021D-4EA5-45F6-A485-BABD7D66F478" imagepath="ui/skins/default/portrait_ph.png"/></componentimages>
+      <states><newstate this="7DCF91F3-3E0B-405A-B1CB-E82A04F2710C" name="NewState" width="44" height="44" interactive="false" uniqueguid="7DCF91F3-3E0B-405A-B1CB-E82A04F2710C"><imagemetrics><image this="820B186B-01D2-4E22-ADC3-6B1B9E5A05C1" uniqueguid="820B186B-01D2-4E22-ADC3-6B1B9E5A05C1" componentimage="AFF7021D-4EA5-45F6-A485-BABD7D66F478" offset="-33.00,-8.00" width="110" height="60"/></imagemetrics></newstate></states>
+    </msg_portrait_2>
+    <msg_portrait_3 this="2B68BA8F-77A1-4B25-A377-9E338C007539" id="msg_portrait_3" offset="0.00,0.00" priority="85" visible="false" allowhorizontalresize="false" allowverticalresize="false" clipimagestocomponent="true" tooltipslocalised="true" uniqueguid="2B68BA8F-77A1-4B25-A377-9E338C007539" currentstate="F78CBEBE-4486-41CF-92AB-AA5947B74295" defaultstate="F78CBEBE-4486-41CF-92AB-AA5947B74295">
+      <componentimages><component_image this="68D49242-E20C-4DD3-8E23-94D98681A164" uniqueguid="68D49242-E20C-4DD3-8E23-94D98681A164" imagepath="ui/skins/default/portrait_ph.png"/></componentimages>
+      <states><newstate this="F78CBEBE-4486-41CF-92AB-AA5947B74295" name="NewState" width="44" height="44" interactive="false" uniqueguid="F78CBEBE-4486-41CF-92AB-AA5947B74295"><imagemetrics><image this="7F093A1E-08ED-47EF-BC90-DC97D7393DCB" uniqueguid="7F093A1E-08ED-47EF-BC90-DC97D7393DCB" componentimage="68D49242-E20C-4DD3-8E23-94D98681A164" offset="-33.00,-8.00" width="110" height="60"/></imagemetrics></newstate></states>
+    </msg_portrait_3>
+    <msg_portrait_4 this="EC62F590-BD28-44A4-AA33-561E3F22D073" id="msg_portrait_4" offset="0.00,0.00" priority="85" visible="false" allowhorizontalresize="false" allowverticalresize="false" clipimagestocomponent="true" tooltipslocalised="true" uniqueguid="EC62F590-BD28-44A4-AA33-561E3F22D073" currentstate="2BC47B86-F5BF-4255-BE20-36D1EECBADD2" defaultstate="2BC47B86-F5BF-4255-BE20-36D1EECBADD2">
+      <componentimages><component_image this="780664A2-CB6C-4D32-A9AB-BD59442EFC88" uniqueguid="780664A2-CB6C-4D32-A9AB-BD59442EFC88" imagepath="ui/skins/default/portrait_ph.png"/></componentimages>
+      <states><newstate this="2BC47B86-F5BF-4255-BE20-36D1EECBADD2" name="NewState" width="44" height="44" interactive="false" uniqueguid="2BC47B86-F5BF-4255-BE20-36D1EECBADD2"><imagemetrics><image this="38A8706C-E907-4E74-B358-4DFA0D7E1A1B" uniqueguid="38A8706C-E907-4E74-B358-4DFA0D7E1A1B" componentimage="780664A2-CB6C-4D32-A9AB-BD59442EFC88" offset="-33.00,-8.00" width="110" height="60"/></imagemetrics></newstate></states>
+    </msg_portrait_4>
+    <msg_portrait_5 this="A8C625F3-F1A2-4025-AB6D-D6089CE7C393" id="msg_portrait_5" offset="0.00,0.00" priority="85" visible="false" allowhorizontalresize="false" allowverticalresize="false" clipimagestocomponent="true" tooltipslocalised="true" uniqueguid="A8C625F3-F1A2-4025-AB6D-D6089CE7C393" currentstate="E3A720FE-468A-4FDD-BD59-F5D5D50C6748" defaultstate="E3A720FE-468A-4FDD-BD59-F5D5D50C6748">
+      <componentimages><component_image this="F2F7B6AA-E029-4406-B802-D16AB71A8002" uniqueguid="F2F7B6AA-E029-4406-B802-D16AB71A8002" imagepath="ui/skins/default/portrait_ph.png"/></componentimages>
+      <states><newstate this="E3A720FE-468A-4FDD-BD59-F5D5D50C6748" name="NewState" width="44" height="44" interactive="false" uniqueguid="E3A720FE-468A-4FDD-BD59-F5D5D50C6748"><imagemetrics><image this="02F73BD8-0CC6-4C51-8106-E42C5B0D0F43" uniqueguid="02F73BD8-0CC6-4C51-8106-E42C5B0D0F43" componentimage="F2F7B6AA-E029-4406-B802-D16AB71A8002" offset="-33.00,-8.00" width="110" height="60"/></imagemetrics></newstate></states>
+    </msg_portrait_5>
+    <msg_portrait_6 this="1E6ECF1A-5A13-4147-B638-2140A5F26230" id="msg_portrait_6" offset="0.00,0.00" priority="85" visible="false" allowhorizontalresize="false" allowverticalresize="false" clipimagestocomponent="true" tooltipslocalised="true" uniqueguid="1E6ECF1A-5A13-4147-B638-2140A5F26230" currentstate="3D433917-E62F-4666-AD90-470BDBA6933E" defaultstate="3D433917-E62F-4666-AD90-470BDBA6933E">
+      <componentimages><component_image this="982DA4BA-0E85-4E27-B149-7A01DAAF85DF" uniqueguid="982DA4BA-0E85-4E27-B149-7A01DAAF85DF" imagepath="ui/skins/default/portrait_ph.png"/></componentimages>
+      <states><newstate this="3D433917-E62F-4666-AD90-470BDBA6933E" name="NewState" width="44" height="44" interactive="false" uniqueguid="3D433917-E62F-4666-AD90-470BDBA6933E"><imagemetrics><image this="19B59AFA-7F04-493E-854B-481EA9DFF8BF" uniqueguid="19B59AFA-7F04-493E-854B-481EA9DFF8BF" componentimage="982DA4BA-0E85-4E27-B149-7A01DAAF85DF" offset="-33.00,-8.00" width="110" height="60"/></imagemetrics></newstate></states>
+    </msg_portrait_6>
+    <msg_portrait_7 this="60DF04D4-BE33-4235-BB35-29BF31C4848C" id="msg_portrait_7" offset="0.00,0.00" priority="85" visible="false" allowhorizontalresize="false" allowverticalresize="false" clipimagestocomponent="true" tooltipslocalised="true" uniqueguid="60DF04D4-BE33-4235-BB35-29BF31C4848C" currentstate="D33EBC01-81C4-48D8-8A68-573D1BF40A70" defaultstate="D33EBC01-81C4-48D8-8A68-573D1BF40A70">
+      <componentimages><component_image this="11A261B8-C6B7-4E74-A90F-589419CEB69C" uniqueguid="11A261B8-C6B7-4E74-A90F-589419CEB69C" imagepath="ui/skins/default/portrait_ph.png"/></componentimages>
+      <states><newstate this="D33EBC01-81C4-48D8-8A68-573D1BF40A70" name="NewState" width="44" height="44" interactive="false" uniqueguid="D33EBC01-81C4-48D8-8A68-573D1BF40A70"><imagemetrics><image this="08A5423F-1BDA-4E10-ADCD-86A377F01488" uniqueguid="08A5423F-1BDA-4E10-ADCD-86A377F01488" componentimage="11A261B8-C6B7-4E74-A90F-589419CEB69C" offset="-33.00,-8.00" width="110" height="60"/></imagemetrics></newstate></states>
+    </msg_portrait_7>
+    <msg_portrait_8 this="B4EA72FE-06BD-4B75-A9F2-2DD8632721FC" id="msg_portrait_8" offset="0.00,0.00" priority="85" visible="false" allowhorizontalresize="false" allowverticalresize="false" clipimagestocomponent="true" tooltipslocalised="true" uniqueguid="B4EA72FE-06BD-4B75-A9F2-2DD8632721FC" currentstate="C7ACE98A-2568-4618-9588-AA59760A98D6" defaultstate="C7ACE98A-2568-4618-9588-AA59760A98D6">
+      <componentimages><component_image this="9A774939-F35A-4B84-8407-5DB5873E2F18" uniqueguid="9A774939-F35A-4B84-8407-5DB5873E2F18" imagepath="ui/skins/default/portrait_ph.png"/></componentimages>
+      <states><newstate this="C7ACE98A-2568-4618-9588-AA59760A98D6" name="NewState" width="44" height="44" interactive="false" uniqueguid="C7ACE98A-2568-4618-9588-AA59760A98D6"><imagemetrics><image this="F4536055-9E6C-47D7-A42A-D4203A85E275" uniqueguid="F4536055-9E6C-47D7-A42A-D4203A85E275" componentimage="9A774939-F35A-4B84-8407-5DB5873E2F18" offset="-33.00,-8.00" width="110" height="60"/></imagemetrics></newstate></states>
+    </msg_portrait_8>
+    <msg_portrait_9 this="03AA2ADA-5778-4359-860F-F693D2DCEAAC" id="msg_portrait_9" offset="0.00,0.00" priority="85" visible="false" allowhorizontalresize="false" allowverticalresize="false" clipimagestocomponent="true" tooltipslocalised="true" uniqueguid="03AA2ADA-5778-4359-860F-F693D2DCEAAC" currentstate="F7275136-F382-4B5D-AD25-38FF6902C7B5" defaultstate="F7275136-F382-4B5D-AD25-38FF6902C7B5">
+      <componentimages><component_image this="05497811-D52B-415F-9FE1-178B0B084997" uniqueguid="05497811-D52B-415F-9FE1-178B0B084997" imagepath="ui/skins/default/portrait_ph.png"/></componentimages>
+      <states><newstate this="F7275136-F382-4B5D-AD25-38FF6902C7B5" name="NewState" width="44" height="44" interactive="false" uniqueguid="F7275136-F382-4B5D-AD25-38FF6902C7B5"><imagemetrics><image this="6CBC5EA3-6AB7-4F31-8D85-82122F260C65" uniqueguid="6CBC5EA3-6AB7-4F31-8D85-82122F260C65" componentimage="05497811-D52B-415F-9FE1-178B0B084997" offset="-33.00,-8.00" width="110" height="60"/></imagemetrics></newstate></states>
+    </msg_portrait_9>
+    <msg_portrait_10 this="E6174C0B-5731-464B-9F12-E7682BDD2039" id="msg_portrait_10" offset="0.00,0.00" priority="85" visible="false" allowhorizontalresize="false" allowverticalresize="false" clipimagestocomponent="true" tooltipslocalised="true" uniqueguid="E6174C0B-5731-464B-9F12-E7682BDD2039" currentstate="0CCB6675-9EFC-49B2-B645-46C11EE261A4" defaultstate="0CCB6675-9EFC-49B2-B645-46C11EE261A4">
+      <componentimages><component_image this="2C13C1BC-CB5D-45AC-8EFC-54D1D8E91CF6" uniqueguid="2C13C1BC-CB5D-45AC-8EFC-54D1D8E91CF6" imagepath="ui/skins/default/portrait_ph.png"/></componentimages>
+      <states><newstate this="0CCB6675-9EFC-49B2-B645-46C11EE261A4" name="NewState" width="44" height="44" interactive="false" uniqueguid="0CCB6675-9EFC-49B2-B645-46C11EE261A4"><imagemetrics><image this="2F1DDCDB-EBA5-43E6-B4E6-28C5C4648653" uniqueguid="2F1DDCDB-EBA5-43E6-B4E6-28C5C4648653" componentimage="2C13C1BC-CB5D-45AC-8EFC-54D1D8E91CF6" offset="-33.00,-8.00" width="110" height="60"/></imagemetrics></newstate></states>
+    </msg_portrait_10>
+    <msg_portrait_11 this="EA29A113-E03C-4864-91E0-CFAECA6D1899" id="msg_portrait_11" offset="0.00,0.00" priority="85" visible="false" allowhorizontalresize="false" allowverticalresize="false" clipimagestocomponent="true" tooltipslocalised="true" uniqueguid="EA29A113-E03C-4864-91E0-CFAECA6D1899" currentstate="66A0F722-C59F-4B43-A79E-40E6A0C40459" defaultstate="66A0F722-C59F-4B43-A79E-40E6A0C40459">
+      <componentimages><component_image this="814BD600-1491-4C78-92C3-D2DCC337B1C2" uniqueguid="814BD600-1491-4C78-92C3-D2DCC337B1C2" imagepath="ui/skins/default/portrait_ph.png"/></componentimages>
+      <states><newstate this="66A0F722-C59F-4B43-A79E-40E6A0C40459" name="NewState" width="44" height="44" interactive="false" uniqueguid="66A0F722-C59F-4B43-A79E-40E6A0C40459"><imagemetrics><image this="ECF0F9DC-1CC9-49F4-8E57-8AC0F45B6F5B" uniqueguid="ECF0F9DC-1CC9-49F4-8E57-8AC0F45B6F5B" componentimage="814BD600-1491-4C78-92C3-D2DCC337B1C2" offset="-33.00,-8.00" width="110" height="60"/></imagemetrics></newstate></states>
+    </msg_portrait_11>
+    <msg_portrait_12 this="54843A94-C6FD-470A-84F0-FCBE71471E04" id="msg_portrait_12" offset="0.00,0.00" priority="85" visible="false" allowhorizontalresize="false" allowverticalresize="false" clipimagestocomponent="true" tooltipslocalised="true" uniqueguid="54843A94-C6FD-470A-84F0-FCBE71471E04" currentstate="0D345F71-9560-4722-84F5-5A586C08F00B" defaultstate="0D345F71-9560-4722-84F5-5A586C08F00B">
+      <componentimages><component_image this="161305DA-9A59-4E85-9442-E6A2340EFC1B" uniqueguid="161305DA-9A59-4E85-9442-E6A2340EFC1B" imagepath="ui/skins/default/portrait_ph.png"/></componentimages>
+      <states><newstate this="0D345F71-9560-4722-84F5-5A586C08F00B" name="NewState" width="44" height="44" interactive="false" uniqueguid="0D345F71-9560-4722-84F5-5A586C08F00B"><imagemetrics><image this="9483E66F-6388-487C-B1D6-2A30B4DAB0D8" uniqueguid="9483E66F-6388-487C-B1D6-2A30B4DAB0D8" componentimage="161305DA-9A59-4E85-9442-E6A2340EFC1B" offset="-33.00,-8.00" width="110" height="60"/></imagemetrics></newstate></states>
+    </msg_portrait_12>
+    <msg_portrait_13 this="2AE6B579-5E1F-430C-A6B9-F4307D4D1DC2" id="msg_portrait_13" offset="0.00,0.00" priority="85" visible="false" allowhorizontalresize="false" allowverticalresize="false" clipimagestocomponent="true" tooltipslocalised="true" uniqueguid="2AE6B579-5E1F-430C-A6B9-F4307D4D1DC2" currentstate="AD72E271-A42B-4694-9730-AD0C436A89C2" defaultstate="AD72E271-A42B-4694-9730-AD0C436A89C2">
+      <componentimages><component_image this="0F41A659-1FA8-495E-B894-BAC01FAFEEDA" uniqueguid="0F41A659-1FA8-495E-B894-BAC01FAFEEDA" imagepath="ui/skins/default/portrait_ph.png"/></componentimages>
+      <states><newstate this="AD72E271-A42B-4694-9730-AD0C436A89C2" name="NewState" width="44" height="44" interactive="false" uniqueguid="AD72E271-A42B-4694-9730-AD0C436A89C2"><imagemetrics><image this="4BEA1097-9C5C-412C-A881-9523EFDE0C48" uniqueguid="4BEA1097-9C5C-412C-A881-9523EFDE0C48" componentimage="0F41A659-1FA8-495E-B894-BAC01FAFEEDA" offset="-33.00,-8.00" width="110" height="60"/></imagemetrics></newstate></states>
+    </msg_portrait_13>
+    <msg_portrait_14 this="90D00FD7-7D37-407F-BCA6-A33325C4C6FC" id="msg_portrait_14" offset="0.00,0.00" priority="85" visible="false" allowhorizontalresize="false" allowverticalresize="false" clipimagestocomponent="true" tooltipslocalised="true" uniqueguid="90D00FD7-7D37-407F-BCA6-A33325C4C6FC" currentstate="675F401F-186E-425A-8CEE-506B6C63399B" defaultstate="675F401F-186E-425A-8CEE-506B6C63399B">
+      <componentimages><component_image this="3DFBB961-C6C3-4A6E-BC68-BF03AE235C48" uniqueguid="3DFBB961-C6C3-4A6E-BC68-BF03AE235C48" imagepath="ui/skins/default/portrait_ph.png"/></componentimages>
+      <states><newstate this="675F401F-186E-425A-8CEE-506B6C63399B" name="NewState" width="44" height="44" interactive="false" uniqueguid="675F401F-186E-425A-8CEE-506B6C63399B"><imagemetrics><image this="E4ED9C6A-FA6B-47C8-90FB-4EFA74F2E844" uniqueguid="E4ED9C6A-FA6B-47C8-90FB-4EFA74F2E844" componentimage="3DFBB961-C6C3-4A6E-BC68-BF03AE235C48" offset="-33.00,-8.00" width="110" height="60"/></imagemetrics></newstate></states>
+    </msg_portrait_14>
+    <msg_portrait_15 this="2E8272EF-F40E-4EC5-986C-7C9CF90820C5" id="msg_portrait_15" offset="0.00,0.00" priority="85" visible="false" allowhorizontalresize="false" allowverticalresize="false" clipimagestocomponent="true" tooltipslocalised="true" uniqueguid="2E8272EF-F40E-4EC5-986C-7C9CF90820C5" currentstate="13E8C87C-FBD8-47C1-8CFA-DC3A9F9E8E84" defaultstate="13E8C87C-FBD8-47C1-8CFA-DC3A9F9E8E84">
+      <componentimages><component_image this="D1E84EAC-EE76-40AD-8A84-898244D3348C" uniqueguid="D1E84EAC-EE76-40AD-8A84-898244D3348C" imagepath="ui/skins/default/portrait_ph.png"/></componentimages>
+      <states><newstate this="13E8C87C-FBD8-47C1-8CFA-DC3A9F9E8E84" name="NewState" width="44" height="44" interactive="false" uniqueguid="13E8C87C-FBD8-47C1-8CFA-DC3A9F9E8E84"><imagemetrics><image this="464A7208-E982-4D3E-ADAB-0BD026919140" uniqueguid="464A7208-E982-4D3E-ADAB-0BD026919140" componentimage="D1E84EAC-EE76-40AD-8A84-898244D3348C" offset="-33.00,-8.00" width="110" height="60"/></imagemetrics></newstate></states>
+    </msg_portrait_15>
+    <msg_portrait_16 this="28E5CF03-5F0B-416D-AE91-4A6B9536C116" id="msg_portrait_16" offset="0.00,0.00" priority="85" visible="false" allowhorizontalresize="false" allowverticalresize="false" clipimagestocomponent="true" tooltipslocalised="true" uniqueguid="28E5CF03-5F0B-416D-AE91-4A6B9536C116" currentstate="8AEF7296-E5B3-457F-852A-D9D9A27ED30D" defaultstate="8AEF7296-E5B3-457F-852A-D9D9A27ED30D">
+      <componentimages><component_image this="B04C27DB-B397-4C20-9FD9-D16E87FD5D4B" uniqueguid="B04C27DB-B397-4C20-9FD9-D16E87FD5D4B" imagepath="ui/skins/default/portrait_ph.png"/></componentimages>
+      <states><newstate this="8AEF7296-E5B3-457F-852A-D9D9A27ED30D" name="NewState" width="44" height="44" interactive="false" uniqueguid="8AEF7296-E5B3-457F-852A-D9D9A27ED30D"><imagemetrics><image this="0C07DF39-1B8C-4AC8-82C5-C9EDA564AB7F" uniqueguid="0C07DF39-1B8C-4AC8-82C5-C9EDA564AB7F" componentimage="B04C27DB-B397-4C20-9FD9-D16E87FD5D4B" offset="-33.00,-8.00" width="110" height="60"/></imagemetrics></newstate></states>
+    </msg_portrait_16>
+    <header_title this="A40A0003-7A10-4DA0-A040-000000000003" id="header_title" offset="72.00,8.00" priority="80" tooltipslocalised="true" uniqueguid="A40A0003-7A10-4DA0-A040-000000000003" currentstate="A40A0013-7A10-4DA0-A040-000000000013" defaultstate="A40A0013-7A10-4DA0-A040-000000000013">
+      <states>
+        <newstate this="A40A0013-7A10-4DA0-A040-000000000013" name="NewState" width="508" height="25" text="Player2" textxoffset="0.00,0.00" textyoffset="0.00,0.00" textvalign="Center" texthalign="Left" texthbehaviour="Never split" textlocalised="true" textlabel="llmdip40_header_title" font_m_font_name="brand_header" font_m_size="18" font_m_colour="#FFF8D7FF" font_m_leading="1" fontcat_name="fe_section_heading" text_shader_name="text_outline_t0" textshadervars="0.00,0.00,0.00,1.00" interactive="false" uniqueguid="A40A0013-7A10-4DA0-A040-000000000013"/>
+      </states>
+    </header_title>
+    <header_meta this="A40A0004-7A10-4DA0-A040-000000000004" id="header_meta" offset="72.00,33.00" priority="80" tooltipslocalised="true" uniqueguid="A40A0004-7A10-4DA0-A040-000000000004" currentstate="A40A0014-7A10-4DA0-A040-000000000014" defaultstate="A40A0014-7A10-4DA0-A040-000000000014">
+      <states>
+        <newstate this="A40A0014-7A10-4DA0-A040-000000000014" name="NewState" width="393" height="19" text="" textxoffset="0.00,0.00" textyoffset="0.00,0.00" textvalign="Center" texthalign="Left" texthbehaviour="Never split" textlocalised="true" textlabel="llmdip40_header_meta" font_m_size="13" font_m_colour="#D7C7A1FF" font_m_leading="1" fontcat_name="fe_default_text" interactive="false" uniqueguid="A40A0014-7A10-4DA0-A040-000000000014"/>
+      </states>
+    </header_meta>
+    <header_attitude this="A40A0005-7A10-4DA0-A040-000000000005" id="header_attitude" offset="477.00,29.00" priority="80" tooltipslocalised="true" uniqueguid="A40A0005-7A10-4DA0-A040-000000000005" currentstate="A40A0015-7A10-4DA0-A040-000000000015" defaultstate="A40A0015-7A10-4DA0-A040-000000000015">
+      <componentimages>
+        <component_image this="A40A0023-7A10-4DA0-A040-000000000023" uniqueguid="A40A0023-7A10-4DA0-A040-000000000023" imagepath="ui/skins/default/frame_text.png"/>
+      </componentimages>
+      <states>
+        <newstate this="A40A0015-7A10-4DA0-A040-000000000015" name="NewState" width="180" height="25" text="" textxoffset="6.00,6.00" textyoffset="0.00,0.00" textvalign="Center" texthalign="Center" texthbehaviour="Never split" textlocalised="true" textlabel="llmdip40_header_attitude" font_m_size="14" font_m_colour="#E6BC6AFF" font_m_leading="1" fontcat_name="fe_default_text" interactive="false" uniqueguid="A40A0015-7A10-4DA0-A040-000000000015">
+          <imagemetrics><image this="A40A0033-7A10-4DA0-A040-000000000033" uniqueguid="A40A0033-7A10-4DA0-A040-000000000033" componentimage="A40A0023-7A10-4DA0-A040-000000000023" width="180" height="25" tile="true" margin="4.00,4.00,4.00,4.00"/></imagemetrics>
+        </newstate>
+      </states>
+    </header_attitude>
+    <proposal_card this="A40A0006-7A10-4DA0-A040-000000000006" id="proposal_card" offset="20.00,376.00" priority="80" tooltipslocalised="true" uniqueguid="A40A0006-7A10-4DA0-A040-000000000006" currentstate="A40A0016-7A10-4DA0-A040-000000000016" defaultstate="A40A0016-7A10-4DA0-A040-000000000016">
+      <componentimages><component_image this="A40A0024-7A10-4DA0-A040-000000000024" uniqueguid="A40A0024-7A10-4DA0-A040-000000000024" imagepath="ui/skins/default/frame_text.png"/></componentimages>
+      <states>
+        <newstate this="A40A0016-7A10-4DA0-A040-000000000016" name="NewState" width="640" height="60" texthbehaviour="Never split" interactive="false" uniqueguid="A40A0016-7A10-4DA0-A040-000000000016">
+          <imagemetrics><image this="A40A0034-7A10-4DA0-A040-000000000034" uniqueguid="A40A0034-7A10-4DA0-A040-000000000034" componentimage="A40A0024-7A10-4DA0-A040-000000000024" width="640" height="60" tile="true" margin="4.00,4.00,4.00,4.00"/></imagemetrics>
+        </newstate>
+      </states>
+    </proposal_card>
+    <proposal_icon this="A40A0009-7A10-4DA0-A040-000000000009" id="proposal_icon" offset="10.00,13.00" priority="90" tooltipslocalised="true" uniqueguid="A40A0009-7A10-4DA0-A040-000000000009" currentstate="A40A0019-7A10-4DA0-A040-000000000019" defaultstate="A40A0019-7A10-4DA0-A040-000000000019">
+      <componentimages><component_image this="A40A0025-7A10-4DA0-A040-000000000025" uniqueguid="A40A0025-7A10-4DA0-A040-000000000025" imagepath="ui/skins/default/icon_diplomacy.png"/></componentimages>
+      <states><newstate this="A40A0019-7A10-4DA0-A040-000000000019" name="NewState" width="34" height="34" interactive="false" uniqueguid="A40A0019-7A10-4DA0-A040-000000000019"><imagemetrics><image this="A40A0035-7A10-4DA0-A040-000000000035" uniqueguid="A40A0035-7A10-4DA0-A040-000000000035" componentimage="A40A0025-7A10-4DA0-A040-000000000025" width="34" height="34"/></imagemetrics></newstate></states>
+    </proposal_icon>
+    <proposal_title this="A40A0007-7A10-4DA0-A040-000000000007" id="proposal_title" offset="54.00,5.00" priority="90" tooltipslocalised="true" uniqueguid="A40A0007-7A10-4DA0-A040-000000000007" currentstate="A40A0017-7A10-4DA0-A040-000000000017" defaultstate="A40A0017-7A10-4DA0-A040-000000000017">
+      <states><newstate this="A40A0017-7A10-4DA0-A040-000000000017" name="NewState" width="572" height="21" text="" textxoffset="0.00,0.00" textyoffset="0.00,0.00" texthbehaviour="Never split" textlocalised="true" textlabel="llmdip40_proposal_title" font_m_size="14" font_m_colour="#E6BC6AFF" font_m_leading="1" fontcat_name="fe_default_text" interactive="false" uniqueguid="A40A0017-7A10-4DA0-A040-000000000017"/></states>
+    </proposal_title>
+    <proposal_detail this="A40A0008-7A10-4DA0-A040-000000000008" id="proposal_detail" offset="54.00,27.00" priority="90" tooltipslocalised="true" uniqueguid="A40A0008-7A10-4DA0-A040-000000000008" currentstate="A40A0018-7A10-4DA0-A040-000000000018" defaultstate="A40A0018-7A10-4DA0-A040-000000000018">
+      <states><newstate this="A40A0018-7A10-4DA0-A040-000000000018" name="NewState" width="572" height="27" text="" textxoffset="0.00,0.00" textyoffset="0.00,0.00" texthbehaviour="Never split" textlocalised="true" textlabel="llmdip40_proposal_detail" font_m_size="14" font_m_colour="#FFF8D7FF" font_m_leading="1" fontcat_name="fe_default_text" interactive="false" uniqueguid="A40A0018-7A10-4DA0-A040-000000000018"/></states>
+    </proposal_detail>
+  </components>
+</layout>

@@ -114,6 +114,7 @@ test("send and close paths avoid the transient diplomacy hierarchy", () => {
 test("ships an independent Player2 chat template", () => {
   const template = fs.readFileSync(path.join(projectRoot, "mod", "llmdip_ui", "llmdip_chat.twui.xml"), "utf8");
   const history = fs.readFileSync(path.join(projectRoot, "mod", "llmdip_ui", "llmdip_history.twui.xml"), "utf8");
+  const ui = fs.readFileSync(path.join(projectRoot, "mod", "script", "campaign", "mod", "llm_diplomacy_ui.lua"), "utf8");
   assert.match(template, /<entry_box[^>]+id="entry_box"/);
   assert.match(template, /callback_id="TextInput"/);
   assert.match(template, /id="entry_box" offset="0\.00,0\.00"/);
@@ -122,19 +123,74 @@ test("ships an independent Player2 chat template", () => {
   assert.match(history, /id="history_text"/);
   assert.match(history, /callback_id="TextInput"/);
   assert.match(history, /interactive="true"/);
-  assert.match(history, /width="560" height="350"/);
+  assert.match(history, /width="640" height="380"/);
   assert.match(history, /textxoffset="12\.00,60\.00"/);
   assert.match(history, /texthbehaviour="Never split"/);
   assert.match(history, /font_m_size="14"/);
-  assert.match(template, /height="42"/);
+  assert.match(history, /imagepath="ui\/skins\/default\/frame_text\.png"/);
+  assert.doesNotMatch(history, /id="history_caption"/);
+  assert.match(history, /textyoffset="10\.00,8\.00"/);
+  assert.match(ui, /local lines = \{ "\[\[col:yellow\]\]" \.\. llmdip_t\("conversation"\)/);
+  assert.match(template, /width="510" height="42"/);
+  assert.match(template, /texthbehaviour="Never split"/);
+  assert.match(ui, /^local INPUT_WIDTH = 510$/m);
+  assert.match(ui, /^local CHAT_HEIGHT = 42$/m);
   assert.match(template, /font_m_size="14"/);
+});
+
+test("everything in the shell hangs from panel_frame, the component CreateComponent keeps", () => {
+  const shell = fs.readFileSync(path.join(projectRoot, "mod", "llmdip_ui", "llmdip_shell.twui.xml"), "utf8");
+  const hierarchy = shell.slice(shell.indexOf("<hierarchy>"), shell.indexOf("</hierarchy>"));
+  const frame = hierarchy.slice(hierarchy.indexOf("<panel_frame"), hierarchy.indexOf("</panel_frame>"));
+  const slots = Array.from({ length: 16 }, (_, i) => ["msg_icon_" + (i + 1), "msg_portrait_" + (i + 1)]).flat();
+  // Portrait slots crop a wide porthole like vanilla agent_options dy_portrait.
+  assert.equal((shell.match(/id="msg_portrait_\d+"[^>]*clipimagestocomponent="true"/g) || []).length, 16);
+  assert.equal((shell.match(/offset="-33\.00,-8\.00" width="110" height="60"/g) || []).length, 16);
+  // Layout v137 ignored dockpoint="Center" on these images (24-09): centre them by offset.
+  const portraitBlocks = shell.split("<msg_portrait_").slice(1).filter(block => block.includes('id="msg_portrait_'));
+  assert.equal(portraitBlocks.length, 16);
+  assert.equal(portraitBlocks.filter(block => block.split("</msg_portrait_")[0].includes("dockpoint")).length, 0);
+  for (const id of ["header_crest", ...slots, "header_title", "header_meta", "header_attitude", "proposal_card", "proposal_title", "proposal_detail"]) {
+    assert.ok(frame.includes("<" + id + " "), id + " must be inside panel_frame");
+  }
+  assert.equal((hierarchy.match(/^      <[a-z_]+ /gm) || []).length, 1, "root must have a single child");
+});
+
+test("0.40 shell is visual-only, root-owned and keeps proven controls independent", () => {
+  const ui = fs.readFileSync(path.join(projectRoot, "mod", "script", "campaign", "mod", "llm_diplomacy_ui.lua"), "utf8");
+  const shell = fs.readFileSync(path.join(projectRoot, "mod", "llmdip_ui", "llmdip_shell.twui.xml"), "utf8");
+  assert.match(ui, /root:CreateComponent\(SHELL_ID, "llmdip_ui\/llmdip_shell"\)/);
+  assert.doesNotMatch(ui, /shell:CreateComponent\((?:CHAT_ID|HISTORY_ID)/);
+  assert.match(ui, /history:MoveTo\(shell_left \+ 20, shell_top \+ SHELL_HEADER_HEIGHT\)/);
+  assert.match(ui, /chat:MoveTo\(shell_left \+ 20, shell_top \+ SHELL_HEADER_HEIGHT \+ HISTORY_HEIGHT \+ 6\)/);
+  assert.match(shell, /imagepath="ui\/skins\/default\/panel_back_tile\.png"/);
+  assert.match(shell, /imagepath="ui\/skins\/default\/panel_back_border\.png"/);
+  assert.match(shell, /id="panel_frame"[^>]+priority="20"/);
+  assert.match(shell, /id="header_title"[^>]+priority="80"/);
+  assert.match(ui, /shell:RegisterTopMost\(\); topmost\(history\); topmost\(chat\)/);
+  assert.doesNotMatch(ui, /topmost\(shell\)/);
+  assert.match(shell, /id="header_title"/);
+  assert.match(shell, /id="header_meta"/);
+  assert.match(shell, /id="header_attitude"[^>]+priority="80"/);
+  assert.match(shell, /id="proposal_card"/);
+  assert.match(shell, /height="60"[^>]+interactive="false"/);
+  assert.match(shell, /id="proposal_title"/);
+  assert.match(shell, /id="proposal_detail"/);
+  assert.match(shell, /id="proposal_icon"/);
+  assert.match(shell, /imagepath="ui\/skins\/default\/icon_diplomacy\.png"/);
+  assert.match(ui, /proposal_card:SetVisible\(state\.proposal ~= nil\)/);
+  assert.match(ui, /llmdip_action_label\(state\.proposal\)/);
+  assert.match(ui, /attitude:SetStateText\(state\.header_attitude or ""\)/);
+  assert.doesNotMatch(shell, /callback_id="TextInput"/);
 });
 
 test("history arrows scroll wrapped lines instead of skipping whole messages", () => {
   const ui = fs.readFileSync(path.join(projectRoot, "mod", "script", "campaign", "mod", "llm_diplomacy_ui.lua"), "utf8");
   assert.match(ui, /local HISTORY_TOTAL_LINES = math.floor\(\(HISTORY_HEIGHT - 24\) \/ 20\)/);
   assert.match(ui, /local HISTORY_SCROLL_STEP = 1/);
-  assert.match(ui, /HISTORY_TOTAL_LINES - #history_header\(target\) - 1/);
+  assert.match(ui, /state\.proposal and math\.floor\(\(PROPOSAL_HISTORY_HEIGHT - 24\) \/ 20\) or HISTORY_TOTAL_LINES/);
+  assert.match(ui, /return math\.max\(1, total - 2\)/);
+  assert.doesNotMatch(ui, /local function history_header/);
   assert.match(ui, /local function wrap_history_text/);
   assert.match(ui, /local function latest_history_start/);
   assert.match(ui, /local function history_scroll_bounds/);
@@ -165,4 +221,24 @@ test("attitude capture reads the vanilla tooltip value, not dy_value state index
   const capture = ui.slice(ui.indexOf("local function capture_attitude"), ui.indexOf("local function clean_attribute_text"));
   assert.match(capture, /component_attitude_score\(right\)/);
   assert.doesNotMatch(capture, /GetStateText/);
+});
+
+test("message icons use a proven vanilla button template, never a custom image-only layout", () => {
+  // A custom image-only layout broke components on load and crashed diplomacy (24-09).
+  const ui = fs.readFileSync(path.join(projectRoot, "mod", "script", "campaign", "mod", "llm_diplomacy_ui.lua"), "utf8");
+  assert.doesNotMatch(ui, /CreateComponent\(id, ICON_TEMPLATE\)/, "icons must come from the shell layout, not be created");
+  assert.equal(fs.existsSync(path.join(projectRoot, "mod", "llmdip_ui", "llmdip_icon.twui.xml")), false);
+});
+
+test("every UI constant is declared before any function that reads it", () => {
+  // MESSAGE_ICONS was declared below capture_header, which then read a nil
+  // global: the portrait was never requested in game (24-09).
+  // Comments may name a constant before it exists; only code counts.
+  const ui = fs.readFileSync(path.join(projectRoot, "mod", "script", "campaign", "mod", "llm_diplomacy_ui.lua"), "utf8")
+    .replace(/--.*$/gm, "");
+  for (const [, name] of ui.matchAll(/^local ([A-Z][A-Z0-9_]+) = /gm)) {
+    const declared = ui.search(new RegExp("^local " + name + " = ", "m"));
+    const firstUse = ui.search(new RegExp("(^|[^A-Za-z0-9_])" + name + "(?![A-Za-z0-9_])", "m")) + 1;
+    assert.equal(firstUse, declared + "local ".length, name + " is used before its declaration");
+  }
 });
