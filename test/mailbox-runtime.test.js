@@ -802,12 +802,25 @@ test('redo resends the player words and replaces the bad reply', () => run(read(
  assert(state.inbox.ai.attitude_value==49)
 `));
 test('redo refuses an executed deal, a pending reply and an empty chat', () => run(read('llm_diplomacy_ui.lua'), redoUi + String.raw`
+ -- 26-09: refusals only reached the input's tooltip and the button looked dead; they
+ -- are now visible lines in the chat.
+ local system=llmdip_t('speaker_system')..': '
  state.inbox.ai={history={you..'hola','Player2: vale'}, request='r9', executed_request='r9'}
- regenerate_last(); assert(#calls==0 and state.response==llmdip_t('redo_blocked_deal'))
+ regenerate_last(); local h=state.inbox.ai.history
+ assert(#calls==0 and h[#h]==system..llmdip_t('redo_blocked_deal'))
  state.inbox.ai={history={you..'hola','Player2: '..llmdip_t('thinking')}, request='r9'}
- regenerate_last(); assert(#calls==0)
+ regenerate_last(); h=state.inbox.ai.history
+ assert(#calls==0 and #h==2, 'a click while waiting adds nothing, so the reply can still replace the thinking line')
  state.inbox.ai={history={'Player2: una carta'}, request='r9'}
- regenerate_last(); assert(#calls==0 and state.response==llmdip_t('redo_nothing'))
+ regenerate_last(); h=state.inbox.ai.history
+ assert(#calls==0 and h[#h]==system..llmdip_t('redo_nothing'))
+`));
+test('a reply saved before redo existed can still be redone', () => run(read('llm_diplomacy_ui.lua'), redoUi + String.raw`
+ state.inbox.ai={history={you..'hola','Player2: Zarina Katarin responde con amabilidad seca...'}}
+ regenerate_last()
+ assert(#calls==1 and calls[1].id==nil and calls[1].text=='hola')
+ local h=state.inbox.ai.history
+ assert(#h==2 and h[2]=='Player2: '..llmdip_t('thinking'))
 `));
 test('the bridge redoes only the latest reply and takes back its relation change', () => run(bridge, String.raw`
  set_up(llmdip_player_phase,'player_phase',true)
@@ -826,4 +839,19 @@ test('the bridge redoes only the latest reply and takes back its relation change
  assert(saved.llmdip39_pending.r9==nil)
  saved.llmdip_last_player_request_player_ai='r10'
  assert(not llmdip_regenerate('ai','r9','hola',0), 'an older reply cannot be redone')
+ sent=nil
+ assert(llmdip_regenerate('ai',nil,'hola',0), 'a reply saved before redo existed has no id')
+ assert(sent.text=='hola' and sent.of==nil)
+`));
+test('redo finds the player line in Spanish even with WH3 character-indexed string.sub', () => run(read('llm_diplomacy_ui.lua'), redoUi + String.raw`
+ -- 26-09: WH3's string.sub counts characters while # counts bytes, so "Tú: " never matched.
+ string.sub=function(s,i,j)
+  local chars={} for c in string.gmatch(s,"[\0-\127\194-\244][\128-\191]*") do chars[#chars+1]=c end
+  j=j or #chars; if j<0 then j=#chars+j+1 end; if i<0 then i=#chars+i+1 end
+  return table.concat(chars,"",math.max(i,1),math.min(j,#chars))
+ end
+ assert(llmdip_t('you')=='Tú')
+ state.inbox.ai={history={you..'katarin','Player2: Vlad. Tus mensajes suelen ser breves...',llmdip_t('speaker_result')..': nada'}, request='r69'}
+ regenerate_last()
+ assert(#calls==1 and calls[1].text=='katarin' and calls[1].id=='r69')
 `));

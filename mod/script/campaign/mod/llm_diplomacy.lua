@@ -545,19 +545,20 @@ end
 
 function llmdip_regenerate(interlocutor_key, previous_id, player_text, applied_delta, ui_attitude, ui_personality)
     if not player_phase then return false end
-    if not valid_key(interlocutor_key) or not valid_key(previous_id) or type(player_text) ~= "string" or #player_text < 1 or #player_text > 1200 then return false end
+    -- previous_id is nil for replies saved before redo existed; they are resent without one.
+    if not valid_key(interlocutor_key) or (previous_id ~= nil and not valid_key(previous_id)) or type(player_text) ~= "string" or #player_text < 1 or #player_text > 1200 then return false end
     local sender, interlocutor = local_faction(), cm:get_faction(interlocutor_key)
     if not sender or sender:is_null_interface() or not interlocutor or interlocutor:is_null_interface() or interlocutor:is_human() or interlocutor:is_dead() then return false end
     local latest = cm:get_saved_value("llmdip_last_player_request_" .. sender:name() .. "_" .. interlocutor_key)
     -- Saves from before this feature have no record; the UI already checked the history.
-    if latest and latest ~= previous_id then out("[LLMDIP] REGENERATE_REJECT|not_latest|" .. previous_id); return false end
-    if pending[previous_id] then
+    if previous_id and latest and latest ~= previous_id then out("[LLMDIP] REGENERATE_REJECT|not_latest|" .. previous_id); return false end
+    if previous_id and pending[previous_id] then
         pending[previous_id] = nil; save_pending()
         if llmdip_mail_supersede then llmdip_mail_supersede(previous_id) end
     end
     undo_relation(sender, interlocutor, applied_delta)
     local sent = new_request(sender, interlocutor, "player", player_text, ui_attitude, ui_personality, previous_id)
-    out("[LLMDIP] REGENERATE|" .. previous_id .. "|" .. tostring(sent))
+    out("[LLMDIP] REGENERATE|" .. tostring(previous_id) .. "|" .. tostring(sent))
     return sent
 end
 

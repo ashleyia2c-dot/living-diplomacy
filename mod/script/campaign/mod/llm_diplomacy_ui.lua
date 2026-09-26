@@ -1021,24 +1021,37 @@ end
 
 local function regenerate_last()
     local target = state.target
-    if not valid_key(target) then return end
-    local entry = state.inbox[target]
+    local entry = valid_key(target) and state.inbox[target] or nil
     local messages = history_for(target)
-    if not entry or not entry.request or messages[#messages] == "Player2: " .. llmdip_t("thinking") then
-        state.response = llmdip_t("redo_nothing"); refresh_owned_ui(); return
+    out("[LLMDIP UI] REDO_CLICK|" .. tostring(target) .. "|" .. tostring(entry and entry.request) .. "|" .. tostring(#messages))
+    -- state.response only reaches the input's tooltip, so a refusal said there looked
+    -- like a dead button (26-09). Refusals are written into the chat instead.
+    local function refuse(reason, key)
+        out("[LLMDIP UI] REDO_SKIP|" .. reason)
+        if valid_key(target) then add_history(target, llmdip_t("speaker_system"), llmdip_t(key)); render_history_bubbles(target) end
     end
-    if entry.executed_request == entry.request then
-        state.response = llmdip_t("redo_blocked_deal"); refresh_owned_ui(); return
-    end
-    local prefix, index = llmdip_t("you") .. ": ", nil
+    if not valid_key(target) then out("[LLMDIP UI] REDO_SKIP|no_target"); return end
+    -- While a reply is being written the click is simply ignored: a line added now
+    -- would stop the reply from replacing the "thinking" line.
+    if messages[#messages] == "Player2: " .. llmdip_t("thinking") then out("[LLMDIP UI] REDO_SKIP|waiting"); return end
+    if entry and entry.request and entry.executed_request == entry.request then return refuse("deal_executed", "redo_blocked_deal") end
+    -- WH3's string.sub counts characters while # counts bytes, so "Tú: " (5 bytes,
+    -- 4 characters) never matched with string.sub(line, 1, #prefix) (26-09). A pattern
+    -- match does not depend on either count.
+    local pattern = "^" .. string.gsub(llmdip_t("you") .. ": ", "[%^%$%(%)%%%.%[%]%*%+%-%?]", "%%%0") .. "(.*)$"
+    local index, text = nil, nil
     for i = #messages, 1, -1 do
-        if string.sub(messages[i], 1, #prefix) == prefix then index = i; break end
+        local said = string.match(messages[i], pattern)
+        if said then index, text = i, said; break end
     end
-    if not index or index == #messages then state.response = llmdip_t("redo_nothing"); refresh_owned_ui(); return end
-    local text = string.sub(messages[index], #prefix + 1)
-    local ok, sent = pcall(function() return llmdip_regenerate(target, entry.request, text, entry.applied_delta or 0, state.attitude_value, state.personality_attributes) end)
+    if not index or index == #messages or text == "" then return refuse("no_reply", "redo_nothing") end
+    -- Replies saved before this version may carry no request id; they are redone
+    -- all the same, only the companion cannot drop the old one from its memory.
+    local previous = entry and valid_key(entry.request) or nil
+    local ok, sent = pcall(function() return llmdip_regenerate(target, previous, text, entry and entry.applied_delta or 0, state.attitude_value, state.personality_attributes) end)
     out("[LLMDIP UI] REDO|" .. tostring(ok) .. "|" .. tostring(sent))
-    if not ok or not sent then state.response = llmdip_t("send_failed"); refresh_owned_ui(); return end
+    if not ok or not sent then return refuse("send_failed|" .. tostring(sent), "send_failed") end
+    entry = state.inbox[target]
     while #messages > index do table.remove(messages) end
     if entry.attitude_value ~= nil and entry.applied_delta then entry.attitude_value = entry.attitude_value - entry.applied_delta end
     entry.proposal = nil; entry.request = nil; entry.applied_delta = 0

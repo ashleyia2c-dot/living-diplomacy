@@ -1,6 +1,6 @@
 {
   "name": "wh3-llm-diplomacy",
-  "version": "0.42.0",
+  "version": "0.42.1",
   "private": true,
   "type": "module",
   "description": "Player2-powered LLM diplomacy bridge for Total War: WARHAMMER III",
