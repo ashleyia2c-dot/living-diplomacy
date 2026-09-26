@@ -9,7 +9,7 @@ local PREFIX = "LLMDIP2"
 local COOLDOWN_TURNS = 1
 
 local request_chunks, response_chunks, pending, published, consumed_external = {}, {}, {}, {}, {}
-local execute_action, apply_relation_reaction
+local execute_action, apply_relation_reaction, execute_betrayal
 local campaign_id = nil
 local menu_open, menu_page, menu_components = false, 1, {}
 local menu_race = nil -- nil: races; all: every known living AI faction.
@@ -472,7 +472,7 @@ local function faction_from_cqi(cqi)
     return nil
 end
 
-local function new_request(player, interlocutor, mode, seed, ui_attitude, ui_personality)
+local function new_request(player, interlocutor, mode, seed, ui_attitude, ui_personality, regenerate_of)
     out("[LLMDIP] REQUEST_PREPARE|" .. tostring(mode) .. "|" .. interlocutor:name())
     if not campaign_id or not valid_key(campaign_id) then out("[LLMDIP] NEED_CAMPAIGN_ID") return false end
     request_serial = request_serial + 1
@@ -486,6 +486,9 @@ local function new_request(player, interlocutor, mode, seed, ui_attitude, ui_per
     if not valid_key(memory_parent) then memory_parent = "root" end
     cm:set_saved_value(memory_key, request_id)
     local state = campaign_snapshot(player, interlocutor, ui_attitude, ui_personality, memory_parent, request_id)
+    -- A redone reply names the request it replaces, so the companion drops the old one.
+    if valid_key(regenerate_of) then state = state .. ",regenerate_of=" .. regenerate_of end
+    if mode == "player" then cm:set_saved_value("llmdip_last_player_request_" .. player:name() .. "_" .. interlocutor:name(), request_id) end
     pending[request_id] = {player = player:name(), interlocutor = interlocutor:name(), sender_cqi = player:command_queue_index()}
     local proposal = pending[request_id]
     proposal.mode = mode; proposal.turn = cm:model():turn_number()
@@ -523,6 +526,41 @@ function llmdip_send_request(interlocutor_key, player_text, ui_attitude, ui_pers
     return sent
 end
 
+-- The player can ask for a reply to be redone when the model wrote nonsense. Only the
+-- latest reply to the player's own words qualifies; background letters never do, and the
+-- UI refuses once a deal from that reply was carried out. The relation change that reply
+-- applied this turn is taken back first.
+local function undo_relation(player, ai, applied)
+    applied = tonumber(applied) or 0
+    if applied == 0 then return 0 end
+    local key = "llmdip_relation_" .. player:name() .. "_" .. ai:name()
+    local saved = split(cm:get_saved_value(key) or "-1,0", ",")
+    local turn = cm:model():turn_number()
+    if tonumber(saved[1]) ~= turn then return 0 end
+    cm:set_saved_value(key, tostring(turn) .. "," .. tostring((tonumber(saved[2]) or 0) - applied))
+    cm:apply_dilemma_diplomatic_bonus(player:name(), ai:name(), -applied)
+    out("[LLMDIP] RELATION_UNDONE|" .. player:name() .. "|" .. ai:name() .. "|" .. tostring(-applied))
+    return -applied
+end
+
+function llmdip_regenerate(interlocutor_key, previous_id, player_text, applied_delta, ui_attitude, ui_personality)
+    if not player_phase then return false end
+    if not valid_key(interlocutor_key) or not valid_key(previous_id) or type(player_text) ~= "string" or #player_text < 1 or #player_text > 1200 then return false end
+    local sender, interlocutor = local_faction(), cm:get_faction(interlocutor_key)
+    if not sender or sender:is_null_interface() or not interlocutor or interlocutor:is_null_interface() or interlocutor:is_human() or interlocutor:is_dead() then return false end
+    local latest = cm:get_saved_value("llmdip_last_player_request_" .. sender:name() .. "_" .. interlocutor_key)
+    -- Saves from before this feature have no record; the UI already checked the history.
+    if latest and latest ~= previous_id then out("[LLMDIP] REGENERATE_REJECT|not_latest|" .. previous_id); return false end
+    if pending[previous_id] then
+        pending[previous_id] = nil; save_pending()
+        if llmdip_mail_supersede then llmdip_mail_supersede(previous_id) end
+    end
+    undo_relation(sender, interlocutor, applied_delta)
+    local sent = new_request(sender, interlocutor, "player", player_text, ui_attitude, ui_personality, previous_id)
+    out("[LLMDIP] REGENERATE|" .. previous_id .. "|" .. tostring(sent))
+    return sent
+end
+
 function llmdip_publish_response(request_id, narrative, compact_action, relation_delta, relation_reason)
     if not player_phase then return false end
     if published[request_id] then out("[LLMDIP] RESPONSE_ACK|" .. request_id); return false end
@@ -546,6 +584,12 @@ function llmdip_publish_response(request_id, narrative, compact_action, relation
     save_pending()
     out("[LLMDIP] RESPONSE|" .. request_id .. "|" .. narrative)
     if llmdip_ui_on_response then llmdip_ui_on_response(request_id, narrative, proposal.interlocutor) end
+    -- A betrayal is the only action that is not a proposal: it happens at once.
+    -- The companion only grants it in background letters; anything else is a plain letter.
+    if proposal.action[1] == "betray_war" then
+        if proposal.mode == "proactive" then return execute_betrayal(request_id, proposal, narrative) end
+        proposal.action = {"reject"}; compact_action = "reject"
+    end
     -- A verbal rejection changes relations immediately. For a real deal, the
     -- credibility change only becomes real after the player fulfils it.
     local deferred = proposal.action[1] ~= "reject"
@@ -674,6 +718,7 @@ execute_action = function(proposal)
     elseif action[1] == "make_peace" then cm:force_make_peace(ai:name(), player:name())
     elseif action[1] == "alliance" and (action[2] == "defensive" or action[2] == "military") then cm:force_alliance(ai:name(), player:name(), action[2] == "military")
     elseif action[1] == "trade_agreement" then cm:force_make_trade_agreement(ai:name(), player:name())
+    elseif action[1] == "non_aggression_pact" then cm:force_non_aggression_pact(ai:name(), player:name())
     elseif action[1] == "military_access" then
         if action[2] == "interlocutor_to_player" or action[2] == "mutual" then cm:force_grant_military_access(ai:name(), player:name(), false) end
         if action[2] == "player_to_interlocutor" or action[2] == "mutual" then cm:force_grant_military_access(player:name(), ai:name(), false) end
@@ -701,6 +746,28 @@ execute_action = function(proposal)
         if war_target then cm:force_declare_war(player:name(), war_target:name(), false, false) end
     else return false end
     return true
+end
+
+execute_betrayal = function(request_id, proposal, narrative)
+    local player, ai = cm:get_faction(proposal.player), cm:get_faction(proposal.interlocutor)
+    local ok = player and not player:is_null_interface() and player:is_human()
+        and ai and not ai:is_null_interface() and not ai:is_human() and not ai:is_dead()
+        and not ai:at_war_with(player)
+    ok = ok and true or false
+    if ok then
+        cm:force_declare_war(ai:name(), player:name(), false, false)
+        record_diplomatic_event("llm_betrayal", ai, player)
+    end
+    out("[LLMDIP] BETRAYAL|" .. request_id .. "|" .. proposal.interlocutor .. "|" .. tostring(ok))
+    out("[LLMDIP] EXECUTED|" .. request_id .. "|" .. tostring(ok))
+    if llmdip_ui_on_betrayal then llmdip_ui_on_betrayal(request_id, proposal.interlocutor, ok) end
+    pending[request_id] = nil
+    save_pending()
+    if llmdip_mail_receive then
+        cm:set_saved_value("llmdip_last_" .. proposal.player .. "_" .. proposal.interlocutor, cm:model():turn_number())
+        llmdip_mail_receive(request_id, proposal, narrative, ok and "betray_war" or "reject")
+    end
+    return ok
 end
 
 apply_relation_reaction = function(proposal, delta, reason)

@@ -1,0 +1,32 @@
+{
+  "name": "Wulfrik the Wanderer",
+  "canonNotes": [
+    "A Norscan champion cursed by the gods to wander the world and prove himself by slaying ever mightier foes; he can speak any tongue.",
+    "Sails the Seaborne, forever seeking champions to challenge."
+  ],
+  "voiceNotes": [
+    "Boastful, restless and theatrical; challenges everyone worth fighting.",
+    "Contemptuous of cowards; oddly respectful of worthy enemies."
+  ],
+  "temperament": {
+    "aggression": 85,
+    "caution": 25,
+    "pride": 85,
+    "greed": 40,
+    "honour": 55
+  },
+  "socialStyle": {
+    "warmth": 35,
+    "sociability": 60,
+    "generosity": 35,
+    "vanity": 85,
+    "spite": 40,
+    "opportunism": 30
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Booming, boastful and restless.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "name": "Deathmaster Snikch",
+  "canonNotes": [
+    "Chief Assassin of Clan Eshin, whose location is always unknown and whose mark is a sign traced in blood.",
+    "Serves Lord Sneek with deadly efficiency."
+  ],
+  "voiceNotes": [
+    "Barely present, whispered and chilling; few words.",
+    "Implies threats rather than stating them."
+  ],
+  "temperament": {
+    "aggression": 70,
+    "caution": 70,
+    "pride": 60,
+    "greed": 40,
+    "honour": 5
+  },
+  "socialStyle": {
+    "warmth": 5,
+    "sociability": 10,
+    "generosity": 10,
+    "vanity": 40,
+    "spite": 60,
+    "opportunism": 70
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Whispered, cold and chilling.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

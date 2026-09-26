@@ -131,7 +131,7 @@ function llmdip_mail_receive(id, proposal, narrative, action)
     table.insert(box.rows, 1, {id=id, target=proposal.interlocutor,
         faction=proposal.faction_name or proposal.interlocutor, lord=proposal.leader or llmdip_t("unknown_lord"),
         turn=proposal.turn, text=narrative, read=false,
-        status=action == "reject" and llmdip_t("conversation") or llmdip_t("pending_proposal")})
+        status=action == "reject" and llmdip_t("conversation") or (action == "betray_war" and llmdip_t("betrayal_status") or llmdip_t("pending_proposal"))})
     while #box.rows > 200 do table.remove(box.rows) end
     save(); refresh()
 end

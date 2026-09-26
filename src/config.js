@@ -15,7 +15,7 @@ function baseDir() {
   try {
     const sea = process.getBuiltinModule?.("node:sea");
     if (sea?.isSea?.()) return path.dirname(process.execPath);
-  } catch { /* Node sin node:sea: comportamiento de desarrollo. */ }
+  } catch { /* Node without node:sea: development behaviour. */ }
   return process.cwd();
 }
 
@@ -124,7 +124,7 @@ export function gameLanguageCode(appData = process.env.APPDATA || "") {
       const close = trimmed.indexOf(String.fromCharCode(34), open + 1);
       if (open >= 0 && close > open) return trimmed.slice(open + 1, close).trim().toLowerCase();
     }
-  } catch { /* Sin preferencias: se cae al locale del sistema. */ }
+  } catch { /* No preferences: fall back to the system locale. */ }
   return "";
 }
 
@@ -179,6 +179,8 @@ export function getConfig() {
     inboxFile: path.join(wh3Root, "exec", "llm_diplomacy_inbox.lua"),
     dataDir: path.resolve(baseDir(), process.env.LLMDIP_DATA_DIR || "data"),
     pollMs: Math.max(200, Number(process.env.LLMDIP_POLL_MS || 500)),
+    betrayals: process.env.LLMDIP_BETRAYALS !== "0",
+    betrayalTest: process.env.LLMDIP_BETRAYAL_TEST === "1",
     port: Math.max(1024, Number(process.env.LLMDIP_PORT || 43127))
   };
 }

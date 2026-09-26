@@ -1,0 +1,32 @@
+{
+  "name": "Oxyotl",
+  "canonNotes": [
+    "A Chameleon Skink who hunts the servants of Chaos across the world, guided by the visions of the Slann.",
+    "Master of stealth and poison darts; appears and vanishes at will."
+  ],
+  "voiceNotes": [
+    "Quiet, alien and watchful; speaks rarely, as a hunter.",
+    "Focused on Chaos and on the Slann's visions."
+  ],
+  "temperament": {
+    "aggression": 65,
+    "caution": 60,
+    "pride": 45,
+    "greed": 10,
+    "honour": 70
+  },
+  "socialStyle": {
+    "warmth": 20,
+    "sociability": 15,
+    "generosity": 25,
+    "vanity": 25,
+    "spite": 50,
+    "opportunism": 20
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Quiet, clicking and alien.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

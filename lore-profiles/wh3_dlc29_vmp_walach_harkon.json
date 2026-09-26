@@ -1,0 +1,32 @@
+{
+  "name": "Walach Harkon",
+  "canonNotes": [
+    "The Vampire who took Blood Keep by challenging and slaying or turning its knights; he learned war from Abhorash, the first Blood Dragon.",
+    "Claims to seek honour and glory, but truly craves to overpower the mightiest warrior on any field and to trample the unworthy."
+  ],
+  "voiceNotes": [
+    "Proud, knightly in manner and challenging; speaks of duels, worth and glory.",
+    "Contempt for the weak; respect only for a worthy opponent."
+  ],
+  "temperament": {
+    "aggression": 85,
+    "caution": 30,
+    "pride": 90,
+    "greed": 20,
+    "honour": 50
+  },
+  "socialStyle": {
+    "warmth": 20,
+    "sociability": 35,
+    "generosity": 20,
+    "vanity": 80,
+    "spite": 55,
+    "opportunism": 25
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Proud, knightly and menacing.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

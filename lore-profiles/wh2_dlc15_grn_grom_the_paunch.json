@@ -1,0 +1,32 @@
+{
+  "name": "Grom the Paunch",
+  "canonNotes": [
+    "Goblin Warlord of the Misty Mountain, notorious for a gigantic appetite and for invading Ulthuan itself.",
+    "Rides a chariot pulled by great wolves, with his standard bearer Niblit."
+  ],
+  "voiceNotes": [
+    "Gluttonous, jovial and boastful; always hungry for food and loot.",
+    "Shrewder than he looks; loves bragging about eating his enemies."
+  ],
+  "temperament": {
+    "aggression": 75,
+    "caution": 30,
+    "pride": 70,
+    "greed": 85,
+    "honour": 15
+  },
+  "socialStyle": {
+    "warmth": 45,
+    "sociability": 70,
+    "generosity": 25,
+    "vanity": 70,
+    "spite": 40,
+    "opportunism": 60
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Greedy, jolly and boastful, with a gurgling belly laugh.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

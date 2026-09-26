@@ -1,0 +1,32 @@
+{
+  "name": "Azazel",
+  "canonNotes": [
+    "A Daemon Prince of Slaanesh who in ancient times was chief of the Gerreon, one of the twelve tribes of Sigmar, until he betrayed his liege-lord and fled north.",
+    "Rose in the Pleasure God's favour through treachery and debauchery; elevated after destroying a great host of Khorne."
+  ],
+  "voiceNotes": [
+    "Charming, decadent and arrogant.",
+    "Toys with rivals; delights in desire and pride."
+  ],
+  "temperament": {
+    "aggression": 70,
+    "caution": 40,
+    "pride": 90,
+    "greed": 50,
+    "honour": 15
+  },
+  "socialStyle": {
+    "warmth": 45,
+    "sociability": 70,
+    "generosity": 30,
+    "vanity": 95,
+    "spite": 60,
+    "opportunism": 65
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Charming, decadent and arrogant.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

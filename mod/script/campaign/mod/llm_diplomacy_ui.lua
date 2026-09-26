@@ -28,6 +28,7 @@ local SHELL_ID = "llmdip_diplomacy_shell"
 local TALK_ID = "llmdip_diplomacy_talk"
 local SEND_ID = "llmdip_diplomacy_send"
 local CLOSE_ID = "llmdip_diplomacy_close"
+local REDO_ID = "llmdip_diplomacy_redo"
 local ACCEPT_ID = "llmdip_diplomacy_accept"
 local CARD_ACCEPT_ID = "llmdip_proposal_accept"
 local CARD_DECLINE_ID = "llmdip_proposal_decline"
@@ -141,6 +142,13 @@ local function ensure_owned_ui()
         down:SetImagePath("ui/skins/default/icon_arrow_down.png"); down:SetTooltipText(llmdip_t("newer_messages"), true)
         down:SetDockingPoint(3); down:SetDockOffset(-8, 39); down:SetVisible(true); topmost(down)
         history:SetVisible(false); topmost(history)
+    end
+    -- Redo sits under the two arrows, in the same gutter and built the same way.
+    if not find_from(history, REDO_ID) then
+        local redo = UIComponent(history:CreateComponent(REDO_ID, "ui/templates/square_medium_button"))
+        redo:SetCanResizeWidth(true); redo:SetCanResizeHeight(true); redo:Resize(34, 34)
+        redo:SetImagePath("ui/skins/default/icon_reset.png"); redo:SetTooltipText(llmdip_t("redo_tooltip"), true)
+        redo:SetDockingPoint(3); redo:SetDockOffset(-8, 76); redo:SetVisible(true); topmost(redo)
     end
     local history_height = state.proposal and PROPOSAL_HISTORY_HEIGHT or HISTORY_HEIGHT
     history:Resize(UI_WIDTH, history_height)
@@ -1011,12 +1019,41 @@ local function send_text()
     state.response = llmdip_t("waiting"); clear_input_text(); render_history_bubbles(target)
 end
 
+local function regenerate_last()
+    local target = state.target
+    if not valid_key(target) then return end
+    local entry = state.inbox[target]
+    local messages = history_for(target)
+    if not entry or not entry.request or messages[#messages] == "Player2: " .. llmdip_t("thinking") then
+        state.response = llmdip_t("redo_nothing"); refresh_owned_ui(); return
+    end
+    if entry.executed_request == entry.request then
+        state.response = llmdip_t("redo_blocked_deal"); refresh_owned_ui(); return
+    end
+    local prefix, index = llmdip_t("you") .. ": ", nil
+    for i = #messages, 1, -1 do
+        if string.sub(messages[i], 1, #prefix) == prefix then index = i; break end
+    end
+    if not index or index == #messages then state.response = llmdip_t("redo_nothing"); refresh_owned_ui(); return end
+    local text = string.sub(messages[index], #prefix + 1)
+    local ok, sent = pcall(function() return llmdip_regenerate(target, entry.request, text, entry.applied_delta or 0, state.attitude_value, state.personality_attributes) end)
+    out("[LLMDIP UI] REDO|" .. tostring(ok) .. "|" .. tostring(sent))
+    if not ok or not sent then state.response = llmdip_t("send_failed"); refresh_owned_ui(); return end
+    while #messages > index do table.remove(messages) end
+    if entry.attitude_value ~= nil and entry.applied_delta then entry.attitude_value = entry.attitude_value - entry.applied_delta end
+    entry.proposal = nil; entry.request = nil; entry.applied_delta = 0
+    state.proposal = nil; state.request_id = nil
+    add_history(target, "Player2", llmdip_t("thinking"))
+    state.response = llmdip_t("waiting"); render_history_bubbles(target)
+end
+
 core:remove_listener("llmdip_contextual_clicks")
 core:add_listener("llmdip_contextual_clicks", "ComponentLClickUp", true, function(context)
     local id = context.string
     if id == TALK_ID then toggle_dialog()
     elseif id == SEND_ID then send_text()
     elseif id == CLOSE_ID then hide_dialog()
+    elseif id == REDO_ID then regenerate_last()
     elseif (id == ACCEPT_ID or id == CARD_ACCEPT_ID) and state.request_id and state.proposal then
         llmdip_accept(state.request_id); state.proposal = nil
         state.response = state.response .. llmdip_t("applying_proposal"); refresh_owned_ui()
@@ -1096,6 +1133,7 @@ function llmdip_ui_on_proposal(request_id, compact_action, relation_delta, relat
     entry.response = (entry.response or "") .. llmdip_t("proposal_prefix") .. tostring(compact_action); state.inbox[target] = entry
     local delta = tonumber(relation_delta) or 0
     if not deferred and entry.attitude_value ~= nil then entry.attitude_value = entry.attitude_value + delta end
+    entry.applied_delta = deferred and 0 or delta
     local reaction = delta > 0 and llmdip_t("reaction_better") or (delta < 0 and llmdip_t("reaction_worse") or llmdip_t("no_change"))
     if compact_action == "reject" then
         add_history(target, llmdip_t("speaker_result"), llmdip_t("no_deal_reaction") .. reaction .. ".")
@@ -1109,6 +1147,16 @@ function llmdip_ui_on_proposal(request_id, compact_action, relation_delta, relat
     end
     persist_history()
 end
+function llmdip_ui_on_betrayal(request_id, target, ok)
+    if not valid_key(target) or not ok then return end
+    local entry = state.inbox[target] or {}; entry.request = request_id; entry.proposal = nil; state.inbox[target] = entry
+    add_history(target, llmdip_t("speaker_system"), llmdip_t("betrayal_done"))
+    if state.target == target then
+        state.request_id = request_id; state.proposal = nil
+        if state.visible then refresh_owned_ui() end
+    end
+    persist_history()
+end
 function llmdip_ui_on_executed(request_id, ok, relation_delta, relation_reason)
     if state.request_id ~= request_id then return end
     state.response = state.response .. (ok and llmdip_t("deal_done_nl") or llmdip_t("deal_failed_nl"))
@@ -1116,6 +1164,7 @@ function llmdip_ui_on_executed(request_id, ok, relation_delta, relation_reason)
     local entry = state.inbox[state.target] or {}
     if ok and entry.attitude_value ~= nil then entry.attitude_value = entry.attitude_value + delta end
     local reaction = delta > 0 and (llmdip_t("diplo_improved") .. tostring(delta) .. ").") or (delta < 0 and (llmdip_t("diplo_worsened") .. tostring(delta) .. ").") or "")
+    if ok then entry.executed_request = request_id end
     state.proposal = nil; entry.proposal = nil; add_history(state.target, llmdip_t("speaker_system"), ok and (llmdip_t("deal_done") .. reaction) or llmdip_t("deal_failed"))
     if state.visible then refresh_owned_ui() end
 end

@@ -1,0 +1,32 @@
+{
+  "name": "Grimgor Ironhide",
+  "canonNotes": [
+    "The most feared Black Orc Warboss, who lives for nothing but the next great fight.",
+    "Leads his Black Orc 'Immortulz' through sheer brutality; has no interest in anything but conquest and worthy opponents."
+  ],
+  "voiceNotes": [
+    "Brutal, short and dismissive; Orcish speech, boasts and threats.",
+    "Respects only strength; talking is for weaklings and gits."
+  ],
+  "temperament": {
+    "aggression": 100,
+    "caution": 5,
+    "pride": 90,
+    "greed": 30,
+    "honour": 20
+  },
+  "socialStyle": {
+    "warmth": 10,
+    "sociability": 20,
+    "generosity": 15,
+    "vanity": 80,
+    "spite": 70,
+    "opportunism": 25
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Deep, brutal and growling, Orc warboss swagger.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

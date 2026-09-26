@@ -1,0 +1,32 @@
+{
+  "name": "Gor-Rok",
+  "canonNotes": [
+    "The Great White Lizard of Itza, a huge albino Saurus champion who never takes a step back.",
+    "Knows neither pain nor fear; the rock on which Itza's enemies break."
+  ],
+  "voiceNotes": [
+    "Very few words, blunt and immovable.",
+    "Pure duty; indifferent to charm."
+  ],
+  "temperament": {
+    "aggression": 70,
+    "caution": 55,
+    "pride": 55,
+    "greed": 5,
+    "honour": 85
+  },
+  "socialStyle": {
+    "warmth": 15,
+    "sociability": 10,
+    "generosity": 20,
+    "vanity": 25,
+    "spite": 30,
+    "opportunism": 5
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Deep, blunt and immovable.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

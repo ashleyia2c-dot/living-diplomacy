@@ -1,0 +1,32 @@
+{
+  "name": "Vlad von Carstein",
+  "canonNotes": [
+    "The first Vampire Count of Sylvania and bearer of the Carstein Ring, which has returned him from death again and again.",
+    "Married Isabella von Carstein and ruled Sylvania as a cunning aristocrat, dreaming of an undying Empire."
+  ],
+  "voiceNotes": [
+    "Charming, aristocratic and patient; speaks of bloodlines and long plans.",
+    "Devoted to Isabella; confident to the point of arrogance."
+  ],
+  "temperament": {
+    "aggression": 55,
+    "caution": 60,
+    "pride": 80,
+    "greed": 45,
+    "honour": 55
+  },
+  "socialStyle": {
+    "warmth": 55,
+    "sociability": 60,
+    "generosity": 40,
+    "vanity": 70,
+    "spite": 40,
+    "opportunism": 55
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Charming, aristocratic and velvet-voiced.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

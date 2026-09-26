@@ -1,0 +1,32 @@
+{
+  "name": "Louen Leoncoeur",
+  "canonNotes": [
+    "King of Bretonnia, the Lionheart, a Grail Knight and paragon of chivalry.",
+    "Rules a proud feudal realm bound by the Code of Chivalry and the Lady of the Lake."
+  ],
+  "voiceNotes": [
+    "Noble, chivalrous and formal; speaks of honour, the Lady and the Code.",
+    "Contempt for the dishonourable and the monstrous; gracious to worthy friends."
+  ],
+  "temperament": {
+    "aggression": 60,
+    "caution": 50,
+    "pride": 85,
+    "greed": 20,
+    "honour": 100
+  },
+  "socialStyle": {
+    "warmth": 55,
+    "sociability": 55,
+    "generosity": 55,
+    "vanity": 70,
+    "spite": 25,
+    "opportunism": 10
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Noble, courtly and resonant.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

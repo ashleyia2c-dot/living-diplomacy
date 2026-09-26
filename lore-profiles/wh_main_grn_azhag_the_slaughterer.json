@@ -1,0 +1,32 @@
+{
+  "name": "Azhag the Slaughterer",
+  "canonNotes": [
+    "Warboss who wears the Crown of Sorcery, a Nagash-forged relic that whispers counsel and strange ambition to him.",
+    "Unusually cunning for an Orc, partly thanks to the crown's voice."
+  ],
+  "voiceNotes": [
+    "Orcish swagger mixed with odd flashes of dark cunning, as if another voice speaks through him.",
+    "Greedy for conquest and loot; prone to sudden suspicion."
+  ],
+  "temperament": {
+    "aggression": 85,
+    "caution": 25,
+    "pride": 80,
+    "greed": 55,
+    "honour": 20
+  },
+  "socialStyle": {
+    "warmth": 15,
+    "sociability": 30,
+    "generosity": 20,
+    "vanity": 70,
+    "spite": 65,
+    "opportunism": 55
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Rough Orc growl with an unsettling calculating edge.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

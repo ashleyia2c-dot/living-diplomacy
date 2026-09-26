@@ -6,7 +6,7 @@ import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { detectWh3Root } from "../src/config.js";
 
-const EXPECTED_PACK_SHA256 = "E0D1F297583413517CEB81FA9BD74FDD7FF7ACB08C6035586481788E7AB0CA16";
+const EXPECTED_PACK_SHA256 = "588BB2465D7416DBBCEB65F5FBB6FC76A21B2607CADF151CA001473EE4C1AB01";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const hash = file => crypto.createHash("sha256").update(fs.readFileSync(file)).digest("hex").toUpperCase();
 

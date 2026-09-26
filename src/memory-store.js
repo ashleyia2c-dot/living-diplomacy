@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { buildPersonality, buildSocialStyle } from "./personality.js";
+import { buildPersonality, buildSocialStyle, applyTemperament, applySocialStyle } from "./personality.js";
 
 const SAFE = /^[a-z0-9_]{1,160}$/;
 
@@ -81,7 +81,12 @@ export class MemoryStore {
     // exact conversation head contained in the loaded WH3 save. Walking that
     // parent chain keeps alternate save branches isolated from one another.
     const timeline = this.readTimeline(request);
-    const all = this.lineage(timeline, request.memoryParent)
+    // A reply the player asked to redo is replaced by the new one and leaves the
+    // conversation; its node stays in the chain so later saves still connect.
+    const chain = this.lineage(timeline, request.memoryParent);
+    const replaced = new Set(chain.map(node => node.supersedes).filter(Boolean));
+    const all = chain
+      .filter(node => !replaced.has(node.requestId))
       .filter(node => node.interlocutor === request.interlocutor && (!node.sender || node.sender === request.sender))
       .flatMap(node => Array.isArray(node.messages) ? node.messages
         // Legacy nodes have no scope field. They are still safe here because
@@ -127,6 +132,7 @@ export class MemoryStore {
       action,
       reaction,
       messages,
+      ...(/^[a-z0-9_]{1,160}$/.test(request.fields?.regenerate_of || "") ? { supersedes: request.fields.regenerate_of } : {}),
       createdAt: new Date().toISOString()
     };
     timeline.updatedAt = new Date().toISOString();
@@ -184,8 +190,18 @@ export class MemoryStore {
     const leaderKey = SAFE.test(identity.leaderSubtype || "") ? identity.leaderSubtype : "unknown_leader";
     const file = path.join(this.factionDir(request), "leaders", `${leaderKey}.json`);
     const current = readJson(file, null);
-    const curated = readJson(path.join(this.loreRoot, `${request.interlocutor}.json`), null) ||
-      readJson(path.join(this.loreRoot, `${leaderKey}.json`), {});
+    // The lord's own profile comes first: a faction file would keep speaking as Karl Franz
+    // after his successor took the throne.
+    const curated = readJson(path.join(this.loreRoot, `${leaderKey}.json`), null) ||
+      readJson(path.join(this.loreRoot, `${request.interlocutor}.json`), {});
+    // Curated lore wins over the copy saved at first contact. That copy used to win,
+    // so every lord met before a profile existed kept empty lore forever.
+    const notes = field => Array.isArray(curated[field]) && curated[field].length ? curated[field]
+      : (Array.isArray(current?.[field]) ? current[field] : []);
+    const generatedStyle = buildSocialStyle(identity, request.interlocutor);
+    const personality = current?.personality
+      ? { ...current.personality, archetype: buildPersonality(identity, request.interlocutor).archetype }
+      : buildPersonality(identity, request.interlocutor);
     const profile = {
       ...(current || {}),
       faction: request.interlocutor,
@@ -194,19 +210,17 @@ export class MemoryStore {
       culture: identity.culture || "unknown",
       subculture: identity.subculture || "unknown",
       // The archetype text is refreshed on every request so improved wording reaches
-      // leaders saved before it; the numeric temperament stays as stored.
-      personality: current?.personality
-        ? { ...current.personality, archetype: buildPersonality(identity, request.interlocutor).archetype }
-        : buildPersonality(identity, request.interlocutor),
-      socialStyle: current?.socialStyle?.signature === buildSocialStyle(identity, request.interlocutor).signature
-        ? current.socialStyle : buildSocialStyle(identity, request.interlocutor),
-      canonNotes: Array.isArray(current?.canonNotes) ? current.canonNotes : (Array.isArray(curated.canonNotes) ? curated.canonNotes : []),
-      voiceNotes: Array.isArray(current?.voiceNotes) ? current.voiceNotes : (Array.isArray(curated.voiceNotes) ? curated.voiceNotes : []),
-      voiceGender: ["male", "female", "other"].includes(current?.voiceGender) ? current.voiceGender : (["male", "female", "other"].includes(curated.voiceGender) ? curated.voiceGender : undefined),
-      voiceIds: Array.isArray(current?.voiceIds) ? current.voiceIds : (Array.isArray(curated.voiceIds) ? curated.voiceIds : []),
-      ttsInstructions: typeof current?.ttsInstructions === "string" ? current.ttsInstructions : (typeof curated.ttsInstructions === "string" ? curated.ttsInstructions : ""),
-      sources: Array.isArray(current?.sources) ? current.sources : (Array.isArray(curated.sources) ? curated.sources : []),
-      note: "La identidad y los rasgos vienen del juego; la personalidad estable se genera por lord. canonNotes permite refinar lords concretos."
+      // leaders saved before it; the numeric temperament stays as stored unless the
+      // curated profile fixes it.
+      personality: curated.temperament ? applyTemperament(personality, curated.temperament) : personality,
+      socialStyle: applySocialStyle(current?.socialStyle?.signature === generatedStyle.signature ? current.socialStyle : generatedStyle, curated.socialStyle),
+      canonNotes: notes("canonNotes"),
+      voiceNotes: notes("voiceNotes"),
+      voiceGender: ["male", "female", "other"].includes(curated.voiceGender) ? curated.voiceGender : (["male", "female", "other"].includes(current?.voiceGender) ? current.voiceGender : undefined),
+      voiceIds: Array.isArray(curated.voiceIds) && curated.voiceIds.length ? curated.voiceIds : (Array.isArray(current?.voiceIds) ? current.voiceIds : []),
+      ttsInstructions: typeof curated.ttsInstructions === "string" && curated.ttsInstructions ? curated.ttsInstructions : (typeof current?.ttsInstructions === "string" ? current.ttsInstructions : ""),
+      sources: notes("sources"),
+      note: "Identity and traits come from the game; the stable personality comes from the lore profile or is generated per lord. canonNotes refine specific lords."
     };
     writeJson(file, profile);
     return profile;

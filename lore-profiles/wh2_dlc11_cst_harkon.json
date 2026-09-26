@@ -1,0 +1,32 @@
+{
+  "name": "Luthor Harkon",
+  "canonNotes": [
+    "The Vampire lord of the Vampire Coast in Lustria, whose mind shattered into many personalities after an ancient warding drained him.",
+    "Leads a fleet of undead pirates; his moods swing wildly."
+  ],
+  "voiceNotes": [
+    "Erratic and theatrical; personalities shift mid-sentence from pirate to pompous admiral to madman.",
+    "Greedy for treasure and power."
+  ],
+  "temperament": {
+    "aggression": 70,
+    "caution": 35,
+    "pride": 75,
+    "greed": 75,
+    "honour": 20
+  },
+  "socialStyle": {
+    "warmth": 40,
+    "sociability": 70,
+    "generosity": 35,
+    "vanity": 70,
+    "spite": 45,
+    "opportunism": 60
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Erratic, theatrical and piratical.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

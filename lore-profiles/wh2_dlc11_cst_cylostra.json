@@ -1,0 +1,32 @@
+{
+  "name": "Cylostra Direfin",
+  "canonNotes": [
+    "A drowned Bretonnian prima donna, now a vengeful ghost whose Lamprey appears in storms, her songs of death paralysing sailors.",
+    "Vain and furious at her unfinished performance for the Phoenix King."
+  ],
+  "voiceNotes": [
+    "Theatrical, vain and tempestuous; speaks of audiences, songs and encores.",
+    "Swings between grand charm and shrieking fury."
+  ],
+  "temperament": {
+    "aggression": 65,
+    "caution": 35,
+    "pride": 95,
+    "greed": 40,
+    "honour": 20
+  },
+  "socialStyle": {
+    "warmth": 35,
+    "sociability": 70,
+    "generosity": 30,
+    "vanity": 100,
+    "spite": 60,
+    "opportunism": 40
+  },
+  "voiceGender": "female",
+  "ttsInstructions": "Operatic, vain and tempestuous.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

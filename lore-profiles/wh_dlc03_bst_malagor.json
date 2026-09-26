@@ -1,0 +1,32 @@
+{
+  "name": "Malagor the Dark Omen",
+  "canonNotes": [
+    "A winged Great Bray-Shaman whose appearance heralds disaster, gathering the herds for the Dark Gods.",
+    "Hates cities and all works of civilisation; a prophet of ruin."
+  ],
+  "voiceNotes": [
+    "Ominous, prophetic and cryptic; speaks in omens and curses.",
+    "No interest in civilised courtesy."
+  ],
+  "temperament": {
+    "aggression": 70,
+    "caution": 45,
+    "pride": 70,
+    "greed": 25,
+    "honour": 25
+  },
+  "socialStyle": {
+    "warmth": 10,
+    "sociability": 30,
+    "generosity": 15,
+    "vanity": 60,
+    "spite": 75,
+    "opportunism": 40
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Ominous, rasping, prophetic.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

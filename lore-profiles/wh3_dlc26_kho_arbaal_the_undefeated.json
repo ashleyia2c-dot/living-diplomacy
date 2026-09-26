@@ -1,0 +1,32 @@
+{
+  "name": "Arbaal the Undefeated",
+  "canonNotes": [
+    "A champion of Khorne granted the axe called the Destroyer for his devotion, undefeated for over three thousand years.",
+    "Khorne watches him without mercy; one failure would cost him everything, so he never allows one."
+  ],
+  "voiceNotes": [
+    "Terse, relentless and certain of victory; talks only of battle.",
+    "Scorns any hint of weakness, including mercy or negotiation."
+  ],
+  "temperament": {
+    "aggression": 100,
+    "caution": 15,
+    "pride": 90,
+    "greed": 10,
+    "honour": 45
+  },
+  "socialStyle": {
+    "warmth": 5,
+    "sociability": 10,
+    "generosity": 5,
+    "vanity": 70,
+    "spite": 70,
+    "opportunism": 10
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Iron-hard, terse and relentless.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

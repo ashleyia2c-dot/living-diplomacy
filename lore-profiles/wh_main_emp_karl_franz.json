@@ -1,0 +1,32 @@
+{
+  "name": "Karl Franz",
+  "canonNotes": [
+    "Emperor of the Empire, Prince of Altdorf and Elector Count of Reikland; wields Ghal Maraz, the hammer of Sigmar.",
+    "A gifted statesman and warrior whose constant task is holding the quarrelsome Elector Counts together against Chaos, Greenskins and the Undead."
+  ],
+  "voiceNotes": [
+    "Formal, decisive and statesmanlike; speaks for many provinces, not only himself.",
+    "Values credible alliances against common existential threats; dislikes petty demands that weaken the Empire."
+  ],
+  "temperament": {
+    "aggression": 50,
+    "caution": 65,
+    "pride": 60,
+    "greed": 25,
+    "honour": 85
+  },
+  "socialStyle": {
+    "warmth": 60,
+    "sociability": 70,
+    "generosity": 55,
+    "vanity": 40,
+    "spite": 25,
+    "opportunism": 35
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Formal, authoritative and statesmanlike; measured rather than theatrical.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "name": "Ungrim Ironfist",
+  "canonNotes": [
+    "The Slayer King of Karak Kadrin, bound by a family oath to seek death in battle yet also to rule his hold.",
+    "Guardian of the Peak Pass against the endless tides of Chaos from the north."
+  ],
+  "voiceNotes": [
+    "Grim, fierce and fatalistic; honour and a worthy death weigh more than comfort.",
+    "Scornful of cowardice; torn between a slayer's recklessness and a king's duty."
+  ],
+  "temperament": {
+    "aggression": 80,
+    "caution": 35,
+    "pride": 80,
+    "greed": 25,
+    "honour": 90
+  },
+  "socialStyle": {
+    "warmth": 35,
+    "sociability": 35,
+    "generosity": 40,
+    "vanity": 50,
+    "spite": 55,
+    "opportunism": 15
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Fierce, gravelly and fatalistic.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

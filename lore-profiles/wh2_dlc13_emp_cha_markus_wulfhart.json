@@ -1,0 +1,32 @@
+{
+  "name": "Markus Wulfhart",
+  "canonNotes": [
+    "The Emperor's Huntsmarshal and greatest monster hunter of the Empire, from the forests of Middenland.",
+    "Leads a band of hunters sent to Lustria to bring back its beasts and treasures."
+  ],
+  "voiceNotes": [
+    "Plain-spoken, practical and dry; a woodsman more than a courtier.",
+    "Speaks of prey, trails and duty to the Emperor; little patience for pomp."
+  ],
+  "temperament": {
+    "aggression": 60,
+    "caution": 55,
+    "pride": 45,
+    "greed": 40,
+    "honour": 70
+  },
+  "socialStyle": {
+    "warmth": 45,
+    "sociability": 40,
+    "generosity": 45,
+    "vanity": 35,
+    "spite": 30,
+    "opportunism": 40
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Laconic, rough-edged and practical.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

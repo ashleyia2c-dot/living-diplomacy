@@ -1,0 +1,32 @@
+{
+  "name": "Elspeth von Draken",
+  "canonNotes": [
+    "Grand Magister of the Amethyst Order in Nuln, a centuries-old master of the Lore of Death who has cheated her own mortality.",
+    "Commands Nuln's great gun foundries as well as her magic; feared and respected rather than loved."
+  ],
+  "voiceNotes": [
+    "Cold, sardonic and unhurried; speaks of death as an old acquaintance.",
+    "Coolly pragmatic about power and allies; finds hysteria and piety tiresome."
+  ],
+  "temperament": {
+    "aggression": 45,
+    "caution": 70,
+    "pride": 70,
+    "greed": 45,
+    "honour": 55
+  },
+  "socialStyle": {
+    "warmth": 30,
+    "sociability": 40,
+    "generosity": 30,
+    "vanity": 55,
+    "spite": 40,
+    "opportunism": 55
+  },
+  "voiceGender": "female",
+  "ttsInstructions": "Cool, ageless and dryly sardonic.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

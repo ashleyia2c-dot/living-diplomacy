@@ -1,10 +1,13 @@
 {
+  "name": "Display name of the lord.",
   "canonNotes": [
     "Brief canonical summary of the character and political situation."
   ],
   "voiceNotes": [
     "Tone, vocabulary, goals, and things this character would never say."
   ],
+  "temperament": { "aggression": 50, "caution": 50, "pride": 50, "greed": 50, "honour": 50 },
+  "socialStyle": { "warmth": 50, "sociability": 50, "generosity": 50, "vanity": 50, "spite": 50, "opportunism": 50 },
   "voiceGender": "male",
   "voiceIds": [],
   "ttsInstructions": "Brief direction for the Player2 voice.",

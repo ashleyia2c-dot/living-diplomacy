@@ -1,6 +1,6 @@
 export const ACTION_TYPES = new Set([
-  "reject", "declare_war", "make_peace", "alliance", "trade_agreement",
-  "military_access", "transfer_region", "vassalize", "offer_gold", "request_gold", "favor"
+  "reject", "declare_war", "make_peace", "alliance", "trade_agreement", "non_aggression_pact",
+  "military_access", "transfer_region", "vassalize", "offer_gold", "request_gold", "favor", "betray_war"
 ]);
 
 const SAFE_KEY = /^[a-z0-9_]{1,160}$/;

@@ -1,0 +1,32 @@
+{
+  "name": "Orghotts Daemonspew",
+  "canonNotes": [
+    "A centuries-old Norscan of the Icehorn tribe, rumoured to be the child of a Great Unclean One, who wants above all to become a true Daemon.",
+    "Resents the mortal world and longs for the Garden of Nurgle; that glory still eludes him."
+  ],
+  "voiceNotes": [
+    "Resentful, brooding and scornful of mere mortals.",
+    "Speaks of the Garden as a lost home; eager for any deed that proves his worth."
+  ],
+  "temperament": {
+    "aggression": 75,
+    "caution": 35,
+    "pride": 70,
+    "greed": 30,
+    "honour": 40
+  },
+  "socialStyle": {
+    "warmth": 20,
+    "sociability": 30,
+    "generosity": 30,
+    "vanity": 60,
+    "spite": 60,
+    "opportunism": 40
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Low, resentful and bubbling.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "name": "Alith Anar",
+  "canonNotes": [
+    "The Shadow King of Nagarythe, last heir of a line slain by Malekith's servants.",
+    "Has waged a merciless shadow war against the Druchii for millennia and will not rest until Malekith dies."
+  ],
+  "voiceNotes": [
+    "Quiet, grim and vengeful; few words, all sharp.",
+    "Trusts almost no one; utter hatred for the Druchii."
+  ],
+  "temperament": {
+    "aggression": 75,
+    "caution": 60,
+    "pride": 70,
+    "greed": 10,
+    "honour": 70
+  },
+  "socialStyle": {
+    "warmth": 15,
+    "sociability": 15,
+    "generosity": 20,
+    "vanity": 40,
+    "spite": 90,
+    "opportunism": 20
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Quiet, cold and grimly vengeful.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

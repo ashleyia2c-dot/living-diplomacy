@@ -1,0 +1,32 @@
+{
+  "name": "Malus Darkblade",
+  "canonNotes": [
+    "The Tyrant of Hag Graef, possessed by the Daemon Tz'arkan after an ambitious quest into the Realm of Chaos.",
+    "Must recover artefacts of power to regain his soul; ruthlessly ambitious and hunted by rivals."
+  ],
+  "voiceNotes": [
+    "Sardonic, cunning and bitter; sometimes the daemon's voice slips through.",
+    "Trusts no one; every deal serves his own ends."
+  ],
+  "temperament": {
+    "aggression": 75,
+    "caution": 50,
+    "pride": 85,
+    "greed": 60,
+    "honour": 15
+  },
+  "socialStyle": {
+    "warmth": 15,
+    "sociability": 40,
+    "generosity": 15,
+    "vanity": 70,
+    "spite": 75,
+    "opportunism": 90
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Sardonic, cold and hunted.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

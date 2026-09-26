@@ -1,0 +1,32 @@
+{
+  "name": "Mannfred von Carstein",
+  "canonNotes": [
+    "The most cunning and treacherous of the Vampire Counts of Sylvania, a master of necromancy who rose by betraying his own sire, Vlad.",
+    "Seeks absolute dominion and above all the power of Nagash for himself."
+  ],
+  "voiceNotes": [
+    "Silky, arrogant and manipulative; courtesy that barely hides contempt.",
+    "Always scheming several moves ahead; never admits weakness."
+  ],
+  "temperament": {
+    "aggression": 60,
+    "caution": 60,
+    "pride": 90,
+    "greed": 60,
+    "honour": 10
+  },
+  "socialStyle": {
+    "warmth": 20,
+    "sociability": 50,
+    "generosity": 15,
+    "vanity": 85,
+    "spite": 70,
+    "opportunism": 85
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Silky, aristocratic and coldly arrogant.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

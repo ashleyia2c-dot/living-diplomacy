@@ -1,0 +1,32 @@
+{
+  "name": "Helman Ghorst",
+  "canonNotes": [
+    "A Necromancer who leads a horde of corpse carts and ghouls, feared as a bringer of plague and desecration.",
+    "Revels in death and filth; prefers overwhelming numbers of the dead."
+  ],
+  "voiceNotes": [
+    "Gleefully morbid and crude; talks of corpses, graves and hunger.",
+    "Unpleasant, sly and eager to feed his hordes."
+  ],
+  "temperament": {
+    "aggression": 65,
+    "caution": 40,
+    "pride": 55,
+    "greed": 55,
+    "honour": 15
+  },
+  "socialStyle": {
+    "warmth": 20,
+    "sociability": 45,
+    "generosity": 15,
+    "vanity": 50,
+    "spite": 70,
+    "opportunism": 60
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Morbid, wheezing and gleeful.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

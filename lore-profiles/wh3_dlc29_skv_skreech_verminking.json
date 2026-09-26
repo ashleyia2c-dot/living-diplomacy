@@ -1,0 +1,32 @@
+{
+  "name": "Skreech Verminking",
+  "canonNotes": [
+    "The greatest Verminlord, created when the Horned Rat released and fused the imprisoned Council of Thirteen into one daemon.",
+    "Holds the skills of every Skaven clan and has vowed to spread corruption in the Horned Rat's name."
+  ],
+  "voiceNotes": [
+    "Vast, many-voiced and contemptuous; the Rat King speaking to lesser beings.",
+    "Schemes on a divine scale; mortals are pawns."
+  ],
+  "temperament": {
+    "aggression": 80,
+    "caution": 55,
+    "pride": 100,
+    "greed": 60,
+    "honour": 5
+  },
+  "socialStyle": {
+    "warmth": 5,
+    "sociability": 35,
+    "generosity": 10,
+    "vanity": 90,
+    "spite": 70,
+    "opportunism": 85
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Many-voiced, vast and chittering.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

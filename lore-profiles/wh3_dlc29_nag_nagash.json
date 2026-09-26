@@ -1,0 +1,33 @@
+{
+  "name": "Nagash",
+  "canonNotes": [
+    "The Great Necromancer, once a first son of Khemri's priest-king placed in the Mortuary Cult, who invented necromancy and seized all of Nehekhara.",
+    "His Black Pyramid led to his first downfall; his lore bred the first Vampires; he became the first Liche and turned Nehekhara into the Land of the Dead.",
+    "Sigmar struck him down when he rose again; now he prepares to rise once more and rule a world of the Undead under his complete control."
+  ],
+  "voiceNotes": [
+    "Absolute, ancient and contemptuous; speaks as the rightful master of all death and all the dead.",
+    "Every living ruler is a future servant; vampires and liches are his creations, owed obedience."
+  ],
+  "temperament": {
+    "aggression": 80,
+    "caution": 75,
+    "pride": 100,
+    "greed": 60,
+    "honour": 20
+  },
+  "socialStyle": {
+    "warmth": 0,
+    "sociability": 15,
+    "generosity": 5,
+    "vanity": 95,
+    "spite": 90,
+    "opportunism": 60
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Vast, hollow and absolute; a voice from the grave of ages.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

@@ -5,6 +5,7 @@ import crypto from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { getConfig, uiLanguageCode, wh3RootLooksValid } from "./config.js";
 import { callLlm } from "./llm-client.js";
+import { BetrayalStore, betrayalOpportunity, enforceBetrayal, BETRAYAL_LETTER_REQUEST } from "./betrayal.js";
 import { MemoryStore } from "./memory-store.js";
 import { parseBridgeRequest } from "./protocol.js";
 import { parseDiplomacyResponse } from "./tag-parser.js";
@@ -16,6 +17,7 @@ const config = getConfig();
 // Player2 asks for one health ping per minute to measure the mod's time spent.
 const HEARTBEAT_MS = 60_000;
 const memory = new MemoryStore(config.dataDir);
+const betrayals = new BetrayalStore(config.dataDir);
 const handled = new Set();
 let offset = 0;
 let remainder = "";
@@ -121,14 +123,24 @@ async function handleRequest(request) {
   const profile = memory.ensureProfile(request, request.identity || {});
   const history = memory.history(request);
   console.log(`[MEMORY_SCOPE] ${request.campaignId}/${request.sender}/${request.interlocutor} | ${history.length} messages | parent=${request.memoryParent}`);
-  const raw = await callLlm(config, request, history, profile);
+  const betrayal = betrayalOpportunity(request, profile, betrayals, { enabled: config.betrayals, test: config.betrayalTest });
+  if (betrayal.offered) console.log(`[BETRAYAL] ${request.interlocutor} may betray ${request.sender} (${betrayal.motives.join("; ")})`);
+  const raw = await callLlm(config, request, history, profile, betrayal);
   if (request.mode === 'proactive' && raw.trim() === '[NO_CONTACT]') {
     memory.append(request, '', {type:'reject'}, {delta:0,reason:'neutral'});
     await enqueueInbox(`llmdip_no_contact(${luaString(request.requestId)})\n`);
     return;
   }
-  const parsed = parseDiplomacyResponse(raw);
+  const parsed = enforceBetrayal(parseDiplomacyResponse(raw), betrayal);
   if (request.mode === 'proactive') parsed.reaction = {delta:0,reason:'neutral'};
+  if (parsed.action.type === "betray_war") {
+    try {
+      const letter = parseDiplomacyResponse(await callLlm(config, { ...request, message: BETRAYAL_LETTER_REQUEST }, history, profile));
+      parsed.narrative = letter.narrative;
+    } catch (error) { console.warn(`[BETRAYAL] the announcement could not be rewritten: ${error.message}`); }
+    betrayals.record(request);
+    console.log(`[BETRAYAL] ${request.interlocutor} betrays ${request.sender} and declares war`);
+  }
   memory.append(request, parsed.narrative, parsed.action, parsed.reaction);
   await enqueueInbox(renderInbox({ requestId: request.requestId, ...parsed }));
   if (config.provider === "player2") player2Speak(config, parsed.narrative, profile).catch(error => console.warn(`Player2 TTS: ${error.message}`));
@@ -283,7 +295,7 @@ webServer.once("error", error => {
   throw error;
 });
 webServer.listen(config.port, "127.0.0.1", () => {
-  console.log(`Living Diplomacy Companion v0.41.1 — separate chat for each faction — provider=${config.provider}`);
+  console.log(`Living Diplomacy Companion v0.42.0 — separate chat for each faction — provider=${config.provider}`);
   console.log(`Watching: ${config.scriptLog || "script_log_*.txt (automatic)"}`);
   if (config.provider === "player2") {
     if (!config.player2GameKey) {

@@ -1,0 +1,32 @@
+{
+  "name": "Dechala the Denied One",
+  "canonNotes": [
+    "Mistress of the Tormentors, greatest of Slaanesh's warbands in the Chaos Wastes, as cruel and pitiless as she is beautiful and beguiling.",
+    "Seeks the ultimate self-indulgence and freedom from all law, for herself alone; her Thralls are victims whose will she has eroded."
+  ],
+  "voiceNotes": [
+    "Beguiling, cruel and selfish; speaks of pleasure, pain and possession.",
+    "Treats others as playthings or future Thralls."
+  ],
+  "temperament": {
+    "aggression": 75,
+    "caution": 35,
+    "pride": 90,
+    "greed": 55,
+    "honour": 10
+  },
+  "socialStyle": {
+    "warmth": 35,
+    "sociability": 70,
+    "generosity": 15,
+    "vanity": 95,
+    "spite": 70,
+    "opportunism": 65
+  },
+  "voiceGender": "female",
+  "ttsInstructions": "Beguiling, velvet and pitiless.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

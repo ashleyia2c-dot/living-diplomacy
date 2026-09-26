@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { SYSTEM_PROMPT, buildMessages } from '../src/llm-client.js';
-import { buildSocialStyle, personalityBrief } from '../src/personality.js';
+import { SYSTEM_PROMPT, buildMessages, powerBalance, powerReminder } from '../src/llm-client.js';
+import { buildSocialStyle, personalityBrief, powerStance } from '../src/personality.js';
 import { MemoryStore } from '../src/memory-store.js';
 import { parseDiplomacyResponse } from '../src/tag-parser.js';
 
@@ -172,4 +172,73 @@ test('a friendly endangered ruler is not taught to defend an invented alliance-b
   assert.match(SYSTEM_PROMPT,/merely mention that the old pact ended/);
   assert.match(SYSTEM_PROMPT,/not an insult or proof of bad faith/);
   assert.match(SYSTEM_PROMPT,/never guarantee an alliance merely because the player is strong/);
+});
+
+test('a far weaker ruler is told plainly that war with the player would be suicide', () => {
+  // 25-09: Miao Ying (1 region, 7 wars, player 12.5x stronger) insulted Vlad's offers of
+  // friendship and gold and answered his threat by proposing war herself.
+  assert.match(SYSTEM_PROMPT, /POWER AND SURVIVAL/);
+  assert.match(SYSTEM_PROMPT, /Never propose it against a player far stronger than you/);
+  assert.match(SYSTEM_PROMPT, /A compliment, an offer of help or friendship, or a gift is never an insult/);
+  assert.match(SYSTEM_PROMPT, /a strength rank of 0 means the rank was not available/);
+  const fields = {relative_power:'player_overwhelming', relative_power_ratio:'12.51', ai_wars:'7',
+    ai_regions:'wh3_main_combi_region_nan_gau', player_regions:'a:b:c:d:e:f:g:h:i:j:k:l',
+    ai_treasury:'12838', player_treasury:'30028', ai_income:'4252', player_income:'33953', region_hops:'5',
+    attitude_text:'Poco amistosa', attitude_category:'2', diplomatic_attitude:'0'};
+  const balance = powerBalance(fields);
+  assert.match(balance, /about 12\.5 times as strong as yours/);
+  assert.match(balance, /Regions held: you 1, the player 12/);
+  assert.match(balance, /at war with 7 faction/);
+  assert.match(balance, /by far the weaker party and your realm is already hard-pressed/);
+  assert.match(balance, /never propose war/);
+  assert.match(balance, /not adjacent/);
+  const request = {campaignId:'c', sender:'vlad', interlocutor:'miao', turn:56, mode:'player',
+    message:'conquistare tu imperio', identity:{}, playerIdentity:{}, state:'', fields};
+  const context = buildMessages(request, [], {}).at(-1).content;
+  assert.match(context, /POWER BALANCE/);
+  // The reminder sits right before the player's words, where models weigh it most.
+  assert.match(context, /BEFORE YOU ANSWER: this ruler is about 12\.5 times stronger than you[\s\S]*\n\nPLAYER'S CURRENT WORDS:\nconquistare tu imperio$/);
+});
+
+test('matched rulers get no reminder; far stronger rulers are told to act dominant', () => {
+  assert.equal(powerReminder({relative_power_ratio:'1.1'}), '');
+  assert.match(powerReminder({relative_power_ratio:'0.1'}), /about 10\.0 times stronger than this ruler\. Answer from a position of dominance/);
+  assert.match(powerReminder({relative_power_ratio:'12.51'}), /win them over[\s\S]*treat it as an opportunity/);
+  assert.equal(powerReminder({}), '');
+  assert.match(powerBalance({relative_power_ratio:'1.0'}), /roughly matched/);
+  assert.match(powerBalance({relative_power_ratio:'2.0'}), /the player is stronger than you/);
+  assert.match(powerBalance({relative_power_ratio:'0.2'}), /Your realm is about 5\.0 times as strong[\s\S]*by far the stronger party/);
+  assert.match(powerBalance({}), /Do not assume you are stronger/);
+});
+
+test('culture changes how a ruler reacts to power: Chaos never courts, Cathay does', () => {
+  const fields = {relative_power_ratio:'12.51', ai_wars:'7', ai_regions:'one'};
+  const chaos = powerStance('wh_main_chs_chaos wh_main_sc_chs_chaos');
+  assert.equal(chaos.courts, false);
+  assert.equal(powerStance('wh3_main_kho_khorne wh3_main_sc_kho_khorne').courts, false);
+  assert.equal(powerStance('wh_dlc03_bst_beastmen wh_dlc03_sc_bst_beastmen').courts, false);
+  assert.equal(powerStance('wh2_main_skv_skaven wh2_main_sc_skv_skaven').courts, true);
+  // Faction and similar keys must not be misread: Cathay's "northern" is not Norsca,
+  // and Chaos Dwarfs are not Dwarfs.
+  assert.deepEqual(powerStance('wh3_main_cth_cathay wh3_main_sc_cth_cathay'), {courts:true, betrays:false, text:''});
+  assert.equal(powerStance('wh3_dlc23_chd_chaos_dwarfs wh3_dlc23_sc_chd_chaos').text, '');
+  const chaosBalance = powerBalance(fields, chaos);
+  assert.match(chaosBalance, /your people do not court, beg or buy peace/);
+  assert.doesNotMatch(chaosBalance, /court them with dignity/);
+  assert.match(chaosBalance, /CULTURAL STANCE ON POWER[^\n]*scorn diplomacy/);
+  assert.match(powerReminder(fields, chaos), /do not court, beg or buy peace from anyone/);
+  assert.match(powerBalance(fields), /court them with dignity/);
+  const request = {campaignId:'c', sender:'vlad', interlocutor:'archaon', turn:5, mode:'player', message:'hola',
+    identity:{culture:'wh_main_chs_chaos', subculture:'wh_main_sc_chs_chaos'}, playerIdentity:{}, state:'', fields};
+  const context = buildMessages(request, [], {}).at(-1).content;
+  assert.match(context, /CULTURAL STANCE ON POWER/);
+  assert.match(context, /BEFORE YOU ANSWER:[^\n]*do not court, beg or buy peace/);
+  assert.match(SYSTEM_PROMPT, /CULTURAL STANCE ON POWER in the POWER BALANCE block overrides this generic advice/);
+});
+
+test('the reply is the ruler speaking, not a description of how the ruler answers', () => {
+  // 25-09: to "hola" Katarin answered "Zarina Katarin ... responde con amabilidad seca ...
+  // La actitud Muy amistosa justifica la apertura. 'Vlad ...'".
+  assert.match(SYSTEM_PROMPT, /only the ruler's own words to the player, in the first person/);
+  assert.match(SYSTEM_PROMPT, /Never narrate the ruler in the third person, describe their tone or traits, or explain how or why you are going to answer/);
 });

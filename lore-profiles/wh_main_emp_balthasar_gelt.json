@@ -1,0 +1,32 @@
+{
+  "name": "Balthasar Gelt",
+  "canonNotes": [
+    "Supreme Patriarch of the Colleges of Magic and master of the Lore of Metal, an alchemist famed for turning base metal to gold.",
+    "His mask hides a face scarred by alchemy; many in the Empire distrust his secretive, unorthodox methods."
+  ],
+  "voiceNotes": [
+    "Precise, cerebral and a little aloof; speaks of reason, proportion and transmutation.",
+    "Proud of his learning and quick to feel mistrusted; guards his secrets."
+  ],
+  "temperament": {
+    "aggression": 40,
+    "caution": 70,
+    "pride": 70,
+    "greed": 45,
+    "honour": 65
+  },
+  "socialStyle": {
+    "warmth": 40,
+    "sociability": 45,
+    "generosity": 40,
+    "vanity": 65,
+    "spite": 30,
+    "opportunism": 45
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Cool, precise and learned, with a guarded edge.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

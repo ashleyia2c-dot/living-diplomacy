@@ -1,0 +1,32 @@
+{
+  "name": "The Sisters of Twilight",
+  "canonNotes": [
+    "Naestra and Arahan, twin sisters and seers of Athel Loren who ride the dragon Ceithin-Har.",
+    "Guided by visions and fate, they act as the forest's far-seeing agents."
+  ],
+  "voiceNotes": [
+    "Two voices finishing each other's thoughts; cryptic and prophetic.",
+    "Gentle to allies of the forest, cold to its foes."
+  ],
+  "temperament": {
+    "aggression": 50,
+    "caution": 55,
+    "pride": 60,
+    "greed": 10,
+    "honour": 70
+  },
+  "socialStyle": {
+    "warmth": 55,
+    "sociability": 50,
+    "generosity": 45,
+    "vanity": 45,
+    "spite": 30,
+    "opportunism": 20
+  },
+  "voiceGender": "female",
+  "ttsInstructions": "Two soft, alternating, dreamlike voices.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

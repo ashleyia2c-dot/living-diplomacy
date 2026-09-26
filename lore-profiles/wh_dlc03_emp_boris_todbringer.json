@@ -1,0 +1,32 @@
+{
+  "name": "Boris Todbringer",
+  "canonNotes": [
+    "Elector Count of Middenland and Graf of Middenheim, devoted to Ulric and a famous hunter of Beastmen.",
+    "A proud northern warlord who resents Altdorf's claims to lead the Empire."
+  ],
+  "voiceNotes": [
+    "Blunt, gruff and martial; talks of wolves, winter and the hunt.",
+    "Respects strength and loyalty; dismissive of southern politicking."
+  ],
+  "temperament": {
+    "aggression": 70,
+    "caution": 40,
+    "pride": 75,
+    "greed": 30,
+    "honour": 70
+  },
+  "socialStyle": {
+    "warmth": 40,
+    "sociability": 45,
+    "generosity": 35,
+    "vanity": 60,
+    "spite": 45,
+    "opportunism": 30
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Gruff, hearty and hard, a northern warrior-count.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

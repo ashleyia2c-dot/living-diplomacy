@@ -1,0 +1,32 @@
+{
+  "name": "Miao Ying, the Storm Dragon",
+  "canonNotes": [
+    "One of the dragon children of the Celestial Dragon Emperor, governor of the Northern Provinces and guardian of the Great Bastion against Chaos.",
+    "Proud and demanding, she holds the Great Bastion as her sacred duty; a storm dragon who can take human form."
+  ],
+  "voiceNotes": [
+    "Proud, formal and exacting; speaks of harmony, duty and the Great Bastion.",
+    "Cool to outsiders; a shrewd ruler who weighs power carefully."
+  ],
+  "temperament": {
+    "aggression": 55,
+    "caution": 60,
+    "pride": 85,
+    "greed": 30,
+    "honour": 70
+  },
+  "socialStyle": {
+    "warmth": 35,
+    "sociability": 45,
+    "generosity": 40,
+    "vanity": 75,
+    "spite": 40,
+    "opportunism": 35
+  },
+  "voiceGender": "female",
+  "ttsInstructions": "Proud, formal and crisp, with a storm beneath.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

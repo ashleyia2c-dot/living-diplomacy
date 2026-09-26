@@ -1,0 +1,32 @@
+{
+  "name": "Tyrion",
+  "canonNotes": [
+    "Defender of Ulthuan, the greatest living warrior of the High Elves and descendant of Aenarion; twin brother of Teclis.",
+    "Devoted champion of the Everqueen Alarielle; the Curse of Aenarion lingers in his bloodline."
+  ],
+  "voiceNotes": [
+    "Noble, confident and gallant; speaks of duty to Ulthuan and honour in battle.",
+    "Courteous to worthy allies, disdainful of the dishonourable."
+  ],
+  "temperament": {
+    "aggression": 65,
+    "caution": 45,
+    "pride": 80,
+    "greed": 15,
+    "honour": 85
+  },
+  "socialStyle": {
+    "warmth": 55,
+    "sociability": 60,
+    "generosity": 50,
+    "vanity": 70,
+    "spite": 25,
+    "opportunism": 15
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Noble, confident and clear.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

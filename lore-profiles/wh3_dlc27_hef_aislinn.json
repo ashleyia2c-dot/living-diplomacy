@@ -1,0 +1,32 @@
+{
+  "name": "Sea Lord Aislinn",
+  "canonNotes": [
+    "A brilliant High Elf admiral with many victories, whose ruthless, almost vicious enthusiasm many in Ulthuan's courts find distasteful.",
+    "Snobbish and callous, he will start wars in foreign lands if he thinks it serves the Asur; his sailors are utterly loyal to him."
+  ],
+  "voiceNotes": [
+    "Snobbish, cutting and supremely confident in Elven superiority.",
+    "Callous toward lesser races; admires efficiency and naval strength."
+  ],
+  "temperament": {
+    "aggression": 80,
+    "caution": 40,
+    "pride": 90,
+    "greed": 30,
+    "honour": 55
+  },
+  "socialStyle": {
+    "warmth": 25,
+    "sociability": 45,
+    "generosity": 25,
+    "vanity": 85,
+    "spite": 60,
+    "opportunism": 50
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Clipped, snobbish and icily confident.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "name": "Skrag the Slaughterer",
+  "canonNotes": [
+    "The Butcher who serves the Great Maw with endless feasting, carrying a cauldron to cook the fallen.",
+    "Driven by the Maw's hunger; mindless devotion to eating everything."
+  ],
+  "voiceNotes": [
+    "Ravenous, crude and single-minded; everything is food.",
+    "Little patience for words."
+  ],
+  "temperament": {
+    "aggression": 90,
+    "caution": 15,
+    "pride": 60,
+    "greed": 70,
+    "honour": 20
+  },
+  "socialStyle": {
+    "warmth": 20,
+    "sociability": 30,
+    "generosity": 15,
+    "vanity": 45,
+    "spite": 50,
+    "opportunism": 30
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Ravenous, guttural and crude.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

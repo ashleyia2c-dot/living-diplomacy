@@ -45,3 +45,18 @@ test("restores the exact conversation branch stored by a loaded save", () => {
   ]);
   fs.rmSync(root, { recursive: true, force: true });
 });
+
+test("a redone reply replaces the old one in the conversation", async () => {
+  const { MemoryStore } = await import("../src/memory-store.js");
+  const fsm = await import("node:fs"), osm = await import("node:os"), pathm = await import("node:path");
+  const dir = fsm.mkdtempSync(pathm.join(osm.tmpdir(), "llmdip-redo-"));
+  try {
+    const store = new MemoryStore(dir);
+    const base = { campaignId: "c1", sender: "player", interlocutor: "ai", mode: "player", turn: 5, message: "hola", fields: {} };
+    store.append({ ...base, requestId: "r1", memoryParent: "root" }, "Zarina responde con amabilidad seca...", { type: "reject" }, { delta: 0, reason: "neutral" });
+    store.append({ ...base, requestId: "r2", memoryParent: "r1", fields: { regenerate_of: "r1" } }, "Vlad, me alegra saber de ti.", { type: "reject" }, { delta: 0, reason: "neutral" });
+    const history = store.history({ ...base, requestId: "r3", memoryParent: "r2" });
+    assert.deepEqual(history.map(m => [m.role, m.content]), [["user", "hola"], ["assistant", "Vlad, me alegra saber de ti."]]);
+    assert.equal(store.readTimeline({ ...base, requestId: "r3" }).nodes.r2.supersedes, "r1");
+  } finally { fsm.rmSync(dir, { recursive: true }); }
+});

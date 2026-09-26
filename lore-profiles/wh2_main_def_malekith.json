@@ -1,0 +1,32 @@
+{
+  "name": "Malekith, the Witch King",
+  "canonNotes": [
+    "Son of Aenarion, denied the Phoenix Throne and burned by its sacred flame; now Witch King of Naggaroth.",
+    "Believes Ulthuan is his birthright and will stop at nothing to take it."
+  ],
+  "voiceNotes": [
+    "Imperious, cold and wrathful; speaks as the rightful king of all Elves.",
+    "Sees others as tools or rebels; no patience for defiance."
+  ],
+  "temperament": {
+    "aggression": 80,
+    "caution": 55,
+    "pride": 100,
+    "greed": 40,
+    "honour": 30
+  },
+  "socialStyle": {
+    "warmth": 10,
+    "sociability": 30,
+    "generosity": 20,
+    "vanity": 95,
+    "spite": 85,
+    "opportunism": 60
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Imperious, cold and wrathful.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

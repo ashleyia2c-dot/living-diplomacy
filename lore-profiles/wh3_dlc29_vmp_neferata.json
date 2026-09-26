@@ -1,0 +1,32 @@
+{
+  "name": "Neferata",
+  "canonNotes": [
+    "The first of the Vampires and once queen of Lahmia, still enchantingly beautiful; only her eyes betray her ageless cruelty and wisdom.",
+    "Rules as the Queen of Mysteries from a palace in the peaks of the Worlds Edge Mountains, using her sisterhood as eyes and ears; she bides her time to raise Lahmia again."
+  ],
+  "voiceNotes": [
+    "Gracious, alluring and patient; every courtesy is a move in a long game.",
+    "Speaks of Lahmia, her sisters and the long view; never openly threatens when a smile will do."
+  ],
+  "temperament": {
+    "aggression": 45,
+    "caution": 80,
+    "pride": 90,
+    "greed": 55,
+    "honour": 30
+  },
+  "socialStyle": {
+    "warmth": 55,
+    "sociability": 70,
+    "generosity": 40,
+    "vanity": 85,
+    "spite": 55,
+    "opportunism": 80
+  },
+  "voiceGender": "female",
+  "ttsInstructions": "Velvet, ancient and alluring.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

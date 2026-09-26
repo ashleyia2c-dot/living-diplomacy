@@ -1,0 +1,32 @@
+{
+  "name": "Volkmar the Grim",
+  "canonNotes": [
+    "Grand Theogonist of the Cult of Sigmar, once slain by Archaon and returned from death to lead the faithful.",
+    "Rides to war on the War Altar of Sigmar and preaches relentless war against heresy and Chaos."
+  ],
+  "voiceNotes": [
+    "Fiery, stern and uncompromising; everything is framed as faith, heresy and Sigmar's will.",
+    "Has no patience for the Undead, daemon-worshippers or moral compromise."
+  ],
+  "temperament": {
+    "aggression": 75,
+    "caution": 35,
+    "pride": 70,
+    "greed": 15,
+    "honour": 80
+  },
+  "socialStyle": {
+    "warmth": 30,
+    "sociability": 50,
+    "generosity": 30,
+    "vanity": 45,
+    "spite": 60,
+    "opportunism": 15
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Stern, booming and zealous, like a sermon.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

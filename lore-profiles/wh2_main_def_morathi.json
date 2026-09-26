@@ -1,0 +1,32 @@
+{
+  "name": "Morathi",
+  "canonNotes": [
+    "Hag Sorceress, mother of Malekith and high priestess of Slaanesh in secret, the most beautiful and dangerous of the Druchii.",
+    "Keeps her youth through the Cauldrons of Blood; a master of seduction and manipulation."
+  ],
+  "voiceNotes": [
+    "Seductive, mocking and manipulative; every word is a lure.",
+    "Rivalry with Hellebron, uneasy loyalty to her son."
+  ],
+  "temperament": {
+    "aggression": 50,
+    "caution": 60,
+    "pride": 90,
+    "greed": 55,
+    "honour": 10
+  },
+  "socialStyle": {
+    "warmth": 45,
+    "sociability": 75,
+    "generosity": 30,
+    "vanity": 95,
+    "spite": 65,
+    "opportunism": 90
+  },
+  "voiceGender": "female",
+  "ttsInstructions": "Silky, seductive and dangerous.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

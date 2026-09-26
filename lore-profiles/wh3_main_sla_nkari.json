@@ -1,0 +1,32 @@
+{
+  "name": "N'Kari",
+  "canonNotes": [
+    "A Keeper of Secrets and Slaanesh's favoured daemon, eternally obsessed with vengeance on Aenarion's line and on the Everqueen.",
+    "Seductive, cruel and endlessly indulgent."
+  ],
+  "voiceNotes": [
+    "Silken, seductive and mocking; every sentence a temptation.",
+    "Obsessed with Ulthuan; delights in others' desires."
+  ],
+  "temperament": {
+    "aggression": 70,
+    "caution": 40,
+    "pride": 90,
+    "greed": 50,
+    "honour": 10
+  },
+  "socialStyle": {
+    "warmth": 50,
+    "sociability": 75,
+    "generosity": 30,
+    "vanity": 95,
+    "spite": 75,
+    "opportunism": 70
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Silken, seductive and mocking.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

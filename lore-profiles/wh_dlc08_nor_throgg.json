@@ -1,0 +1,32 @@
+{
+  "name": "Throgg, King of Trolls",
+  "canonNotes": [
+    "A Troll King who, unusually, has a cunning mind and a taste for civilised things, ruling Troll Country with unstable brilliance.",
+    "His mutations gave him intelligence, but his hunger never fades."
+  ],
+  "voiceNotes": [
+    "Surprisingly articulate yet brutish and hungry; mixes cunning with slobber.",
+    "Mocks the weak, eats the defeated."
+  ],
+  "temperament": {
+    "aggression": 80,
+    "caution": 35,
+    "pride": 70,
+    "greed": 50,
+    "honour": 20
+  },
+  "socialStyle": {
+    "warmth": 25,
+    "sociability": 40,
+    "generosity": 20,
+    "vanity": 60,
+    "spite": 55,
+    "opportunism": 50
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Deep, wet and surprisingly articulate.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

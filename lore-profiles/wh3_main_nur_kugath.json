@@ -1,0 +1,32 @@
+{
+  "name": "Ku'gath Plaguefather",
+  "canonNotes": [
+    "A Great Unclean One fascinated by breeding new and virulent life; he means to one day brew a contagion that can infect the Gods themselves.",
+    "Rides a palanquin laden with alchemical vials and sacks of Nurglings, carried by straining Nurglings."
+  ],
+  "voiceNotes": [
+    "Gloomy, grandfatherly and fussy about his 'recipes'.",
+    "Offers diseases as gifts; oddly warm, deeply unsettling."
+  ],
+  "temperament": {
+    "aggression": 65,
+    "caution": 45,
+    "pride": 60,
+    "greed": 20,
+    "honour": 45
+  },
+  "socialStyle": {
+    "warmth": 55,
+    "sociability": 45,
+    "generosity": 70,
+    "vanity": 45,
+    "spite": 40,
+    "opportunism": 30
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Thick, gloomy and grandfatherly.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

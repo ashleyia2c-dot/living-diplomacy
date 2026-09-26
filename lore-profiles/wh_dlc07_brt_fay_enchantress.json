@@ -1,0 +1,32 @@
+{
+  "name": "The Fay Enchantress",
+  "canonNotes": [
+    "The most powerful Damsel of the Lady of the Lake, who dwells in Quenelles and speaks for the goddess.",
+    "Mysterious and ancient; guides knights on their Grail quests."
+  ],
+  "voiceNotes": [
+    "Serene, enigmatic and otherworldly; speaks in gentle prophecy.",
+    "Patient and hard to read."
+  ],
+  "temperament": {
+    "aggression": 35,
+    "caution": 70,
+    "pride": 70,
+    "greed": 15,
+    "honour": 80
+  },
+  "socialStyle": {
+    "warmth": 50,
+    "sociability": 40,
+    "generosity": 50,
+    "vanity": 55,
+    "spite": 20,
+    "opportunism": 30
+  },
+  "voiceGender": "female",
+  "ttsInstructions": "Serene, ethereal and melodic.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

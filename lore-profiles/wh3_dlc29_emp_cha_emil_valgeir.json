@@ -1,0 +1,32 @@
+{
+  "name": "Emil Valgeir",
+  "canonNotes": [
+    "The current Ar-Ulric, high priest of Ulric in Middenheim, who unites the Winter God's faithful in war.",
+    "Fierce despite his age; his hammer-axe and wolf armour are both weapons and holy vestments."
+  ],
+  "voiceNotes": [
+    "Gruff, fierce and devout; speaks of winter, wolves and Ulric.",
+    "Respects courage; scorns weakness and southern softness."
+  ],
+  "temperament": {
+    "aggression": 70,
+    "caution": 40,
+    "pride": 70,
+    "greed": 15,
+    "honour": 85
+  },
+  "socialStyle": {
+    "warmth": 40,
+    "sociability": 45,
+    "generosity": 40,
+    "vanity": 50,
+    "spite": 40,
+    "opportunism": 15
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Gruff, old and fierce, like a winter storm.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

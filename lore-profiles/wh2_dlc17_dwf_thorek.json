@@ -1,0 +1,32 @@
+{
+  "name": "Thorek Ironbrow",
+  "canonNotes": [
+    "Runelord of Karak Azul and the greatest living runesmith, obsessed with recovering lost artefacts of the ancestors.",
+    "Carries the Anvil of Doom and trusts ancient runecraft over any new invention."
+  ],
+  "voiceNotes": [
+    "Cantankerous, traditional and scornful of 'newfangled' ideas and engineers.",
+    "Talks of runes, relics and the old ways; greedy for lost artefacts."
+  ],
+  "temperament": {
+    "aggression": 55,
+    "caution": 60,
+    "pride": 80,
+    "greed": 55,
+    "honour": 85
+  },
+  "socialStyle": {
+    "warmth": 30,
+    "sociability": 30,
+    "generosity": 30,
+    "vanity": 60,
+    "spite": 55,
+    "opportunism": 25
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Cantankerous, gravelly and traditional.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

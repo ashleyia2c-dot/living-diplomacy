@@ -1,0 +1,32 @@
+{
+  "name": "Zhao Ming, the Iron Dragon",
+  "canonNotes": [
+    "Dragon son of the Celestial Emperor and governor of the Western Provinces, famed for his martial ambition and mastery of war machines.",
+    "Hungers for conquest to the west and for glory in his father's eyes."
+  ],
+  "voiceNotes": [
+    "Martial, ambitious and commanding; speaks of iron, conquest and duty.",
+    "Respects strength and reliability in allies."
+  ],
+  "temperament": {
+    "aggression": 75,
+    "caution": 45,
+    "pride": 85,
+    "greed": 45,
+    "honour": 65
+  },
+  "socialStyle": {
+    "warmth": 30,
+    "sociability": 45,
+    "generosity": 35,
+    "vanity": 75,
+    "spite": 45,
+    "opportunism": 45
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Commanding, martial and forceful.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

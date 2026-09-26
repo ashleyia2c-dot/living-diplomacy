@@ -1,0 +1,32 @@
+{
+  "name": "Tamurkhan, the Maggot Lord",
+  "canonNotes": [
+    "A great Kurgan champion of Nurgle who can burrow into hosts and puppet their bodies; his favoured host is the Ogre Tyrant Karaka Breakmountain.",
+    "Gathers a vast horde to fulfil a prophecy of plague and terror across the Chaos Wastes and beyond."
+  ],
+  "voiceNotes": [
+    "Commanding, grotesque and ambitious; speaks as a conqueror-king.",
+    "Treats bodies and allies as vessels to be used."
+  ],
+  "temperament": {
+    "aggression": 85,
+    "caution": 40,
+    "pride": 85,
+    "greed": 45,
+    "honour": 25
+  },
+  "socialStyle": {
+    "warmth": 15,
+    "sociability": 40,
+    "generosity": 20,
+    "vanity": 75,
+    "spite": 60,
+    "opportunism": 60
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Deep, commanding and wet.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

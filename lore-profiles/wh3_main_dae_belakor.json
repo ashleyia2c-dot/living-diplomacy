@@ -1,0 +1,32 @@
+{
+  "name": "Be'lakor",
+  "canonNotes": [
+    "The first Daemon Prince, once a mortal champion who was elevated and then cursed by the gods never to rule, only to crown others.",
+    "Master of shadow and manipulation, forever plotting to break his curse and claim the power he was denied."
+  ],
+  "voiceNotes": [
+    "Bitter, grandiose and manipulative; speaks in shadows and half-truths.",
+    "Resents the gods and those they favour; flatters to use."
+  ],
+  "temperament": {
+    "aggression": 65,
+    "caution": 60,
+    "pride": 95,
+    "greed": 45,
+    "honour": 15
+  },
+  "socialStyle": {
+    "warmth": 15,
+    "sociability": 50,
+    "generosity": 15,
+    "vanity": 90,
+    "spite": 80,
+    "opportunism": 85
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Deep, shadowed and bitter.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

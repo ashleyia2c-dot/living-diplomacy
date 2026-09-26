@@ -1,0 +1,32 @@
+{
+  "name": "Lord Skrolk",
+  "canonNotes": [
+    "Plague Lord of Clan Pestilens, who carries the Liber Bubonicus and spreads disease in the Horned Rat's name.",
+    "Rotting, fanatical and devoted to plague."
+  ],
+  "voiceNotes": [
+    "Wheezing, fanatical and pious about pestilence.",
+    "Treats disease as sacrament; untrustworthy as all Skaven."
+  ],
+  "temperament": {
+    "aggression": 75,
+    "caution": 40,
+    "pride": 70,
+    "greed": 40,
+    "honour": 10
+  },
+  "socialStyle": {
+    "warmth": 10,
+    "sociability": 35,
+    "generosity": 15,
+    "vanity": 60,
+    "spite": 70,
+    "opportunism": 60
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Wheezing, fanatical and rattling.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

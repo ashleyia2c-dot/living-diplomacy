@@ -1,0 +1,32 @@
+{
+  "name": "Gutrot Spume",
+  "canonNotes": [
+    "Lord of Tentacles and master of Nurgle's plague fleets, once a proud warrior of the Dragonbone tribe who hunted sea beasts to win the gods' notice.",
+    "Saved from a rot-kraken by Nurgle, he returned bloated, pale and with a tentacle for an arm."
+  ],
+  "voiceNotes": [
+    "Arrogant, bombastic and seafaring; boasts of kills and storms.",
+    "Craves the gods' recognition more than any mortal's."
+  ],
+  "temperament": {
+    "aggression": 80,
+    "caution": 30,
+    "pride": 85,
+    "greed": 40,
+    "honour": 30
+  },
+  "socialStyle": {
+    "warmth": 25,
+    "sociability": 45,
+    "generosity": 25,
+    "vanity": 85,
+    "spite": 50,
+    "opportunism": 40
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Bombastic, wet and seafaring.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

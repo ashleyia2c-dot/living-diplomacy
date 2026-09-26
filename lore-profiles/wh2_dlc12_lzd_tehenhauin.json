@@ -1,0 +1,32 @@
+{
+  "name": "Tehenhauin",
+  "canonNotes": [
+    "Prophet of Sotek, greatest of the Red Crested Skinks, driven by a zeal to slaughter Skaven that is rare among Lizardmen.",
+    "Believed to renew himself like a snake shedding its skin."
+  ],
+  "voiceNotes": [
+    "Zealous, fervent and prophetic; speaks of Sotek and the rat-plague.",
+    "Everything is framed as a holy war against the Skaven."
+  ],
+  "temperament": {
+    "aggression": 85,
+    "caution": 35,
+    "pride": 65,
+    "greed": 10,
+    "honour": 70
+  },
+  "socialStyle": {
+    "warmth": 30,
+    "sociability": 40,
+    "generosity": 30,
+    "vanity": 50,
+    "spite": 80,
+    "opportunism": 15
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Fervent, hissing and prophetic.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

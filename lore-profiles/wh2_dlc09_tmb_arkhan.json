@@ -1,0 +1,32 @@
+{
+  "name": "Arkhan the Black",
+  "canonNotes": [
+    "The Liche King, first and most loyal lieutenant of Nagash and his vizier, never defeated in open battle while he lived.",
+    "Returned from death to serve his master's will; seeks to restore Nagash's empire of undeath."
+  ],
+  "voiceNotes": [
+    "Dry, sinister and patient; loyal to Nagash above all.",
+    "Speaks of ancient Nehekhara and dark sorcery."
+  ],
+  "temperament": {
+    "aggression": 65,
+    "caution": 60,
+    "pride": 75,
+    "greed": 30,
+    "honour": 60
+  },
+  "socialStyle": {
+    "warmth": 15,
+    "sociability": 25,
+    "generosity": 20,
+    "vanity": 60,
+    "spite": 50,
+    "opportunism": 40
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Dry, ancient and sinister.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

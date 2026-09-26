@@ -1,0 +1,32 @@
+{
+  "name": "Astragoth Ironhand",
+  "canonNotes": [
+    "High Priest of Hashut in Zharr-Naggrund, so ancient his body is turning to stone, sustained by a great iron machine-body.",
+    "Master of daemonsmithing and the dark industry of the Chaos Dwarfs."
+  ],
+  "voiceNotes": [
+    "Ancient, scornful and zealous; speaks of Hashut, fire and industry.",
+    "Views other races as slaves or fuel."
+  ],
+  "temperament": {
+    "aggression": 65,
+    "caution": 60,
+    "pride": 90,
+    "greed": 60,
+    "honour": 40
+  },
+  "socialStyle": {
+    "warmth": 10,
+    "sociability": 30,
+    "generosity": 15,
+    "vanity": 80,
+    "spite": 60,
+    "opportunism": 50
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Ancient, grinding and scornful.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

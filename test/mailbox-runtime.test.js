@@ -500,7 +500,7 @@ test('proposal history uses a readable agreement name without changing stored ac
   'trade_agreement','military_access,mutual','military_access,interlocutor_to_player',
   'military_access,player_to_interlocutor','transfer_region,wh3_main_example,player',
   'vassalize,player','vassalize,interlocutor','offer_gold,100','request_gold,100',
-  'favor,defend,100,none'}
+  'favor,defend,100,none','non_aggression_pact','betray_war'}
  for _,code in ipairs({'en','es','fr','de','it','ru','pl','cs','tr','ko','pt','zh','tw'}) do
   llmdip_set_language(code)
   for _,action in ipairs(actions) do
@@ -749,4 +749,81 @@ test('portrait and crest slots come from the shell and sit beside their cards',(
  assert(first.height>=44 and second.height>=44,'Card shorter than its icon')
  hide_dialog()
  assert(not icon1.visible and not portrait2.visible,'Icons must hide with the dialog')
+`));
+
+const betrayalSetup = String.raw`
+ set_up(llmdip_player_phase,'player_phase',true)
+ wars={}
+ cm.force_declare_war=function(self,a,b) wars[#wars+1]=a..'>'..b end
+ local player={name=function() return 'player' end,is_null_interface=function() return false end,is_human=function() return true end}
+ ai={name=function() return 'ai' end,is_null_interface=function() return false end,is_human=function() return false end,is_dead=function() return false end,at_war_with=function() return false end}
+ cm.get_faction=function(self,key) return key=='player' and player or ai end
+ mail_status=nil; llmdip_mail_receive=function(id,p,n,a) mail_status=a end
+ proposals={}; llmdip_ui_on_proposal=function(id,c) proposals[#proposals+1]=c end
+ betrayed=nil; llmdip_ui_on_betrayal=function(id,t,ok) betrayed=ok end
+`;
+test('a betrayal letter declares war at once, with no card to accept', () => run(bridge, betrayalSetup + String.raw`
+ set_up(llmdip_publish_response,'pending',{r1={player='player',interlocutor='ai',mode='proactive',turn=1}})
+ assert(llmdip_publish_response('r1','Tu alianza me estorba.','betray_war',0,'neutral'))
+ assert(#wars==1 and wars[1]=='ai>player')
+ assert(#proposals==0 and betrayed==true and mail_status=='betray_war')
+ assert(saved.llmdip39_pending.r1==nil)
+`));
+test('betray_war outside a background letter is only words', () => run(bridge, betrayalSetup + String.raw`
+ set_up(llmdip_publish_response,'pending',{r1={player='player',interlocutor='ai',mode='player',turn=1}})
+ assert(llmdip_publish_response('r1','Nunca te traicionaria.','betray_war',0,'neutral'))
+ assert(#wars==0 and betrayed==nil and proposals[1]=='reject')
+`));
+test('no betrayal war is declared on someone already at war', () => run(bridge, betrayalSetup + String.raw`
+ ai.at_war_with=function() return true end
+ set_up(llmdip_publish_response,'pending',{r1={player='player',interlocutor='ai',mode='proactive',turn=1}})
+ assert(not llmdip_publish_response('r1','Ya estamos en guerra.','betray_war',0,'neutral'))
+ assert(#wars==0 and betrayed==false and mail_status=='reject')
+`));
+test('the inbox and the chat mark a betrayal', () => {
+  run(mailbox, String.raw`llmdip_set_language('es'); first[1](); llmdip_mail_receive('r1',{interlocutor='ai',turn=1},'Carta','betray_war'); assert(saved.llmdip39_mailbox.rows[1].status==llmdip_t('betrayal_status'))`);
+  run(read('llm_diplomacy_ui.lua'), String.raw`llmdip_set_language('es'); state.inbox.ai={history={}}; llmdip_ui_on_betrayal('r1','ai',true); local h=history_for('ai'); assert(string.find(h[#h], 'Traici'))`);
+});
+
+const redoUi = String.raw`
+ llmdip_set_language('es')
+ calls={}
+ llmdip_regenerate=function(target,id,text,delta) calls[#calls+1]={target=target,id=id,text=text,delta=delta}; return true end
+ state.target='ai'; state.visible=true
+ local you=llmdip_t('you')..': '
+`;
+test('redo resends the player words and replaces the bad reply', () => run(read('llm_diplomacy_ui.lua'), redoUi + String.raw`
+ state.inbox.ai={history={you..'hola', 'Player2: Zarina Katarin responde con amabilidad seca...', llmdip_t('speaker_result')..': nada'}, request='r9', applied_delta=1, attitude_value=50, proposal='trade_agreement'}
+ regenerate_last()
+ assert(#calls==1 and calls[1].id=='r9' and calls[1].text=='hola' and calls[1].delta==1)
+ local h=state.inbox.ai.history
+ assert(#h==2 and h[1]==you..'hola' and h[2]=='Player2: '..llmdip_t('thinking'))
+ assert(state.inbox.ai.request==nil and state.inbox.ai.proposal==nil and state.proposal==nil)
+ assert(state.inbox.ai.attitude_value==49)
+`));
+test('redo refuses an executed deal, a pending reply and an empty chat', () => run(read('llm_diplomacy_ui.lua'), redoUi + String.raw`
+ state.inbox.ai={history={you..'hola','Player2: vale'}, request='r9', executed_request='r9'}
+ regenerate_last(); assert(#calls==0 and state.response==llmdip_t('redo_blocked_deal'))
+ state.inbox.ai={history={you..'hola','Player2: '..llmdip_t('thinking')}, request='r9'}
+ regenerate_last(); assert(#calls==0)
+ state.inbox.ai={history={'Player2: una carta'}, request='r9'}
+ regenerate_last(); assert(#calls==0 and state.response==llmdip_t('redo_nothing'))
+`));
+test('the bridge redoes only the latest reply and takes back its relation change', () => run(bridge, String.raw`
+ set_up(llmdip_player_phase,'player_phase',true)
+ local player={name=function() return 'player' end,is_null_interface=function() return false end}
+ local ai={name=function() return 'ai' end,is_null_interface=function() return false end,is_human=function() return false end,is_dead=function() return false end}
+ cm.get_faction=function(self,key) return ai end
+ cm.get_local_faction=function() return player end
+ local bonus={}; cm.apply_dilemma_diplomatic_bonus=function(self,a,b,v) bonus[#bonus+1]=v end
+ local sent; set_up(llmdip_regenerate,'new_request',function(p,i,mode,text,att,pers,of) sent={mode=mode,text=text,of=of}; return true end)
+ set_up(llmdip_regenerate,'pending',{r9={player='player',interlocutor='ai',mode='player',action={'trade_agreement'}}})
+ saved.llmdip_last_player_request_player_ai='r9'
+ saved.llmdip_relation_player_ai='1,1'
+ assert(llmdip_regenerate('ai','r9','hola',1))
+ assert(sent.mode=='player' and sent.text=='hola' and sent.of=='r9')
+ assert(bonus[1]==-1 and saved.llmdip_relation_player_ai=='1,0')
+ assert(saved.llmdip39_pending.r9==nil)
+ saved.llmdip_last_player_request_player_ai='r10'
+ assert(not llmdip_regenerate('ai','r9','hola',0), 'an older reply cannot be redone')
 `));

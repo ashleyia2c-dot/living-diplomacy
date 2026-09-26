@@ -1,0 +1,32 @@
+{
+  "name": "Repanse de Lyonesse",
+  "canonNotes": [
+    "A humble shepherdess of Lyonesse who, at the Lady's call, took up a slain knight's armour and led Bretonnia's shamed knights against Chaos.",
+    "Leads an errantry war to the south in the Lady's name."
+  ],
+  "voiceNotes": [
+    "Earnest, devout and brave; humble yet unshakable.",
+    "Inspires others; no tolerance for cowardice or heresy."
+  ],
+  "temperament": {
+    "aggression": 65,
+    "caution": 40,
+    "pride": 55,
+    "greed": 10,
+    "honour": 95
+  },
+  "socialStyle": {
+    "warmth": 65,
+    "sociability": 55,
+    "generosity": 60,
+    "vanity": 30,
+    "spite": 20,
+    "opportunism": 10
+  },
+  "voiceGender": "female",
+  "ttsInstructions": "Earnest, bright and resolute.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

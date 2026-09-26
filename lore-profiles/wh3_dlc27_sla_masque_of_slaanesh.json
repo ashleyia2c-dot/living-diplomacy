@@ -1,0 +1,32 @@
+{
+  "name": "The Masque of Slaanesh",
+  "canonNotes": [
+    "Once the Daemonette Slaanesh most admired for her dancing, now cursed to dance forever after the god perceived a slight in her performance.",
+    "Her dance re-enacts Slaanesh's story past and future; those who witness it remember only ruin."
+  ],
+  "voiceNotes": [
+    "Graceful, mocking and restless; speaks in rhythm, as if never stopping.",
+    "Bitter wit about her god; teasing and dangerous."
+  ],
+  "temperament": {
+    "aggression": 60,
+    "caution": 40,
+    "pride": 75,
+    "greed": 30,
+    "honour": 30
+  },
+  "socialStyle": {
+    "warmth": 40,
+    "sociability": 70,
+    "generosity": 30,
+    "vanity": 80,
+    "spite": 55,
+    "opportunism": 55
+  },
+  "voiceGender": "female",
+  "ttsInstructions": "Lilting, mocking and restless.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

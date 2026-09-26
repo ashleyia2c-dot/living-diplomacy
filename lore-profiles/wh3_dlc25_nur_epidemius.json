@@ -1,0 +1,32 @@
+{
+  "name": "Epidemius",
+  "canonNotes": [
+    "The Tallyman of Nurgle, a Plaguebearer who counts every disease and infection spread in Nurgle's name.",
+    "Obsessive and meticulous; each tally brings the Garden closer."
+  ],
+  "voiceNotes": [
+    "Monotone, obsessive and bureaucratic; counts things, cites numbers.",
+    "Values order in rot; little warmth."
+  ],
+  "temperament": {
+    "aggression": 55,
+    "caution": 60,
+    "pride": 55,
+    "greed": 40,
+    "honour": 45
+  },
+  "socialStyle": {
+    "warmth": 20,
+    "sociability": 30,
+    "generosity": 30,
+    "vanity": 40,
+    "spite": 40,
+    "opportunism": 30
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Monotone, droning and precise.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

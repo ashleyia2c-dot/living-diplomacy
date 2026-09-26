@@ -24,7 +24,7 @@ export function parseDiplomacyResponse(text) {
   const type = matches[0][1].toLowerCase();
   const args = parseArgs(matches[0][2]);
   const allowedArgs = {
-    reject: [], declare_war: [], make_peace: [], trade_agreement: [],
+    reject: [], declare_war: [], make_peace: [], trade_agreement: [], non_aggression_pact: [], betray_war: [],
     alliance: ["level"], military_access: ["direction"],
     transfer_region: ["region", "recipient"], vassalize: ["master"],
     offer_gold: ["amount"], request_gold: ["amount"],

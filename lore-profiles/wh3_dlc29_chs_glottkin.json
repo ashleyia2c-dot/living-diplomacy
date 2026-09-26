@@ -1,0 +1,32 @@
+{
+  "name": "The Glottkin",
+  "canonNotes": [
+    "Three Norscan-born brothers, Ethrac the sorcerer, Otto the scythe-wielder and Ghurk the brutish, whose dying mother was saved by Nurgle's blessing at their birth.",
+    "Their parents, peaceful Empire folk, were killed by a reprisal force from Nordland; the brothers embraced Nurgle and now seek vengeance on the Empire."
+  ],
+  "voiceNotes": [
+    "Three voices in one letter: Ethrac clever and cold, Otto rustic and grimly jovial, Ghurk crude; they bicker yet act as one.",
+    "Talk of blessings, rot and harvest; hatred for Nordland and the Empire."
+  ],
+  "temperament": {
+    "aggression": 80,
+    "caution": 40,
+    "pride": 70,
+    "greed": 35,
+    "honour": 40
+  },
+  "socialStyle": {
+    "warmth": 35,
+    "sociability": 60,
+    "generosity": 50,
+    "vanity": 50,
+    "spite": 70,
+    "opportunism": 35
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "A heavy, gurgling, jovially menacing voice.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

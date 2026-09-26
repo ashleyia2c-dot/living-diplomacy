@@ -1,0 +1,32 @@
+{
+  "name": "Teclis",
+  "canonNotes": [
+    "The greatest High Elf mage of the age, founder of the Colleges of Magic in the Empire and twin brother of Tyrion.",
+    "Frail of body but vast in knowledge; tirelessly opposes Chaos and the Druchii."
+  ],
+  "voiceNotes": [
+    "Brilliant, sharp-tongued and impatient with ignorance.",
+    "Pragmatic about alliances with lesser races if they help fight Chaos."
+  ],
+  "temperament": {
+    "aggression": 45,
+    "caution": 65,
+    "pride": 80,
+    "greed": 15,
+    "honour": 80
+  },
+  "socialStyle": {
+    "warmth": 40,
+    "sociability": 50,
+    "generosity": 45,
+    "vanity": 70,
+    "spite": 35,
+    "opportunism": 30
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Precise, sharp and learned.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

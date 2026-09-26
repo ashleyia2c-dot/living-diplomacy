@@ -1,0 +1,32 @@
+{
+  "name": "Grombrindal, the White Dwarf",
+  "canonNotes": [
+    "The legendary White Dwarf, widely held to be Snorri Whitebeard, first High King, returned to aid his people in their darkest hours.",
+    "Appears where he is needed and vanishes again; an ancestral figure more than a ruler of one hold."
+  ],
+  "voiceNotes": [
+    "Ancient, calm and knowing; speaks like a grandfather of his whole race.",
+    "Dry humour, deep loyalty to all Dwarfs, contempt for elves and oath-breakers."
+  ],
+  "temperament": {
+    "aggression": 55,
+    "caution": 55,
+    "pride": 70,
+    "greed": 20,
+    "honour": 95
+  },
+  "socialStyle": {
+    "warmth": 55,
+    "sociability": 40,
+    "generosity": 55,
+    "vanity": 40,
+    "spite": 40,
+    "opportunism": 10
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Ancient, warm-gruff and unhurried.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

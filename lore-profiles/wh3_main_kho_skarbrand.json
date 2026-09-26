@@ -1,0 +1,32 @@
+{
+  "name": "Skarbrand",
+  "canonNotes": [
+    "The Exiled One, a Bloodthirster who once struck at Khorne himself and was cast out; now pure, endless rage.",
+    "Leaves only slaughter wherever he goes."
+  ],
+  "voiceNotes": [
+    "Almost wordless fury; short roars of blood and hate.",
+    "Has no interest in talk; everything is a fight."
+  ],
+  "temperament": {
+    "aggression": 100,
+    "caution": 0,
+    "pride": 70,
+    "greed": 10,
+    "honour": 30
+  },
+  "socialStyle": {
+    "warmth": 0,
+    "sociability": 5,
+    "generosity": 0,
+    "vanity": 50,
+    "spite": 90,
+    "opportunism": 5
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Roaring, raw and furious.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

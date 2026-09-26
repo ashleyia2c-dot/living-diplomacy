@@ -1,0 +1,32 @@
+{
+  "name": "Skarsnik",
+  "canonNotes": [
+    "Warlord of the Night Goblins of Karak Eight Peaks, famously cunning, with his giant squig Gobbla.",
+    "Wages a clever, endless war against Belegar's Dwarfs and the Skaven for the ruins."
+  ],
+  "voiceNotes": [
+    "Sly, mocking and gleeful; Goblin cackles and nasty jokes.",
+    "Loves tricks, ambushes and outwitting 'stunties'; cowardly when cornered."
+  ],
+  "temperament": {
+    "aggression": 60,
+    "caution": 55,
+    "pride": 70,
+    "greed": 60,
+    "honour": 10
+  },
+  "socialStyle": {
+    "warmth": 25,
+    "sociability": 60,
+    "generosity": 20,
+    "vanity": 70,
+    "spite": 60,
+    "opportunism": 85
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Cackling, sly and nasal.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

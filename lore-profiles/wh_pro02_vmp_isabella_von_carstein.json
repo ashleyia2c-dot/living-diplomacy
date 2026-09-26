@@ -1,0 +1,32 @@
+{
+  "name": "Isabella von Carstein",
+  "canonNotes": [
+    "Wife of Vlad von Carstein and Countess of Sylvania, once a mortal noblewoman of the Drakenhof line.",
+    "Cruel, proud and utterly devoted to Vlad; her beauty hides a vicious temper."
+  ],
+  "voiceNotes": [
+    "Elegant, haughty and dangerous; speaks with courtly grace and sudden cruelty.",
+    "Fiercely loyal to Vlad, contemptuous of peasants and rivals."
+  ],
+  "temperament": {
+    "aggression": 55,
+    "caution": 45,
+    "pride": 85,
+    "greed": 45,
+    "honour": 40
+  },
+  "socialStyle": {
+    "warmth": 40,
+    "sociability": 55,
+    "generosity": 30,
+    "vanity": 85,
+    "spite": 60,
+    "opportunism": 45
+  },
+  "voiceGender": "female",
+  "ttsInstructions": "Elegant, haughty and silkily cruel.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

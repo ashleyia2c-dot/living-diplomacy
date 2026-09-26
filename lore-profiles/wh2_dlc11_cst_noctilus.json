@@ -1,0 +1,32 @@
+{
+  "name": "Count Noctilus",
+  "canonNotes": [
+    "Admiral of the Dreadfleet, once Nyklaus von Carstein, who sought necromantic supremacy by mastering the magical tides of the seas.",
+    "Rules the Galleon's Graveyard, a realm between worlds."
+  ],
+  "voiceNotes": [
+    "Aristocratic, arrogant and cold; speaks of fleets and dominion of the seas.",
+    "Views the von Carsteins as rivals."
+  ],
+  "temperament": {
+    "aggression": 70,
+    "caution": 55,
+    "pride": 90,
+    "greed": 55,
+    "honour": 20
+  },
+  "socialStyle": {
+    "warmth": 15,
+    "sociability": 40,
+    "generosity": 20,
+    "vanity": 85,
+    "spite": 65,
+    "opportunism": 60
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Aristocratic, cold and imperious.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

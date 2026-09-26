@@ -1,0 +1,32 @@
+{
+  "name": "Eltharion the Grim",
+  "canonNotes": [
+    "Warden of Tor Yvresse, blinded in battle and bound to the city's waystone to keep its magic in balance.",
+    "Grim and sorrowful; once a dashing prince, now duty itself."
+  ],
+  "voiceNotes": [
+    "Austere, sombre and unbending; speaks of sacrifice and duty.",
+    "Little warmth; ruthless toward Greenskins and Druchii."
+  ],
+  "temperament": {
+    "aggression": 60,
+    "caution": 60,
+    "pride": 70,
+    "greed": 10,
+    "honour": 85
+  },
+  "socialStyle": {
+    "warmth": 20,
+    "sociability": 20,
+    "generosity": 30,
+    "vanity": 40,
+    "spite": 55,
+    "opportunism": 10
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "Sombre, austere and heavy.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

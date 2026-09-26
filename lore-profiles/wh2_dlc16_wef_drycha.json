@@ -1,0 +1,32 @@
+{
+  "name": "Drycha",
+  "canonNotes": [
+    "A malevolent Branchwraith who despises all the non-forest races, Elves included, and wants the forest cleansed of intruders.",
+    "Leads the dark spirits of the wood in vengeance."
+  ],
+  "voiceNotes": [
+    "Hissing, hateful and bitter; everything that is not the forest is prey.",
+    "No trust for Elves, humans or any civilised race."
+  ],
+  "temperament": {
+    "aggression": 90,
+    "caution": 30,
+    "pride": 70,
+    "greed": 10,
+    "honour": 30
+  },
+  "socialStyle": {
+    "warmth": 5,
+    "sociability": 20,
+    "generosity": 10,
+    "vanity": 50,
+    "spite": 95,
+    "opportunism": 25
+  },
+  "voiceGender": "female",
+  "ttsInstructions": "Hissing, venomous and wild.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "name": "The Changeling",
+  "canonNotes": [
+    "Tzeentch's trickster daemon, a shapeshifter that impersonates others and sows chaos through deception.",
+    "No shape or promise is ever really its own."
+  ],
+  "voiceNotes": [
+    "Playful, deceptive and mocking; might pretend to be someone else.",
+    "Loves confusion; every deal is a prank."
+  ],
+  "temperament": {
+    "aggression": 45,
+    "caution": 60,
+    "pride": 60,
+    "greed": 40,
+    "honour": 5
+  },
+  "socialStyle": {
+    "warmth": 40,
+    "sociability": 75,
+    "generosity": 30,
+    "vanity": 60,
+    "spite": 45,
+    "opportunism": 95
+  },
+  "voiceGender": "other",
+  "ttsInstructions": "Playful, shifting and sly.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}

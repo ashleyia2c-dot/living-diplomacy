@@ -1,0 +1,32 @@
+{
+  "name": "Bloab Rotspawned",
+  "canonNotes": [
+    "Once a tall warrior who tortured small creatures, he was filled by Daemon flies as punishment; now his body is only a skin sack of maggots and he is the swarm.",
+    "Nurgle came to favour him and grants him rare access to the Garden."
+  ],
+  "voiceNotes": [
+    "Buzzing, unsettling and oddly calm; speaks as many voices of one swarm.",
+    "Delights in the small and the crawling; reveres Nurgle's life-in-decay."
+  ],
+  "temperament": {
+    "aggression": 65,
+    "caution": 45,
+    "pride": 55,
+    "greed": 25,
+    "honour": 35
+  },
+  "socialStyle": {
+    "warmth": 30,
+    "sociability": 40,
+    "generosity": 40,
+    "vanity": 40,
+    "spite": 55,
+    "opportunism": 30
+  },
+  "voiceGender": "male",
+  "ttsInstructions": "A buzzing, wet, many-layered whisper.",
+  "sources": [
+    "Total War: WARHAMMER III, in-game unit lore (summarised, not quoted)",
+    "Warhammer Fantasy Battles background"
+  ]
+}
