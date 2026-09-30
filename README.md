@@ -7,16 +7,21 @@ Source code for the Living Diplomacy mod and its companion program.
 
 ## Install the Workshop edition
 
-The Workshop subscription installs the Warhammer III `.pack` only. AI conversations also need the separate, text-only Player2 companion.
+The mod has two parts. The Workshop subscription installs the Warhammer III `.pack`, and Steam keeps it updated. AI replies also need the companion, a small free program that runs next to the game, because Warhammer III scripts cannot connect to anything outside the game.
+
+**Once:**
 
 1. Subscribe to the Workshop item and enable it in the game launcher.
 2. Install and sign in to [Player2](https://player2.game).
-3. Install [Node.js 20 or newer](https://nodejs.org).
-4. On the [latest release page](https://github.com/ashleyia2c-dot/living-diplomacy/releases/latest), download the asset named `Player2-Diplomacy-WH3-Workshop-Companion-*.zip` from **Assets**. Do not use the automatically generated "Source code" archives as the installer.
-5. Extract the ZIP, run `START_PLAYER2.bat`, and leave its window open while playing. No `npm install` is needed.
-6. In a single-player campaign, open diplomacy with a faction and click the small hand icon beside the question mark.
+3. Download [`Living-Diplomacy-Companion.zip`](https://github.com/ashleyia2c-dot/living-diplomacy/releases/latest/download/Living-Diplomacy-Companion.zip) and extract it to a folder you keep. No Node.js needed.
 
-Do not install a second `llm_diplomacy.pack` manually when using Workshop. No other mods are required. The BAT verifies that Steam has downloaded the compatible pack. This edition has text conversations only. See [`README_WORKSHOP.txt`](README_WORKSHOP.txt) for troubleshooting and alternative Steam library paths.
+**Every time you play:** open Player2, run `WH3-LLM-Diplomacy-Companion.exe` and leave its window open, then start the game. It closes itself when you quit Warhammer III.
+
+In a single-player campaign, open diplomacy with a faction and click the small hand icon beside the question mark. If the companion is not running, the chat says so after a few seconds instead of waiting forever.
+
+The executable is not code-signed, so Windows may show "Windows protected your PC" the first time: choose **More info** and **Run anyway**. If you prefer not to run it, the readable alternative is `Living-Diplomacy-Steam-BAT-*.zip` from the [latest release](https://github.com/ashleyia2c-dot/living-diplomacy/releases/latest): it needs [Node.js 20 or newer](https://nodejs.org) and runs `START_PLAYER2.bat` instead. Use one companion or the other, never both.
+
+Do not install a second `llm_diplomacy.pack` manually when using Workshop. The companion checks that the installed pack is the exact version it was released with, and says so clearly if Steam has not finished updating. See [`README_WORKSHOP.txt`](README_WORKSHOP.txt) for troubleshooting and alternative Steam library paths.
 
 ## What is in this repository
 

@@ -11,8 +11,26 @@ import { parseBridgeRequest } from "./protocol.js";
 import { parseDiplomacyResponse } from "./tag-parser.js";
 import { renderInbox, luaString } from "./lua-renderer.js";
 import { connectPlayer2, player2Heartbeat, player2Speak } from "./player2-client.js";
+import { checkInstalledPack } from "./pack-compat.js";
 
 const config = getConfig();
+// The executable build embeds the SHA-256 of the pack it was released with. The
+// companion and the Workshop pack ship as a matched pair, so a mismatch stops here
+// with a readable message instead of failing silently inside the game.
+const expectedPackSha256 = typeof __LLMDIP_EXPECTED_PACK_SHA256__ === "string"
+  ? __LLMDIP_EXPECTED_PACK_SHA256__ : "";
+if (expectedPackSha256) {
+  const installed = checkInstalledPack(config.wh3Root, expectedPackSha256);
+  if (!installed.ok) {
+    console.error(installed.reason);
+    for (const candidate of installed.candidates) console.error(`Checked pack path: ${candidate}`);
+    console.error(`Required pack SHA-256: ${expectedPackSha256}`);
+    process.exit(1);
+  }
+  console.log(`Matching pack verified: ${installed.pack} (${installed.actual})`);
+  if (installed.warning) console.warn(installed.warning);
+  if (process.argv.includes("--verify-install")) process.exit(0);
+}
 
 // Player2 asks for one health ping per minute to measure the mod's time spent.
 const HEARTBEAT_MS = 60_000;
@@ -192,6 +210,11 @@ async function poll() {
       try { request = parseBridgeRequest(line); }
       catch (error) { console.warn(`Request ignored: ${error.message}`); continue; }
       if (request) {
+        // Tell the game someone is here before talking to the model. The mod waits a
+        // few seconds for this signal; without it, a player who only subscribed on the
+        // Workshop would stare at "Thinking..." forever instead of being told the
+        // companion is missing.
+        await enqueueInbox("if llmdip_companion_alive then llmdip_companion_alive() end\n");
         try { await handleRequest(request); }
         catch (error) {
           console.warn(`Could not answer ${request.requestId}: ${error.message}`);
@@ -295,7 +318,7 @@ webServer.once("error", error => {
   throw error;
 });
 webServer.listen(config.port, "127.0.0.1", () => {
-  console.log(`Living Diplomacy Companion v0.42.1 — separate chat for each faction — provider=${config.provider}`);
+  console.log(`Living Diplomacy Companion v0.42.2 — separate chat for each faction — provider=${config.provider}`);
   console.log(`Watching: ${config.scriptLog || "script_log_*.txt (automatic)"}`);
   if (config.provider === "player2") {
     if (!config.player2GameKey) {
@@ -312,6 +335,7 @@ webServer.listen(config.port, "127.0.0.1", () => {
   // If this never arrives, the Lua falls back to English instead of blank text.
   atomicWrite(config.inboxFile,
     "-- LLM Diplomacy Companion\n" +
+    "if llmdip_companion_alive then llmdip_companion_alive() end\n" +
     "llmdip_set_language(" + JSON.stringify(config.uiLanguage) + ")\n");
   console.log(`Fallback language: ${config.language} (${config.uiLanguage}). Letters follow the game's language setting.`);
   console.log(`Local chat: http://127.0.0.1:${config.port}`);

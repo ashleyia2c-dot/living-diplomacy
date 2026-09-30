@@ -9,6 +9,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { createRequire } from "node:module";
+import crypto from "node:crypto";
 import { build } from "esbuild";
 import { PLAYER2_GAME_CLIENT_ID } from "../src/config.js";
 
@@ -16,10 +18,13 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const BUILD_DIR = path.join(ROOT, "build");
 const DIST_DIR = path.join(ROOT, "dist");
 const EXE = path.join(DIST_DIR, "WH3-LLM-Diplomacy-Companion.exe");
+const PACK = path.join(DIST_DIR, "llm_diplomacy.pack");
 const BUNDLE = path.join(BUILD_DIR, "companion.cjs");
 const BLOB = path.join(BUILD_DIR, "companion.blob");
 const SEA_CONFIG = path.join(BUILD_DIR, "sea-config.json");
 const FUSE = "NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2";
+const require = createRequire(import.meta.url);
+const postjectCli = path.join(path.dirname(require.resolve("postject")), "cli.js");
 
 // node.exe viene firmado por la Node.js Foundation. Inyectar dentro rompe esa firma,
 // y un binario con firma CORRUPTA levanta mas sospechas en los antivirus que uno sin
@@ -55,6 +60,14 @@ if (!PLAYER2_GAME_CLIENT_ID && !process.argv.includes("--sin-atribucion")) {
 
 fs.mkdirSync(BUILD_DIR, { recursive: true });
 fs.mkdirSync(DIST_DIR, { recursive: true });
+if (!fs.existsSync(PACK)) throw new Error(`Falta el pack correspondiente: ${PACK}`);
+const expectedPackSha256 = crypto.createHash("sha256").update(fs.readFileSync(PACK)).digest("hex");
+// SEA cannot read source-tree JSON files on a clean player's computer. Embed the
+// curated profiles, so launching the EXE from any folder keeps the same leaders.
+const embeddedLore = Object.fromEntries(fs.readdirSync(path.join(ROOT, "lore-profiles"))
+  .filter(name => name.endsWith(".json"))
+  .map(name => [name.slice(0, -5), JSON.parse(fs.readFileSync(path.join(ROOT, "lore-profiles", name), "utf8"))]));
+if (!Object.keys(embeddedLore).length) throw new Error("No curated leader profiles found; refusing an incomplete release.");
 
 // Node SEA solo admite un punto de entrada CommonJS, y el companion es ESM: esbuild
 // lo aplana a un unico CJS. Por eso companion.js no puede usar top-level await.
@@ -66,7 +79,11 @@ await build({
   format: "cjs",
   target: "node22",
   outfile: BUNDLE,
-  legalComments: "none"
+  legalComments: "none",
+  define: {
+    __LLMDIP_EXPECTED_PACK_SHA256__: JSON.stringify(expectedPackSha256),
+    __LLMDIP_EMBEDDED_LORE__: JSON.stringify(embeddedLore)
+  }
 });
 
 console.log("2/4  Generando el blob SEA...");
@@ -94,13 +111,15 @@ if (signtool) {
 
 console.log("4/4  Inyectando el companion en el ejecutable...");
 execFileSync(process.execPath, [
-  path.join(ROOT, "node_modules", "postject", "dist", "cli.js"),
+  postjectCli,
   EXE, "NODE_SEA_BLOB", BLOB, "--sentinel-fuse", FUSE
 ], { stdio: "inherit" });
 
 const megabytes = (fs.statSync(EXE).size / 1024 / 1024).toFixed(1);
 console.log("");
 console.log(`Listo: ${EXE}  (${megabytes} MB)`);
+console.log(`Pack requerido SHA-256: ${expectedPackSha256}`);
+console.log(`Perfiles incluidos: ${Object.keys(embeddedLore).length}`);
 console.log(PLAYER2_GAME_CLIENT_ID
   ? `Atribucion incrustada: ${PLAYER2_GAME_CLIENT_ID}`
   : "SIN ATRIBUCION (build de pruebas): no generara ingresos.");

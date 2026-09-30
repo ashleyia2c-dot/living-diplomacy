@@ -22,12 +22,16 @@ string.find=function(...)
  assert(select('#',...)<=3, 'WH3 string.find: unsupported fourth argument poisons native argument reader')
  return standard_find(...)
 end
-listeners={}; first={}; saved={}; widgets={}; phase=true; battle=false; round=1; requests=0; opens=0
+listeners={}; first={}; saved={}; widgets={}; phase=true; battle=false; round=1; requests=0; opens=0; callbacks={}
 out=function() end
 core={get_env=function() return _G end, remove_listener=function() end,
  add_listener=function(self,name,event,condition,callback) listeners[name]={event=event,condition=condition,callback=callback} end}
 function fire(name, id) listeners[name].callback({string=id}) end
 cm={add_first_tick_callback=function(self,fn) table.insert(first,fn) end,
+ -- El juego real tiene real_callback (reloj de pared, el unico que avanza
+ -- mientras la diplomacia congela la campana). Aqui se guardan para dispararlos
+ -- a mano en la prueba que los necesite.
+ real_callback=function(self,fn,ms) callbacks[#callbacks+1]={fn=fn,ms=ms} end,
  get_saved_value=function(self,key) return saved[key] end,
  set_saved_value=function(self,key,value) saved[key]=value end,
  is_processing_battle=function() return battle end,
@@ -792,6 +796,53 @@ const redoUi = String.raw`
  state.target='ai'; state.visible=true
  local you=llmdip_t('you')..': '
 `;
+// Quien se suscribe en el Workshop y no instala el companion se quedaba mirando
+// "Pensando..." sin explicacion. Ahora se le avisa, pero el aviso es de la
+// interfaz: si entrara en el historial, el modelo lo leeria en el siguiente
+// mensaje como si se lo hubiera dicho un lider.
+test('el aviso de companion ausente se ve, pero no entra en el historial', () => run(read('llm_diplomacy_ui.lua'), redoUi + String.raw`
+ state.inbox.ai={history={you..'hola', 'Player2: '..llmdip_t('thinking')}}
+ callbacks={}
+ watch_for_companion('ai')
+ assert(#callbacks==1 and callbacks[1].ms>=5000, 'el vigilante espera, no dispara al momento')
+ callbacks[1].fn()
+
+ local historia=state.inbox.ai.history
+ assert(#historia==2, 'el historial sigue teniendo dos lineas')
+ assert(historia[2]=='Player2: '..llmdip_t('thinking'), 'el hueco del lider no se toca')
+ for i=1,#historia do
+  assert(not string.find(historia[i], 'living%-diplomacy', 1), 'el aviso no puede quedarse en el historial')
+ end
+
+ local pintado=table.concat(history_body_lines('ai'), '\n')
+ assert(string.find(pintado, 'living%-diplomacy', 1), 'pero el jugador si lo ve')
+ assert(string.find(pintado, llmdip_t('speaker_system'), 1), 'y sale como System, no como el lider')
+
+ llmdip_ui_on_response('r1','Katarin responde','ai')
+ assert(state.notice==nil, 'una respuesta retira el aviso')
+ assert(not string.find(table.concat(history_body_lines('ai'), '\n'), 'living%-diplomacy', 1))
+`));
+
+test('cerrar la ventana antes de tiempo no deja el aviso armado', () => run(read('llm_diplomacy_ui.lua'), redoUi + String.raw`
+ state.inbox.ai={history={you..'hola', 'Player2: '..llmdip_t('thinking')}}
+ callbacks={}
+ watch_for_companion('ai')
+ state.visible=false
+ callbacks[1].fn()
+ assert(state.notice==nil, 'con la ventana cerrada no se arma nada')
+ state.visible=true
+ assert(not string.find(table.concat(history_body_lines('ai'), ' '), 'living%-diplomacy', 1), 'ni aparece al reabrir')
+`));
+
+test('el companion vivo impide el aviso aunque el modelo tarde', () => run(read('llm_diplomacy_ui.lua'), redoUi + String.raw`
+ state.inbox.ai={history={you..'hola', 'Player2: '..llmdip_t('thinking')}}
+ callbacks={}
+ llmdip_companion_is_alive=function() return true end
+ watch_for_companion('ai')
+ callbacks[1].fn()
+ assert(state.notice==nil, 'si el companion contesta, no se acusa a nadie')
+`));
+
 test('redo resends the player words and replaces the bad reply', () => run(read('llm_diplomacy_ui.lua'), redoUi + String.raw`
  state.inbox.ai={history={you..'hola', 'Player2: Zarina Katarin responde con amabilidad seca...', llmdip_t('speaker_result')..': nada'}, request='r9', applied_delta=1, attitude_value=50, proposal='trade_agreement'}
  regenerate_last()

@@ -22,9 +22,15 @@ function writeJson(file, value) {
 }
 
 export class MemoryStore {
-  constructor(dataDir) {
+  // The standalone executable carries the curated lord profiles inside it, so a fresh
+  // install never loses their lore or depends on the folder it was launched from.
+  constructor(dataDir, {
+    loreRoot = path.resolve("lore-profiles"),
+    embeddedLore = typeof __LLMDIP_EMBEDDED_LORE__ === "object" ? __LLMDIP_EMBEDDED_LORE__ : {}
+  } = {}) {
     this.root = path.join(dataDir, "campaigns");
-    this.loreRoot = path.resolve("lore-profiles");
+    this.loreRoot = loreRoot;
+    this.embeddedLore = embeddedLore;
     this.pendingLedgerFiles = new Map();
     fs.mkdirSync(this.root, { recursive: true });
   }
@@ -192,7 +198,9 @@ export class MemoryStore {
     const current = readJson(file, null);
     // The lord's own profile comes first: a faction file would keep speaking as Karl Franz
     // after his successor took the throne.
-    const curated = readJson(path.join(this.loreRoot, `${leaderKey}.json`), null) ||
+    const curated = this.embeddedLore[leaderKey] ||
+      readJson(path.join(this.loreRoot, `${leaderKey}.json`), null) ||
+      this.embeddedLore[request.interlocutor] ||
       readJson(path.join(this.loreRoot, `${request.interlocutor}.json`), {});
     // Curated lore wins over the copy saved at first contact. That copy used to win,
     // so every lord met before a profile existed kept empty lore forever.

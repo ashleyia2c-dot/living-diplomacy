@@ -608,6 +608,17 @@ function llmdip_publish_response(request_id, narrative, compact_action, relation
     return true
 end
 
+-- El companion avisa de que esta vivo en cuanto recoge una peticion, antes de
+-- hablar con el modelo. Sin esta senal el juego no puede distinguir "el modelo
+-- tarda" de "no hay companion", y un jugador recien suscrito al Workshop se
+-- queda mirando "Pensando..." para siempre sin saber que le falta la mitad.
+local companion_seen = false
+function llmdip_companion_alive()
+    companion_seen = true
+    return true
+end
+function llmdip_companion_is_alive() return companion_seen end
+
 function llmdip_no_contact(request_id)
     if not player_phase or not valid_key(request_id) then return false end
     if not pending[request_id] then out("[LLMDIP] RESPONSE_ACK|" .. request_id); return false end

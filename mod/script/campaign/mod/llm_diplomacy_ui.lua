@@ -7,6 +7,9 @@ setfenv(1, core:get_env())
 local state = {
     visible = false, target = nil, response = llmdip_t("open_conversation"),
     request_id = nil, proposal = nil, inbox = {}, history_offset = 0,
+    -- Aviso de interfaz (companion ausente). Transitorio a proposito:
+    -- fuera de inbox no se guarda en la partida ni viaja al modelo.
+    notice = nil,
     attitude_value = nil, attitude_label = "", personality_attributes = "unknown",
     header_title = "Player2", header_meta = "", header_attitude = "",
     header_ai_speaker = "Player2", header_flag = "", header_crest_image = "", header_portrait = "", header_has_portrait = false, header_player_flag = "",
@@ -555,6 +558,15 @@ local function after_prefix(text, prefix)
 end
 local function history_body_lines(target)
     local result, history = {}, history_for(target)
+    -- El aviso se muestra como una linea de System al final. Se anade sobre una
+    -- copia: el historial real no se toca, asi que no se guarda con la partida
+    -- ni acaba en el contexto del modelo como si lo hubiera dicho alguien.
+    if state.notice and state.notice.target == target then
+        local shown = {}
+        for i = 1, #history do shown[i] = history[i] end
+        shown[#shown + 1] = llmdip_t("speaker_system") .. ": " .. state.notice.text
+        history = shown
+    end
     local latest_start = 1
     local entry = state.inbox[target] or {}
     local ai_name = entry.header_ai_speaker or "Player2"
@@ -999,6 +1011,26 @@ local function ensure_talk_button()
     return value
 end
 
+-- Sin companion no vuelve nada y el chat se queda en "Pensando..." para
+-- siempre, que es justo lo que ve quien solo se ha suscrito en el Workshop. A
+-- los pocos segundos se le dice que le falta, y solo si el companion no ha dado
+-- senales de vida: si esta abierto y el modelo tarda, aqui no se toca nada.
+local COMPANION_WAIT_MS = 9000
+local function watch_for_companion(target)
+    if not valid_key(target) then return end
+    cm:real_callback(function()
+        if llmdip_companion_is_alive and llmdip_companion_is_alive() then return end
+        -- Si ya no se esta mirando esa conversacion, el aviso no pinta nada y
+        -- dejarlo armado lo haria salir al reabrir, fuera de contexto.
+        if not state.visible or state.target ~= target then return end
+        local messages = history_for(target)
+        if #messages == 0 or messages[#messages] ~= "Player2: " .. llmdip_t("thinking") then return end
+        state.notice = {target = target, text = llmdip_t("companion_missing")}
+        out("[LLMDIP UI] COMPANION_MISSING|" .. tostring(target))
+        render_history_bubbles(target)
+    end, COMPANION_WAIT_MS)
+end
+
 local function send_text()
     local previous_target = state.target
     local target, text = capture_target(), read_input_text()
@@ -1015,8 +1047,10 @@ local function send_text()
     local ok, sent = pcall(function() return llmdip_send_request(target, text, state.attitude_value, state.personality_attributes) end)
     out("[LLMDIP UI] SEND_END|" .. tostring(ok) .. "|" .. tostring(sent))
     if not ok or not sent then state.response = llmdip_t("send_failed"); refresh_owned_ui(); return end
+    state.notice = nil
     add_history(target, llmdip_t("you"), text); add_history(target, "Player2", llmdip_t("thinking"))
     state.response = llmdip_t("waiting"); clear_input_text(); render_history_bubbles(target)
+    watch_for_companion(target)
 end
 
 local function regenerate_last()
@@ -1056,8 +1090,10 @@ local function regenerate_last()
     if entry.attitude_value ~= nil and entry.applied_delta then entry.attitude_value = entry.attitude_value - entry.applied_delta end
     entry.proposal = nil; entry.request = nil; entry.applied_delta = 0
     state.proposal = nil; state.request_id = nil
+    state.notice = nil
     add_history(target, "Player2", llmdip_t("thinking"))
     state.response = llmdip_t("waiting"); render_history_bubbles(target)
+    watch_for_companion(target)
 end
 
 core:remove_listener("llmdip_contextual_clicks")
@@ -1124,13 +1160,14 @@ core:remove_listener("llmdip_contextual_diplomacy_closed")
 core:add_listener("llmdip_contextual_diplomacy_closed", "PanelClosedCampaign", function(context)
     return context.string == "diplomacy_dropdown"
 end, function()
-    hide_dialog(); state.target = nil; state.history_offset = 0
+    hide_dialog(); state.target = nil; state.history_offset = 0; state.notice = nil
     wanted_target = nil
     state.attitude_value, state.attitude_label, state.personality_attributes = nil, "", "unknown"
 end, true)
 
 function llmdip_ui_on_response(request_id, narrative, target)
     if type(target) ~= "string" then return end
+    state.notice = nil
     local entry = state.inbox[target] or {}; entry.request = request_id; entry.response = narrative; state.inbox[target] = entry
     local messages = history_for(target)
     local pending = messages[#messages]
