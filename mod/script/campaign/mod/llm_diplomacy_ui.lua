@@ -1019,13 +1019,21 @@ local COMPANION_WAIT_MS = 9000
 local function watch_for_companion(target)
     if not valid_key(target) then return end
     cm:real_callback(function()
-        if llmdip_companion_is_alive and llmdip_companion_is_alive() then return end
         -- Si ya no se esta mirando esa conversacion, el aviso no pinta nada y
         -- dejarlo armado lo haria salir al reabrir, fuera de contexto.
         if not state.visible or state.target ~= target then return end
-        local messages = history_for(target)
-        if #messages == 0 or messages[#messages] ~= "Player2: " .. llmdip_t("thinking") then return end
-        state.notice = {target = target, text = llmdip_t("companion_missing")}
+        -- Only a pickup of THIS message counts: an old line left in the inbox
+        -- file by a previous session must not hide the notice.
+        local answered = llmdip_companion_answered_target and llmdip_companion_answered_target(target)
+        -- An older companion answers, but may not understand this version of the
+        -- mod: say so even when its reply has already arrived.
+        local outdated = answered and llmdip_companion_outdated and llmdip_companion_outdated()
+        if answered and not outdated then return end
+        if not outdated then
+            local messages = history_for(target)
+            if #messages == 0 or messages[#messages] ~= "Player2: " .. llmdip_t("thinking") then return end
+        end
+        state.notice = {target = target, text = outdated and llmdip_t("companion_outdated") or llmdip_t("companion_missing")}
         out("[LLMDIP UI] COMPANION_MISSING|" .. tostring(target))
         render_history_bubbles(target)
     end, COMPANION_WAIT_MS)

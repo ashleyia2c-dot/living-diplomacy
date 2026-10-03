@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { buildCompanionBundle } from "./build-bundle.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 // RPFM vive en tools/ del proyecto. El segundo candidato cubre las copias que aun
@@ -31,8 +32,8 @@ async function serverReady() {
 }
 
 async function ensureServer() {
-  if (await serverReady()) return;
-  if (!fs.existsSync(serverExe)) throw new Error(`No se encontró RPFM Server: ${serverExe}`);
+  if (await serverReady()) throw new Error("An RPFM server is already running. Close it before building; this builder will not close your open packs.");
+  if (!fs.existsSync(serverExe)) throw new Error(`RPFM Server was not found: ${serverExe}`);
   child = spawn(serverExe, [], {
     cwd: path.dirname(serverExe), windowsHide: true, stdio: ["ignore", "pipe", "pipe"]
   });
@@ -41,9 +42,9 @@ async function ensureServer() {
   for (let attempt = 0; attempt < 50; attempt++) {
     await new Promise(resolve => setTimeout(resolve, 100));
     if (await serverReady()) return;
-    if (child.exitCode !== null) throw new Error(`RPFM Server terminó: ${errorText.slice(-500)}`);
+    if (child.exitCode !== null) throw new Error(`RPFM Server stopped: ${errorText.slice(-500)}`);
   }
-  throw new Error("RPFM Server no abrió el puerto 45127");
+  throw new Error("RPFM Server did not open port 45127");
 }
 
 function parseSse(text, wantedId) {
@@ -57,7 +58,7 @@ function parseSse(text, wantedId) {
       return message.result;
     }
   }
-  throw new Error(`MCP no devolvió respuesta para id=${wantedId}`);
+  throw new Error(`MCP returned no response for id=${wantedId}`);
 }
 
 async function rpc(method, params = {}, notification = false) {
@@ -85,6 +86,9 @@ async function tool(name, args = {}) {
 }
 
 async function main() {
+  // The companion travels inside the pack, so a Steam update updates it too.
+  const bundle = await buildCompanionBundle();
+  console.log(`Companion bundle ${bundle.version} (${Math.round(bundle.bytes / 1024)} KB) goes into the pack.`);
   await ensureServer();
   await rpc("initialize", {
     protocolVersion: "2025-06-18", capabilities: {},
@@ -98,17 +102,19 @@ async function main() {
   const text = opened.content?.find(item => item.type === "text")?.text || "";
   const payload = JSON.parse(text);
   const list = Array.isArray(payload) ? payload : payload.VecStringContainerInfo;
-  if (!Array.isArray(list) || list.length !== 1) throw new Error(`Pack nuevo no encontrado: ${text}`);
+  if (!Array.isArray(list) || list.length !== 1) throw new Error(`New pack was not found: ${text}`);
   const packKey = Array.isArray(list[0])
     ? list[0][0]
     : (list[0].key || list[0].pack_key || list[0].path || list[0].name);
-  if (!packKey) throw new Error(`RPFM no devolvió pack_key: ${text}`);
+  if (!packKey) throw new Error(`RPFM returned no pack_key: ${text}`);
 
   await tool("add_packed_files", {
     pack_key: packKey,
     source_paths: [luaSource, luaUiSource, overlayTemplate, historyTemplate, bubbleTemplate, shellTemplate, loggingMarker,
       path.join(modDir, "script/campaign/mod/llm_diplomacy_mailbox.lua"),
-      path.join(modDir, "script/campaign/mod/llm_diplomacy_i18n.lua")],
+      path.join(modDir, "script/campaign/mod/llm_diplomacy_i18n.lua"),
+      path.join(modDir, "script/campaign/mod/llm_diplomacy_world.lua"),
+      bundle.out],
     destination_paths: JSON.stringify([
       { File: "script/campaign/mod/llm_diplomacy.lua" },
       { File: "script/campaign/mod/llm_diplomacy_ui.lua" },
@@ -118,7 +124,9 @@ async function main() {
       { File: "llmdip_ui/llmdip_shell.twui.xml" },
       { File: "script/enable_console_logging" },
       { File: "script/campaign/mod/llm_diplomacy_mailbox.lua" },
-      { File: "script/campaign/mod/llm_diplomacy_i18n.lua" }
+      { File: "script/campaign/mod/llm_diplomacy_i18n.lua" },
+      { File: "script/campaign/mod/llm_diplomacy_world.lua" },
+      { File: "living_diplomacy/companion_bundle.js" }
     ]),
     ignore_paths: null
   });
@@ -126,8 +134,8 @@ async function main() {
   await tool("change_compression_format", { pack_key: packKey, format: JSON.stringify("None") });
   fs.mkdirSync(path.dirname(output), { recursive: true });
   await tool("save_pack_as", { pack_key: packKey, path: output });
-  if (!fs.existsSync(output) || fs.statSync(output).size < 100) throw new Error("RPFM no produjo un PackFile válido");
-  console.log(`Pack creado: ${output}`);
+  if (!fs.existsSync(output) || fs.statSync(output).size < 100) throw new Error("RPFM did not produce a valid PackFile");
+  console.log(`Pack created: ${output}`);
 }
 
 try { await main(); }

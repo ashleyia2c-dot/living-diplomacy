@@ -5,7 +5,7 @@ let cachedConnection;
 
 const HEALTH_TIMEOUT_MS = 10000;
 const PLAYER2_CLOSED =
-  "Player2 is not open. Open the Player2 app, sign in, and try again.";
+  "Player2 is not open. Open the Player2 app, sign in and try again.";
 
 // Player2 deletes api.port when it closes cleanly, so its absence means the app is
 // not running. An unclean exit can leave it behind, so this only decides the error
@@ -63,7 +63,7 @@ export async function connectPlayer2(config, fetchImpl = fetch) {
     if (config.player2Profile) {
       const profiles = await readJson(await fetchImpl(`${root}/v1/ai_profiles`, { headers: headers(config), signal: AbortSignal.timeout(10000) }), "Player2 profiles");
       const wanted = profiles.find(item => item.name === config.player2Profile || item.id === config.player2Profile);
-      if (!wanted?.base_url) throw new Error(`Player2 does not have the '${config.player2Profile}' profile`);
+      if (!wanted?.base_url) throw new Error(`Player2 has no profile '${config.player2Profile}'`);
       apiBase = trimSlash(wanted.base_url);
     }
     return { root, apiBase, version: health.client_version || "unknown" };
@@ -91,17 +91,22 @@ export async function player2Heartbeat(config, fetchImpl = fetch) {
   }
 }
 
-export async function player2Chat(config, messages, fetchImpl = fetch) {
+export async function player2Chat(config, messages, fetchImpl = fetch, { maxTokens = 2500, timeoutMs = 60000 } = {}) {
   const connection = await connectPlayer2(config, fetchImpl);
   const response = await fetchImpl(`${connection.apiBase}/chat/completions`, {
-    signal: AbortSignal.timeout(60000),
+    signal: AbortSignal.timeout(timeoutMs),
     method: "POST",
     headers: headers(config),
-    body: JSON.stringify({ messages, stream: false, temperature: 0.75, max_tokens: 700 })
+    // The model Player2 picks may reason before it answers (deepseek-flash did on
+    // 02-10-2026), and the reasoning counts against this cap: at 700 a briefing came
+    // back empty and a letter used 685. 2500 was checked against the live API.
+    // gpt-5.6-luna reasons too on long structured tasks: the courts' dispatches used all
+    // 2500 and came back empty (03-10-2026), so that call asks for more.
+    body: JSON.stringify({ messages, stream: false, temperature: 0.75, max_tokens: maxTokens })
   });
   const payload = await readJson(response, "Player2 chat");
   const text = payload?.choices?.[0]?.message?.content;
-  if (typeof text !== "string") throw new Error("Player2 did not return choices[0].message.content");
+  if (typeof text !== "string") throw new Error("Player2 returned no choices[0].message.content");
   return { text, model: payload.model || "model selected in Player2", connection };
 }
 

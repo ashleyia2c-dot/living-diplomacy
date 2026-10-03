@@ -21,7 +21,9 @@ In a single-player campaign, open diplomacy with a faction and click the small h
 
 The executable is not code-signed, so Windows may show "Windows protected your PC" the first time: choose **More info** and **Run anyway**. If you prefer not to run it, the readable alternative is `Living-Diplomacy-Steam-BAT-*.zip` from the [latest release](https://github.com/ashleyia2c-dot/living-diplomacy/releases/latest): it needs [Node.js 20 or newer](https://nodejs.org) and runs `START_PLAYER2.bat` instead. Use one companion or the other, never both.
 
-Do not install a second `llm_diplomacy.pack` manually when using Workshop. The companion checks that the installed pack is the exact version it was released with, and says so clearly if Steam has not finished updating. See [`README_WORKSHOP.txt`](README_WORKSHOP.txt) for troubleshooting and alternative Steam library paths.
+Do not install a second `llm_diplomacy.pack` manually when using Workshop. See [`README_WORKSHOP.txt`](README_WORKSHOP.txt) for troubleshooting and alternative Steam library paths.
+
+**Updates.** Since 0.43 the mod's `.pack` also carries the companion of its own release, as plain text between two markers with its version and SHA-256 (`src/bundle-loader.js`). When Steam updates the mod, the executable (`src/launcher.js`) and `START_PLAYER2.bat` run that newer companion, so players download the companion once and Steam keeps it up to date. A missing or damaged copy falls back to the companion built into the executable. The game and the companion check compatibility by protocol number, not by one exact pack.
 
 ## What is in this repository
 
@@ -44,7 +46,7 @@ Warhammer III scripts cannot open network connections, so the companion acts as 
 
 By default it only connects to `127.0.0.1`: the local Player2 app, and its own status page on `http://127.0.0.1:43127`. The only other destination in the code is an optional OpenAI-compatible provider that a user must configure explicitly in a `.env` file (`LLMDIP_PROVIDER=openai`); it is off by default.
 
-Conversation memory is stored as JSON in a `data/` folder next to the companion.
+Conversation memory is stored as JSON in `%APPDATA%\LivingDiplomacy\data`; an older `data/` folder next to the companion is copied there on the first start.
 
 ## Building the older executable (developer reference)
 

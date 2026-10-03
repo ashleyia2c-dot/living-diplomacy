@@ -64,7 +64,7 @@ test("ninguna traduccion se quedo vacia o con el texto de otro idioma", () => {
 test("cada clave usada en el mod existe en la tabla", () => {
   const english = tables().en;
   const used = new Set();
-  for (const file of ["llm_diplomacy.lua", "llm_diplomacy_ui.lua", "llm_diplomacy_mailbox.lua"]) {
+  for (const file of ["llm_diplomacy.lua", "llm_diplomacy_ui.lua", "llm_diplomacy_mailbox.lua", "llm_diplomacy_world.lua"]) {
     for (const match of read(file).matchAll(/llmdip_t\("([a-z_]+)"\)/g)) used.add(match[1]);
   }
   assert.ok(used.size > 20, "casi no se esta usando la tabla: algo se quedo sin migrar");
@@ -81,7 +81,7 @@ test("la tabla no se referencia a si misma", () => {
 
 test("ningun texto usa flechas que la fuente del juego no sabe dibujar", () => {
   // En partida, "(↑ earlier · ↓ later)" se veia como "( earlier ·  later)".
-  for (const file of ["llm_diplomacy_i18n.lua", "llm_diplomacy.lua", "llm_diplomacy_ui.lua", "llm_diplomacy_mailbox.lua"]) {
+  for (const file of ["llm_diplomacy_i18n.lua", "llm_diplomacy.lua", "llm_diplomacy_ui.lua", "llm_diplomacy_mailbox.lua", "llm_diplomacy_world.lua"]) {
     assert.doesNotMatch(read(file), /[←-⇿]/, `${file} contiene flechas`);
   }
 });

@@ -11,11 +11,18 @@ local COOLDOWN_TURNS = 1
 local request_chunks, response_chunks, pending, published, consumed_external = {}, {}, {}, {}, {}
 local execute_action, apply_relation_reaction, execute_betrayal
 local campaign_id = nil
-local menu_open, menu_page, menu_components = false, 1, {}
-local menu_race = nil -- nil: races; all: every known living AI faction.
 local request_serial = 0
 local runtime_nonce = tostring(math.floor(os.clock() * 1000000))
 local player_phase = false
+-- Companion presence, tied to request ids (see llmdip_companion_alive).
+local COMPANION_WAIT_MS = 9000
+-- How the game and the companion talk (the companion's src/protocol.js keeps the
+-- other half). PROTOCOL rises only when an older companion could no longer cope;
+-- MIN_COMPANION_PROTOCOL is the oldest companion this pack still accepts. Keeping
+-- them is what lets players update the mod without downloading a new companion.
+local PROTOCOL, MIN_COMPANION_PROTOCOL = 1, 1
+local companion_outdated = false
+local companion_seen, companion_watched, companion_answered, companion_silent = false, {}, {}, false
 local function copy_data(value)
     if type(value) ~= "table" then return value end
     local result = {}; for k, v in pairs(value) do result[k] = copy_data(v) end
@@ -151,6 +158,18 @@ local function leader_identity(faction)
     return result
 end
 
+-- Field armies only: a settlement's garrison is not an army a ruler counts.
+local function field_army_count(faction)
+    return safe_value(nil, function()
+        local list, n = faction:military_force_list(), 0
+        for i = 0, list:num_items() - 1 do
+            local force = list:item_at(i)
+            if not force:is_null_interface() and not force:is_armed_citizenry() then n = n + 1 end
+        end
+        return n
+    end)
+end
+
 local function faction_strength_rank(faction)
     return safe_value(0, function() return cm:model():faction_strength_rank(faction) end)
 end
@@ -275,7 +294,40 @@ local function model_attitude_value(subject, other)
     return 0
 end
 
+-- What this lord has heard about the wider world (llm_diplomacy_world.lua): the news
+-- and the court gossip that matter most to them, and their court's report on foreign
+-- affairs. Its own pcall: a failure there must never cost the conversation its dossier.
+local function world_brief(interlocutor, player)
+    local ok, news, gossip = pcall(function()
+        if llmdip_world_brief then return llmdip_world_brief(interlocutor:name(), player:name()) end
+        return "none", "none"
+    end)
+    if not ok then out("[LLMDIP] WORLD_BRIEF_ERROR|" .. tostring(news)); news, gossip = "none", "none" end
+    local report_ok, report = pcall(function()
+        return llmdip_world_court_report and llmdip_world_court_report(interlocutor:name(), player:name()) or "none"
+    end)
+    if not report_ok then out("[LLMDIP] COURT_REPORT_ERROR|" .. tostring(report)); report = "none" end
+    local signals_ok, signals = pcall(function()
+        return llmdip_world_court_signals and llmdip_world_court_signals(interlocutor:name()) or "none"
+    end)
+    if not signals_ok then out("[LLMDIP] COURT_SIGNALS_ERROR|" .. tostring(signals)); signals = "none" end
+    local course_ok, course = pcall(function()
+        return llmdip_world_war_course and llmdip_world_war_course(interlocutor:name()) or "none"
+    end)
+    if not course_ok then out("[LLMDIP] WAR_COURSE_ERROR|" .. tostring(course)); course = "none" end
+    -- What the lord's own court thought and decided this turn (the council of courts).
+    local dispatch_ok, dispatch = pcall(function()
+        return llmdip_world_dispatch and llmdip_world_dispatch(interlocutor:name()) or "none"
+    end)
+    if not dispatch_ok then out("[LLMDIP] COURT_DISPATCH_ERROR|" .. tostring(dispatch)); dispatch = "none" end
+    dispatch = string.gsub(tostring(dispatch or "none"), "[,;|=]", "")
+    return string.sub(tostring(news or "none"), 1, 700), string.sub(tostring(gossip or "none"), 1, 500),
+        string.sub(tostring(report or "none"), 1, 2000), string.sub(tostring(signals or "none"), 1, 240),
+        string.sub(tostring(course or "none"), 1, 120), string.sub(dispatch, 1, 1200)
+end
+
 local function campaign_snapshot(player, interlocutor, ui_attitude, ui_personality, memory_parent, memory_head)
+    local world_news, court_gossip, court_report, court_signals, war_course, court_dispatch = world_brief(interlocutor, player)
     local ok, value = pcall(function()
         local ai_leader, player_leader = leader_identity(interlocutor), leader_identity(player)
         -- Never traverse UIComponents from the request pipeline. Diplomacy is
@@ -343,6 +395,11 @@ local function campaign_snapshot(player, interlocutor, ui_attitude, ui_personali
             "shared_border_regions=" .. tostring(shared_border_count(player, interlocutor)),
             "player_regions=" .. region_keys(player, 12),
             "ai_regions=" .. region_keys(interlocutor, 12),
+            -- The lists above stop at 12; these are the real totals.
+            "player_settlements=" .. tostring(safe_value("unknown", function() return player:region_list():num_items() end)),
+            "ai_settlements=" .. tostring(safe_value("unknown", function() return interlocutor:region_list():num_items() end)),
+            "player_field_armies=" .. tostring(field_army_count(player) or "unknown"),
+            "ai_field_armies=" .. tostring(field_army_count(interlocutor) or "unknown"),
             "player_allies=" .. list_keys(player:factions_allied_with(), 10),
             "player_trades=" .. list_keys(player:factions_trading_with(), 10),
             "player_wars=" .. list_keys(player:factions_at_war_with(), 10),
@@ -371,6 +428,12 @@ local function campaign_snapshot(player, interlocutor, ui_attitude, ui_personali
             "ai_culture=" .. clean_value(interlocutor:culture()),
             "ai_subculture=" .. clean_value(interlocutor:subculture()),
             "ai_wars=" .. tostring(interlocutor:factions_at_war_with():num_items()),
+            "world_news=" .. clean_value(world_news),
+            "court_gossip=" .. clean_value(court_gossip),
+            "court_report=" .. clean_value(court_report),
+            "court_signals=" .. clean_value(court_signals),
+            "war_course=" .. clean_value(war_course),
+            "court_dispatch=" .. clean_value(court_dispatch),
             -- Las preferencias del juego pueden estar en blanco (idioma por defecto de Steam),
             -- asi que el companion no puede deducirlo: se lo decimos desde dentro del juego.
             "ui_language=" .. clean_value((llmdip_game_language and llmdip_game_language()) or "unknown")
@@ -472,6 +535,16 @@ local function faction_from_cqi(cqi)
     return nil
 end
 
+-- Nadie recoge la peticion en unos segundos: no hay companion corriendo, o se
+-- cerro solo tras una actualizacion de Steam. La ventana de cartas lo dice.
+local function watch_companion(request_id)
+    companion_watched[request_id] = true
+    cm:real_callback(function()
+        if not companion_answered[request_id] then
+            companion_silent = true; out("[LLMDIP] COMPANION_SILENT|" .. request_id)
+        end
+    end, COMPANION_WAIT_MS)
+end
 local function new_request(player, interlocutor, mode, seed, ui_attitude, ui_personality, regenerate_of)
     out("[LLMDIP] REQUEST_PREPARE|" .. tostring(mode) .. "|" .. interlocutor:name())
     if not campaign_id or not valid_key(campaign_id) then out("[LLMDIP] NEED_CAMPAIGN_ID") return false end
@@ -508,6 +581,7 @@ local function new_request(player, interlocutor, mode, seed, ui_attitude, ui_per
     -- request through UITrigger: that queue stops advancing while diplomacy
     -- pauses the campaign.
     out("[LLMDIP] REQUEST|" .. request_id .. "|" .. campaign_id .. "|" .. player:name() .. "|" .. interlocutor:name() .. "|" .. mode .. "|" .. percent_encode(state) .. "|" .. percent_encode(seed))
+    watch_companion(request_id)
     return true
 end
 
@@ -609,15 +683,33 @@ function llmdip_publish_response(request_id, narrative, compact_action, relation
 end
 
 -- El companion avisa de que esta vivo en cuanto recoge una peticion, antes de
--- hablar con el modelo. Sin esta senal el juego no puede distinguir "el modelo
--- tarda" de "no hay companion", y un jugador recien suscrito al Workshop se
--- queda mirando "Pensando..." para siempre sin saber que le falta la mitad.
-local companion_seen = false
-function llmdip_companion_alive()
+-- hablar con el modelo, y nombra la peticion: llmdip_companion_alive("<id>").
+-- Sin esta senal el juego no distingue "el modelo tarda" de "no hay companion".
+-- Va atada al id porque el fichero del inbox sobrevive al companion: si Steam
+-- actualiza el mod y el companion viejo se niega a arrancar, la siguiente
+-- partida vuelve a ejecutar la linea vieja. Esa linea lleva un id de otra sesion
+-- (los ids incluyen la hora y un nonce por sesion) y nunca cuenta como respuesta.
+function llmdip_companion_alive(request_id, companion_protocol)
     companion_seen = true
+    -- Only requests sent in this session count; anything else is a stale line.
+    if valid_key(request_id) and companion_watched[request_id] then
+        companion_answered[request_id] = true; companion_silent = false
+        -- An older companion still answers, but may not understand this version.
+        companion_outdated = (tonumber(companion_protocol) or 0) < MIN_COMPANION_PROTOCOL
+    end
     return true
 end
 function llmdip_companion_is_alive() return companion_seen end
+-- Ha recogido el companion el ultimo mensaje del jugador a esta faccion?
+function llmdip_companion_answered_target(target)
+    local player = local_faction()
+    if not valid_key(target) or not player or player:is_null_interface() then return false end
+    local id = cm:get_saved_value("llmdip_last_player_request_" .. player:name() .. "_" .. target)
+    return valid_key(id) and companion_answered[id] == true or false
+end
+-- Una peticion se quedo sin recoger: la ventana de cartas lo explica.
+function llmdip_companion_silent() return companion_silent end
+function llmdip_companion_outdated() return companion_outdated end
 
 function llmdip_no_contact(request_id)
     if not player_phase or not valid_key(request_id) then return false end
@@ -872,7 +964,7 @@ local function initiative_score(player, ai)
 end
 
 function llmdip_mail_request(excluded)
-    if not player_phase or not campaign_id or menu_open or cm:is_multiplayer() then return false end
+    if not player_phase or not campaign_id or cm:is_multiplayer() then return false end
     if cm:is_processing_battle() or cm:is_pending_battle_active() then return false end
     -- Only one unfinished background generation at a time. A completed proposal
     -- does not block other letters; the player remains free to ignore it.
@@ -889,37 +981,22 @@ function llmdip_mail_request(excluded)
                 -- Fair rotation: social letters need not compete against wars.
                 -- Avoid rescanning every army merely to choose the next sender.
                 local score = cm:model():turn_number() - last
+                -- A court that decided this turn to write to the player goes first.
+                if llmdip_world_letter_motive and safe_value(nil, function() return llmdip_world_letter_motive(ai:name()) end) then
+                    score = score + 1000
+                end
                 if score > best_score then best, best_score = ai, score end
             end
         end
     end
     if best then
         cm:set_saved_value("llmdip_last_" .. player:name() .. "_" .. best:name(), cm:model():turn_number())
-        local sent = new_request(player, best, "proactive", "You may send one brief personal letter this turn. Speak as the current lord, not an abstract faction. A social or emotional motive is sufficient: warmth, admiration, vanity, rivalry, spite, ambition, concern, generosity or self-interest, grounded in identity, attitude and saved history. A treaty is NOT required. Prefer a fresh, specific personal message when appropriate; otherwise return [NO_CONTACT]. Avoid repeating greetings, demands or gifts. Write 30-80 words. The player has not spoken and may ignore you; silence is not rejection or consent. Propose transfers only with supported tags; never claim they already happened.")
+        local motive = llmdip_world_letter_motive and safe_value(nil, function() return llmdip_world_letter_motive(best:name()) end)
+        if motive and llmdip_world_motive_used then pcall(llmdip_world_motive_used, best:name()) end
+        local sent = new_request(player, best, "proactive", (motive and (motive .. " ") or "") .. "You may send one brief personal letter this turn. Speak as the current lord, not an abstract faction. A social or emotional motive is sufficient: warmth, admiration, vanity, rivalry, spite, ambition, concern, generosity or self-interest, grounded in identity, attitude and saved history. A treaty is NOT required. News or court gossip from world_news and court_gossip, or something in your court_report (a lost army, a new threat, a common enemy), is also a good reason to write: share it, ask for help or offer it, as this lord would. Prefer a fresh, specific personal message when appropriate; otherwise return [NO_CONTACT]. Avoid repeating greetings, demands or gifts. Write 30-80 words. The player has not spoken and may ignore you; silence is not rejection or consent. Propose transfers only with supported tags; never claim they already happened.")
         return sent and best:name() or false
     end
     return false, true -- Completed selection: no eligible contacts this round.
-end
-
-local function destroy_menu()
-    for i = 1, #menu_components do pcall(function() menu_components[i]:Destroy() end) end
-    menu_components, menu_open = {}, false
-end
-
-local function make_button(id, text, x, y, width)
-    local ok, component = pcall(function()
-        local root = core:get_ui_root()
-        local uic = core:get_or_create_component(id, "ui/templates/square_medium_text_button", root)
-        uic:SetCanResizeWidth(true); uic:SetCanResizeHeight(true); uic:Resize(width or 360, 34)
-        uic:SetDockingPoint(1); uic:SetDockOffset(x, y)
-        uic:PropagatePriority(200); uic:SetInteractive(true)
-        local label = find_uicomponent(uic, "button_txt")
-        if label then label:SetStateText(text); label:SetInteractive(false) end
-        uic:SetVisible(true)
-        return uic
-    end)
-    if ok and component then menu_components[#menu_components + 1] = component return component end
-    return nil
 end
 
 local race_names = {
@@ -951,13 +1028,13 @@ local function contact_race(faction)
     return key, name
 end
 
-local function show_contact_menu()
-    destroy_menu(); menu_open = true
+-- Who the player may hear from, grouped by race, for the letters window. Only
+-- factions already met, alive and not human; names come from the game's own
+-- localisation. The window only draws this list and calls llmdip_toggle_contact.
+function llmdip_contact_groups()
     local player = local_faction()
-    -- Keep the filter list beside the left diplomacy portrait, not across it.
-    local x, y, width, per_page = 270, 170, 325, 8
-    make_button("llmdip_close", llmdip_t("menu_close"), x, y, width)
-    local met, candidates, groups = player:factions_met(), {}, {}
+    if not player or player:is_null_interface() then return {} end
+    local met, groups, order = player:factions_met(), {}, {}
     for i = 0, met:num_items() - 1 do
         local faction = met:item_at(i)
         if not faction:is_human() and not faction:is_dead() then
@@ -965,82 +1042,28 @@ local function show_contact_menu()
             local name = localised_value("factions_screen_name_" .. key)
             if name == "factions_screen_name_" .. key or name == "" then name = key end
             local race, race_name = contact_race(faction)
-            local group = groups[race] or {key=race, name=race_name, count=0, enabled=0}
-            group.count = group.count + 1
-            if contact_enabled(player:name(), key) then group.enabled = group.enabled + 1 end
-            groups[race] = group
-            if menu_race == "all" or menu_race == race then
-                candidates[#candidates + 1] = {key=key, name=name}
+            local group = groups[race]
+            if not group then
+                group = {key=race, name=race_name, count=0, enabled=0, factions={}}
+                groups[race] = group; order[#order + 1] = group
             end
+            local on = contact_enabled(player:name(), key)
+            group.count = group.count + 1
+            if on then group.enabled = group.enabled + 1 end
+            -- The game's own label for this faction's attitude toward the player
+            -- ("Muy amistosa", "Hostile"), shown beside its name in the list.
+            local attitude = safe_value(nil, function()
+                return common.get_context_value("CcoCampaignFaction", key, "AttitudeTooltip")
+            end)
+            if type(attitude) ~= "string" or attitude == "" or #attitude > 40 then attitude = nil end
+            group.factions[#group.factions + 1] = {key=key, name=name, enabled=on, attitude=attitude}
         end
     end
-    if not menu_race then
-        for _, group in pairs(groups) do candidates[#candidates + 1] = group end
-        make_button("llmdip_all_races", llmdip_t("see_all_factions"), x, y + 42, width)
-    else
-        make_button("llmdip_races_back", llmdip_t("back_to_races"), x, y + 42, width)
-    end
-    table.sort(candidates, function(a,b) if a.name == b.name then return a.key < b.key end return a.name < b.name end)
-    local pages = math.max(1, math.ceil(#candidates / per_page))
-    menu_page = math.max(1, math.min(menu_page, pages))
-    local title = not menu_race and llmdip_t("races") or (menu_race == "all" and llmdip_t("all_factions") or (groups[menu_race] and groups[menu_race].name or llmdip_t("no_factions")))
-    local heading = make_button("llmdip_filter_title", title .. " — " .. menu_page .. "/" .. pages, x, y + 84, width)
-    if heading then heading:SetInteractive(false) end
-    local first = (menu_page - 1) * per_page + 1
-    for i = first, math.min(#candidates, first + per_page - 1) do
-        local key, name = candidates[i].key, candidates[i].name
-        if not menu_race then
-            local group = candidates[i]
-            make_button("llmdip_race_" .. key, name .. " (" .. group.enabled .. "/" .. group.count .. llmdip_t("enabled_suffix"), x, y + 126 + 38 * (i - first), width)
-        else
-            local mark = contact_enabled(player:name(), key) and llmdip_t("contact_on") or llmdip_t("contact_off")
-            local button = make_button("llmdip_contact_" .. key, mark .. name, x, y + 126 + 38 * (i - first), width)
-            if button then button:SetTooltipText(name .. "\n" .. key, true) end
-        end
-    end
-    if #candidates == 0 then
-        local empty = make_button("llmdip_filter_empty", llmdip_t("no_known_factions"), x, y + 126, width)
-        if empty then empty:SetInteractive(false) end
-    end
-    if first > 1 then make_button("llmdip_prev", llmdip_t("prev_page_btn"), x, y + 462, 155) end
-    if first + per_page <= #candidates then make_button("llmdip_next", llmdip_t("next_page_btn"), x + 170, y + 462, 155) end
+    local function by_name(a, b) if a.name == b.name then return a.key < b.key end return a.name < b.name end
+    table.sort(order, by_name)
+    for _, group in ipairs(order) do table.sort(group.factions, by_name) end
+    return order
 end
-
-local function create_menu_button()
-    local ok, err = pcall(function()
-        local root = core:get_ui_root()
-        local button = core:get_or_create_component("llmdip_menu_button", "ui/templates/square_medium_text_button", root)
-        button:SetCanResizeWidth(true); button:SetCanResizeHeight(true); button:Resize(160, 36)
-        button:SetDockingPoint(1); button:SetDockOffset(20, 123)
-        button:PropagatePriority(200); button:SetInteractive(true)
-        local label = find_uicomponent(button, "button_txt")
-        if not label then error("Falta button_txt en el botón de facciones") end
-        label:SetStateText(llmdip_t("ai_factions_button")); label:SetInteractive(false)
-        button:SetTooltipText(llmdip_t("toggle_factions"), true); button:SetVisible(true)
-        out("[LLMDIP] CONTACT_BUTTON_READY|top_left|20|123|0.39.8")
-    end)
-    if not ok then out("[LLMDIP] CONTACT_BUTTON_ERROR|" .. tostring(err)) end
-end
-
-core:add_listener("llmdip_ui_clicks", "ComponentLClickUp", true, function(context)
-    local id = context.string
-    if id == "llmdip_menu_button" then if menu_open then destroy_menu() else menu_race=nil; menu_page=1; show_contact_menu() end
-    elseif id == "llmdip_close" then destroy_menu()
-    elseif id == "llmdip_all_races" then menu_race="all"; menu_page=1; show_contact_menu()
-    elseif id == "llmdip_races_back" then menu_race=nil; menu_page=1; show_contact_menu()
-    elseif string.sub(id or "", 1, 12) == "llmdip_race_" then
-        local key = string.sub(id, 13)
-        if valid_key(key) then menu_race=key; menu_page=1; show_contact_menu() end
-    elseif id == "llmdip_prev" then menu_page = math.max(1, menu_page - 1); show_contact_menu()
-    elseif id == "llmdip_next" then menu_page = menu_page + 1; show_contact_menu()
-    elseif string.sub(id or "", 1, 15) == "llmdip_contact_" then
-        local ai_key = string.sub(id, 16)
-        if valid_key(ai_key) then
-            broadcast(table.concat({PREFIX, "T", ai_key}, "|"))
-            cm:callback(function() if menu_open then show_contact_menu() end end, 0.2)
-        end
-    end
-end, true)
 
 local function poll_inbox()
     if not player_phase then cm:real_callback(poll_inbox, 1000); return end
@@ -1052,6 +1075,10 @@ local function poll_inbox()
         setfenv(loader, core:get_env())
         local ok, err = pcall(loader)
         if not ok then out("[LLMDIP] inbox error: " .. tostring(err)) end
+    end
+    if llmdip_world_tick then
+        local ok, err = pcall(llmdip_world_tick)
+        if not ok then out("[LLMDIP] WORLD_TICK_ERROR|" .. tostring(err)) end
     end
     if llmdip_mail_tick then
         local ok, err = pcall(llmdip_mail_tick)
@@ -1081,7 +1108,7 @@ cm:add_first_tick_callback(function()
     campaign_id = cm:get_saved_value("llmdip_campaign_id")
     out("[LLMDIP] BUILD|0.39.8-inbox")
     out("[LLMDIP] READY|" .. tostring(cm:is_multiplayer()) .. "|" .. local_faction():name())
+    out("[LLMDIP] PROTOCOL|" .. PROTOCOL .. "|" .. MIN_COMPANION_PROTOCOL)
     if campaign_id then out("[LLMDIP] CAMPAIGN_ID|" .. campaign_id) else out("[LLMDIP] NEED_CAMPAIGN_ID") end
-    create_menu_button()
     poll_inbox()
 end)

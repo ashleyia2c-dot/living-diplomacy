@@ -13,6 +13,7 @@ import { createRequire } from "node:module";
 import crypto from "node:crypto";
 import { build } from "esbuild";
 import { PLAYER2_GAME_CLIENT_ID } from "../src/config.js";
+import { companionDefines, embeddedLore as readEmbeddedLore } from "./build-bundle.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const BUILD_DIR = path.join(ROOT, "build");
@@ -60,30 +61,26 @@ if (!PLAYER2_GAME_CLIENT_ID && !process.argv.includes("--sin-atribucion")) {
 
 fs.mkdirSync(BUILD_DIR, { recursive: true });
 fs.mkdirSync(DIST_DIR, { recursive: true });
-if (!fs.existsSync(PACK)) throw new Error(`Falta el pack correspondiente: ${PACK}`);
-const expectedPackSha256 = crypto.createHash("sha256").update(fs.readFileSync(PACK)).digest("hex");
 // SEA cannot read source-tree JSON files on a clean player's computer. Embed the
 // curated profiles, so launching the EXE from any folder keeps the same leaders.
-const embeddedLore = Object.fromEntries(fs.readdirSync(path.join(ROOT, "lore-profiles"))
-  .filter(name => name.endsWith(".json"))
-  .map(name => [name.slice(0, -5), JSON.parse(fs.readFileSync(path.join(ROOT, "lore-profiles", name), "utf8"))]));
-if (!Object.keys(embeddedLore).length) throw new Error("No curated leader profiles found; refusing an incomplete release.");
+const embeddedLore = readEmbeddedLore();
 
 // Node SEA solo admite un punto de entrada CommonJS, y el companion es ESM: esbuild
 // lo aplana a un unico CJS. Por eso companion.js no puede usar top-level await.
 console.log("1/4  Empaquetando el companion (ESM -> CommonJS)...");
+// The entry is the launcher: it runs a newer companion found inside the installed mod
+// (Steam keeps it up to date) and otherwise the companion built in here.
 await build({
-  entryPoints: [path.join(ROOT, "src", "companion.js")],
+  entryPoints: [path.join(ROOT, "src", "launcher.js")],
   bundle: true,
   platform: "node",
   format: "cjs",
   target: "node22",
   outfile: BUNDLE,
   legalComments: "none",
-  define: {
-    __LLMDIP_EXPECTED_PACK_SHA256__: JSON.stringify(expectedPackSha256),
-    __LLMDIP_EMBEDDED_LORE__: JSON.stringify(embeddedLore)
-  }
+  // Marks the player build (it checks that the mod is installed), embeds the lore and
+  // the version: the same defines as the bundle inside the pack.
+  define: companionDefines()
 });
 
 console.log("2/4  Generando el blob SEA...");
@@ -118,7 +115,6 @@ execFileSync(process.execPath, [
 const megabytes = (fs.statSync(EXE).size / 1024 / 1024).toFixed(1);
 console.log("");
 console.log(`Listo: ${EXE}  (${megabytes} MB)`);
-console.log(`Pack requerido SHA-256: ${expectedPackSha256}`);
 console.log(`Perfiles incluidos: ${Object.keys(embeddedLore).length}`);
 console.log(PLAYER2_GAME_CLIENT_ID
   ? `Atribucion incrustada: ${PLAYER2_GAME_CLIENT_ID}`

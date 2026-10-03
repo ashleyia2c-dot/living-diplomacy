@@ -1,3 +1,21 @@
+// How the game and the companion talk: the inbox calls, the [LLMDIP] log lines and
+// the request format. Raise COMPANION_PROTOCOL only when an older partner could no
+// longer understand the other; releases that keep it work with the companion
+// players already have. The game announces its own number and the oldest companion
+// it accepts in a "PROTOCOL|<pack>|<min companion>" log line.
+export const COMPANION_PROTOCOL = 1;
+// Packs older than the protocol line (0.42.x) understand protocol 1 as well.
+export const MIN_PACK_PROTOCOL = 0;
+
+// What to tell the player when the game announces its protocol; empty if all is well.
+export function protocolAdvice(packProtocol, minCompanion) {
+  if (COMPANION_PROTOCOL < minCompanion) {
+    return "This companion is older than your Living Diplomacy mod. Download the new companion (your conversations are kept): https://github.com/ashleyia2c-dot/living-diplomacy/releases/latest";
+  }
+  if (packProtocol < MIN_PACK_PROTOCOL) return "Your Living Diplomacy mod is older than this companion. Let Steam finish updating the mod.";
+  return "";
+}
+
 export const ACTION_TYPES = new Set([
   "reject", "declare_war", "make_peace", "alliance", "trade_agreement", "non_aggression_pact",
   "military_access", "transfer_region", "vassalize", "offer_gold", "request_gold", "favor", "betray_war"
@@ -19,7 +37,7 @@ function safeKey(value, field) {
 
 function goldAmount(value) {
   const amount = Number(value);
-  if (!Number.isSafeInteger(amount) || amount < 100 || amount > 20000) throw new Error("amount must be an integer from 100 to 20000");
+  if (!Number.isSafeInteger(amount) || amount < 100 || amount > 20000) throw new Error("amount must be an integer between 100 and 20000");
   return amount;
 }
 
@@ -38,14 +56,14 @@ export function validateAction(input) {
     result.favor = enumValue(input.favor, FAVOR_TYPES, "favor");
     result.amount = goldAmount(input.amount);
     if (result.favor === "join_war") result.target = safeKey(input.target, "target");
-    else if (input.target !== undefined) throw new Error("target is allowed only for join_war");
+    else if (input.target !== undefined) throw new Error("target is only allowed for join_war");
   }
   return result;
 }
 
 export function validateReaction(input = {}) {
   const delta = Number(input.delta ?? 0);
-  if (!Number.isSafeInteger(delta) || delta < -1 || delta > 1) throw new Error("reaction.delta must be -1, 0, or 1");
+  if (!Number.isSafeInteger(delta) || delta < -1 || delta > 1) throw new Error("reaction.delta must be -1, 0 or 1");
   const reason = enumValue(input.reason || "neutral", REACTION_REASONS, "reaction.reason");
   return { delta, reason };
 }
@@ -74,9 +92,11 @@ export function parseBridgeRequest(line) {
   enumValue(mode, new Set(["player", "proactive"]), "mode");
   let message, state;
   try { message = decodeURIComponent(encodedMessage); state = decodeURIComponent(encodedState); }
-  catch { throw new Error("REQUEST message has invalid percent encoding"); }
+  catch { throw new Error("REQUEST message has invalid percent-encoding"); }
   if (!message.trim() || message.length > 1200) throw new Error("Message is empty or too long");
-  if (state.length > 8000) throw new Error("Campaign state is too long");
+  // 0.43 adds what the lord has heard of the wider world (world_news, court_gossip,
+  // at most 1200 characters together) to a dossier that already runs to a few thousand.
+  if (state.length > 12000) throw new Error("Campaign state is too long");
   const fields = Object.fromEntries(state.split(",").map(value => {
     const at = value.indexOf("="); return at > 0 ? [value.slice(0, at), value.slice(at + 1)] : [value, ""];
   }));
@@ -96,7 +116,8 @@ export function parseBridgeRequest(line) {
       leader: fields.ai_leader, leaderSubtype: fields.ai_leader_subtype,
       leaderTitle: fields.ai_leader_title || "", leaderDescription: fields.ai_leader_description || "",
       leaderRank: number("ai_leader_rank"), unique: flag("ai_leader_unique"), immortal: flag("ai_leader_immortal"),
-      male: fields.ai_leader_male !== "0", traits: list("ai_leader_traits"),
+      // ai_leader_male is not read: the game reports 1 for every lord, women included.
+      traits: list("ai_leader_traits"),
       battles: number("ai_leader_battles"), victories: number("ai_leader_victories"), region: fields.ai_leader_region || "none",
       vanillaPersonality: list("ai_vanilla_personality"), culture: fields.ai_culture, subculture: fields.ai_subculture
     },

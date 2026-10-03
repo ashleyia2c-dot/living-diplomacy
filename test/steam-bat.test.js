@@ -71,7 +71,8 @@ test("Steam consumer package is source-only and its guide distinguishes one-time
   const builder = fs.readFileSync(path.join(project, "scripts", "build-steam-bat.js"), "utf8");
   assert.doesNotMatch(builder, /copyFileSync[^\n]*(?:\.exe|\.pack)/i);
   assert.match(builder, /\["src", "lore-profiles"\]/);
-  const guide = fs.readFileSync(path.join(project, "README_STEAM_BAT_0.42.2.txt"), "utf8");
+  const version = JSON.parse(fs.readFileSync(path.join(project, "package.json"), "utf8")).version;
+  const guide = fs.readFileSync(path.join(project, `README_STEAM_BAT_${version}.txt`), "utf8");
   for (const text of ["SUBSCRIBE INSTALLS THE GAME MOD, NOT THE AI COMPANION", "ONE-TIME SETUP", "EVERY TIME YOU PLAY", "START_PLAYER2.bat", "Node.js", "Leave that window open"]) {
     assert.ok(guide.includes(text), text);
   }

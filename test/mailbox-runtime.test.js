@@ -109,8 +109,8 @@ function run(source, body) {
   assert.equal(status,lua.LUA_OK,status!==lua.LUA_OK?to_jsstring(lua.lua_tostring(L,-1)):'');
  } finally {lua.lua_close(L);}
 }
-test('all four campaign files parse as Lua 5.1; mailbox has no AI opening/intervention',()=>{
- for(const name of ['llm_diplomacy.lua','llm_diplomacy_i18n.lua','llm_diplomacy_ui.lua','llm_diplomacy_mailbox.lua']) luaparse.parse(read(name),{luaVersion:'5.1'});
+test('all five campaign files parse as Lua 5.1; mailbox has no AI opening/intervention',()=>{
+ for(const name of ['llm_diplomacy.lua','llm_diplomacy_i18n.lua','llm_diplomacy_ui.lua','llm_diplomacy_mailbox.lua','llm_diplomacy_world.lua']) luaparse.parse(read(name),{luaVersion:'5.1'});
  assert.doesNotMatch(mailbox,/OpenDiplomacyWith|intervention:new|trigger_transient_intervention|FactionTurnStart/);
  assert.doesNotMatch(bridge,/llmdip_proactive_turn|llm_diplomacy_initiative/);
  assert.match(bridge,/add_faction_turn_start_listener_by_name/);
@@ -121,9 +121,9 @@ for(const [name,body] of [
  ['each enabled sender is checked once, and load keeps per-turn attempts',`first[1](); for i=1,20 do llmdip_mail_tick() end; assert(requests==3 and saved.llmdip39_mailbox.queries==2); first[1](); llmdip_mail_tick(); assert(requests==3); round=2; llmdip_mail_tick(); assert(requests==4)`],
  ['incoming message never opens diplomacy; identities persist',`first[1](); llmdip_mail_receive('r1',{interlocutor='ai',faction_name='Kislev',leader='Katarin',turn=1},'Saludos','reject'); assert(opens==0); assert(saved.llmdip39_mailbox.rows[1].lord=='Katarin'); assert(not saved.llmdip39_mailbox.rows[1].read)`],
  ['duplicates are ignored and saved rows are isolated copies',`first[1](); llmdip_mail_receive('r1',{interlocutor='ai',turn=1},'Carta','reject'); local old=saved.llmdip39_mailbox; llmdip_mail_read('ai'); assert(old.rows[1].read==false); assert(saved.llmdip39_mailbox.rows[1].read); llmdip_mail_receive('r1',{interlocutor='ai',turn=1},'Duplicada','reject'); assert(#saved.llmdip39_mailbox.rows==1)`],
- ['explicit reply uses shared conversation, closing does not query',`first[1](); llmdip_mail_tick(); llmdip_mail_receive('r1',{interlocutor='ai',turn=1,faction_name='Kislev',leader='Katarin'},'Carta','reject'); fire('llmdip39_mail_click','llmdip39_mail_button'); assert(widgets.llmdip39_mail_panel.visible); fire('llmdip39_mail_click','llmdip39_mail_reply_1'); assert(opens==1 and not widgets.llmdip39_mail_panel.visible)`],
- ['closed mailbox stays closed on arrival',`first[1](); llmdip_mail_tick(); fire('llmdip39_mail_click','llmdip39_mail_button'); fire('llmdip39_mail_click','llmdip39_mail_button'); assert(not widgets.llmdip39_mail_panel.visible); llmdip_mail_receive('r1',{interlocutor='ai',turn=1},'Carta','reject'); assert(not widgets.llmdip39_mail_panel.visible and opens==0)`],
- ['blocking panels suspend queries and hide the mailbox',`first[1](); llmdip_mail_tick(); fire('llmdip39_mail_click','llmdip39_mail_button'); fire('llmdip39_mail_panel_open','popup_pre_battle'); llmdip_mail_tick(); assert(requests==1 and not widgets.llmdip39_mail_panel.visible); fire('llmdip39_mail_panel_close','popup_pre_battle'); llmdip_mail_tick(); assert(requests==2)`],
+ ['explicit reply uses shared conversation, closing does not query',`first[1](); llmdip_mail_tick(); llmdip_mail_receive('r1',{interlocutor='ai',turn=1,faction_name='Kislev',leader='Katarin'},'Carta','reject'); fire('llmdip39_mail_click','llmdip39_mail_button'); assert(widgets.llmdip_hub_shell.visible); fire('llmdip39_mail_click','llmdip39_mail_reply_1'); assert(opens==1 and not widgets.llmdip_hub_shell.visible)`],
+ ['closed mailbox stays closed on arrival',`first[1](); llmdip_mail_tick(); fire('llmdip39_mail_click','llmdip39_mail_button'); fire('llmdip39_mail_click','llmdip39_mail_button'); assert(not widgets.llmdip_hub_shell.visible); llmdip_mail_receive('r1',{interlocutor='ai',turn=1},'Carta','reject'); assert(not widgets.llmdip_hub_shell.visible and opens==0)`],
+ ['blocking panels suspend queries and hide the mailbox',`first[1](); llmdip_mail_tick(); fire('llmdip39_mail_click','llmdip39_mail_button'); fire('llmdip39_mail_panel_open','popup_pre_battle'); llmdip_mail_tick(); assert(requests==1 and not widgets.llmdip_hub_shell.visible); fire('llmdip39_mail_panel_close','popup_pre_battle'); llmdip_mail_tick(); assert(requests==2)`],
  ['ignored unread letters do not stop background queries or open diplomacy',`first[1](); for i=1,4 do llmdip_mail_receive('r'..i,{interlocutor='ai',turn=1},'Carta','reject') end; llmdip_mail_tick(); assert(requests==1 and opens==0)`],
  ['restoring older mailbox snapshot excludes future letters',`first[1](); llmdip_mail_receive('old',{interlocutor='ai',turn=1},'Antes','reject'); local snapshot=saved.llmdip39_mailbox; llmdip_mail_receive('future',{interlocutor='ai',turn=2},'Después','reject'); saved.llmdip39_mailbox=snapshot; first[1](); llmdip_mail_read('ai'); assert(#saved.llmdip39_mailbox.rows==1 and saved.llmdip39_mailbox.rows[1].id=='old')`]
 ]) test(name,()=>run(mailbox,body));
@@ -152,59 +152,71 @@ test('mail button is owned by root, not an engine toolbar',()=>run(mailbox,`
  assert(widgets.llmdip39_mail_button.parent==root)
 `));
 
-test('mail entry has readable child label, explicit top-left docking and priority',()=>run(mailbox,`
+test('one entry button with a readable label, top-left docking and priority',()=>run(mailbox,`
  first[1](); llmdip_mail_tick()
  local b=widgets.llmdip39_mail_button
  assert(b.template=='ui/templates/square_medium_text_button')
- assert(b.dock==1 and b.x==190 and b.y==123 and b.priority==200)
- assert(b.width==180 and b.height==36 and b.interactive)
- assert(b.children.button_txt.text==llmdip_t('ai_messages_button')..'0)' and not b.children.button_txt.interactive)
+ assert(b.dock==1 and b.x==20 and b.y==123 and b.priority==200)
+ assert(b.width==210 and b.height==36 and b.interactive)
+ assert(b.children.button_txt.text==llmdip_t('hub_button')..' (0)' and not b.children.button_txt.interactive)
  llmdip_mail_receive('r1',{interlocutor='ai',turn=1},'Carta','reject')
- assert(b.children.button_txt.text==llmdip_t('ai_messages_button')..'1)')
+ assert(b.children.button_txt.text==llmdip_t('hub_button')..' (1)')
 `));
 
-test('faction menu uses text template children and is placed below the map entries',()=>run(bridge,`
- cm.get_local_faction=function() return {name=function() return 'player' end,
-  factions_met=function() return {num_items=function() return 1 end,item_at=function() return {
-   name=function() return 'ai' end,is_human=function() return false end,is_dead=function() return false end} end} end} end
- fire('llmdip_ui_clicks','llmdip_menu_button')
- assert(widgets.llmdip_close.dock==1 and widgets.llmdip_close.x==270 and widgets.llmdip_close.y==170)
- assert(widgets.llmdip_close.width==325)
- assert(widgets.llmdip_close.children.button_txt.text==llmdip_t('menu_close'))
- fire('llmdip_ui_clicks','llmdip_all_races')
- assert(widgets.llmdip_contact_ai.children.button_txt.text==llmdip_t('contact_off')..'ai')
-`));
-
-test('mailbox reuses verified history template, sizes the text child and closes without destruction',()=>run(mailbox,`
+test('the contacts tab draws text-template rows inside the window frame',()=>run(mailbox,`
+ llmdip_toggle_contact=function() return true end
+ llmdip_contact_groups=function() return {{key='ksl',name='Kislev',count=1,enabled=0,factions={{key='ai',name='Katarin',enabled=false}}}} end
  first[1](); llmdip_mail_tick()
- local manual=root:CreateComponent('manual_history','llmdip_ui/llmdip_history')
- manual.children.history_text:SetStateText('Conversación manual intacta')
  fire('llmdip39_mail_click','llmdip39_mail_button')
- local p=widgets.llmdip39_mail_panel
- assert(p.template=='llmdip_ui/llmdip_history' and p.parent==root)
- assert(p.children.history_text.width==540 and p.children.history_text.height==370)
- assert(string.find(p.children.history_text.text,llmdip_t('no_letters'),1))
- fire('llmdip39_mail_click','llmdip39_mail_close'); assert(not p.visible)
- fire('llmdip39_mail_click','llmdip39_mail_button'); assert(p==widgets.llmdip39_mail_panel and p.visible)
- assert(manual.children.history_text.text=='Conversación manual intacta')
+ fire('llmdip39_mail_click','llmdip_hub_tab_contacts')
+ local shell, nav, row=widgets.llmdip_hub_shell, widgets.llmdip_hub_nav, widgets.llmdip_hub_row_1
+ assert(nav.template=='ui/templates/square_medium_text_button' and nav.parent==root)
+ assert(nav.children.button_txt.text==llmdip_t('see_all_factions'))
+ assert(row.parent==root and row.children.button_txt.text=='Kislev (0/1'..llmdip_t('enabled_suffix'))
+ assert(row.x>=shell.x and row.x+row.width<=shell.x+680 and row.y>=shell.y+60 and row.y+row.height<=shell.y+500)
+ assert(not widgets.llmdip_hub_mark_1.visible, 'races show counts, not a tick')
+ fire('llmdip39_mail_click','llmdip_hub_row_1')
+ assert(widgets.llmdip_hub_row_1.children.button_txt.text=='Katarin'..'  ['..llmdip_t('contact_off')..']')
+ assert(not widgets.llmdip_hub_mark_1.visible, 'no tick while it cannot write: the cross looked like close')
+ assert(widgets.llmdip_hub_race_on.visible and widgets.llmdip_hub_race_off.visible)
+ fire('llmdip39_mail_click','llmdip_hub_row_1')
+ assert(widgets.llmdip_hub_row_1.children.button_txt.text=='Katarin'..'  ['..llmdip_t('contact_on')..']', 'the click answers at once')
+ assert(widgets.llmdip_hub_mark_1.visible)
+ assert(widgets.llmdip_hub_nav.children.button_txt.text==llmdip_t('back_to_races'))
+ assert(not widgets.llmdip_hub_card_1.visible, 'letters are hidden on this tab')
+`));
+
+test('the window reuses the chat frame and message cards, and closes without destruction',()=>run(mailbox,`
+ first[1](); llmdip_mail_tick()
+ local chat=root:CreateComponent('llmdip_diplomacy_shell','llmdip_ui/llmdip_shell')
+ chat.children.header_title:SetStateText('Katarin')
+ fire('llmdip39_mail_click','llmdip39_mail_button')
+ local shell, card=widgets.llmdip_hub_shell, widgets.llmdip_hub_card_1
+ assert(shell.template=='llmdip_ui/llmdip_shell' and shell.parent==root and shell.visible)
+ assert(shell.width==680 and shell.height==500)
+ assert(shell.children.header_title.text==llmdip_t('hub_title'))
+ assert(not shell.children.header_attitude.visible and not shell.children.proposal_card.visible)
+ assert(card.template=='llmdip_ui/llmdip_bubble' and card.parent==root and card.visible)
+ assert(string.find(card.children.bubble_text.text,llmdip_t('letters_empty'),1))
+ fire('llmdip39_mail_click','llmdip39_mail_close'); assert(not shell.visible and not card.visible)
+ fire('llmdip39_mail_click','llmdip39_mail_button'); assert(shell==widgets.llmdip_hub_shell and shell.visible)
+ assert(chat.children.header_title.text=='Katarin', 'the chat frame is never touched')
 `));
 
 test('localized faction labels and alphabetical order retain internal action keys',()=>run(bridge,`
  common={get_localised_string=function(key)
   return ({factions_screen_name_ai_a='Sylvania',factions_screen_name_ai_b='Carcassonne'})[key] or ''
  end}
- cm.get_local_faction=function() return {name=function() return 'player' end,
+ cm.get_local_faction=function() return {name=function() return 'player' end,is_null_interface=function() return false end,
   factions_met=function() return {num_items=function() return 2 end,item_at=function(self,i) return {
    name=function() return i==0 and 'ai_a' or 'ai_b' end,is_human=function() return false end,is_dead=function() return false end} end} end} end
  saved.llmdip_contacts_player=',ai_b,'
- fire('llmdip_ui_clicks','llmdip_menu_button')
- fire('llmdip_ui_clicks','llmdip_all_races')
- assert(widgets.llmdip_contact_ai_b.children.button_txt.text==llmdip_t('contact_on')..'Carcassonne')
- assert(widgets.llmdip_contact_ai_a.children.button_txt.text==llmdip_t('contact_off')..'Sylvania')
- assert(widgets.llmdip_contact_ai_b.y<widgets.llmdip_contact_ai_a.y)
+ local factions=llmdip_contact_groups()[1].factions
+ assert(factions[1].key=='ai_b' and factions[1].name=='Carcassonne' and factions[1].enabled==true)
+ assert(factions[2].key=='ai_a' and factions[2].name=='Sylvania' and factions[2].enabled==false)
 `));
 
-test('race drilldown excludes dead/human factions and keeps activation and pagination isolated',()=>run(bridge,`
+test('contact groups exclude dead and human factions, count each race and switch through events',()=>run(bridge,`
  local factions={}
  for i=1,11 do factions[#factions+1]={key='dark_'..i,race='wh2_main_sc_def_dark_elves'} end
  factions[#factions+1]={key='kislev',race='wh3_main_sc_ksl_kislev'}
@@ -219,24 +231,46 @@ test('race drilldown excludes dead/human factions and keeps activation and pagin
     is_dead=function() return f.dead or false end,is_human=function() return f.human or false end}
   end} end} end
  saved.llmdip_contacts_player=',dark_1,'
- fire('llmdip_ui_clicks','llmdip_menu_button')
- assert(widgets.llmdip_race_wh2_main_sc_def_dark_elves.children.button_txt.text=='Elfos Oscuros (1/11'..llmdip_t('enabled_suffix'))
- assert(not widgets.llmdip_race_wh_main_sc_dwf_dwarfs and not widgets.llmdip_race_wh_main_sc_emp_empire)
- fire('llmdip_ui_clicks','llmdip_race_wh2_main_sc_def_dark_elves')
- assert(widgets.llmdip_contact_dark_1 and not widgets.llmdip_contact_kislev)
- assert(widgets.llmdip_next and not widgets.llmdip_prev)
- fire('llmdip_ui_clicks','llmdip_next')
- assert(widgets.llmdip_prev and not widgets.llmdip_next)
- fire('llmdip_ui_clicks','llmdip_races_back')
- fire('llmdip_ui_clicks','llmdip_race_wh3_main_sc_ksl_kislev')
- assert(widgets.llmdip_contact_kislev and not widgets.llmdip_contact_dark_1 and not widgets.llmdip_next)
- assert(saved.llmdip_contacts_player==',dark_1,')
- local trigger, delayed
+ local groups=llmdip_contact_groups()
+ assert(#groups==2, 'dead and human factions never appear')
+ assert(groups[1].key=='wh2_main_sc_def_dark_elves' and groups[1].name=='Elfos Oscuros')
+ assert(groups[1].count==11 and groups[1].enabled==1 and groups[1].factions[1].key=='dark_1' and groups[1].factions[1].enabled)
+ assert(groups[2].key=='wh3_main_sc_ksl_kislev' and groups[2].count==1 and groups[2].enabled==0)
+ local trigger
  CampaignUI={TriggerCampaignScriptEvent=function(cqi,event) trigger=event end}
- cm.callback=function(self,fn) delayed=fn end
- fire('llmdip_ui_clicks','llmdip_contact_kislev'); assert(trigger=='LLMDIP2|T|kislev')
- fire('llmdip_ui_clicks','llmdip_close'); delayed()
- assert(not widgets.llmdip_close, 'A queued refresh must not reopen a closed menu')
+ llmdip_toggle_contact('kislev'); assert(trigger=='LLMDIP2|T|kislev')
+ assert(saved.llmdip_contacts_player==',dark_1,', 'the switch travels as an event, never written directly')
+`));
+
+test('contacts paginate seven rows at a time and a queued refresh never reopens a closed window',()=>run(mailbox,`
+ local dark={}
+ for i=1,11 do dark[#dark+1]={key='dark_'..i,name='Dark '..string.format('%02d',i),enabled=i==1} end
+ local groups={{key='dark',name='Elfos Oscuros',count=11,enabled=1,factions=dark},
+  {key='ksl',name='Kislev',count=1,enabled=0,factions={{key='kislev',name='Kislev',enabled=false}}}}
+ llmdip_contact_groups=function() return groups end
+ local toggled={}
+ llmdip_toggle_contact=function(key) toggled[#toggled+1]=key end
+ first[1](); llmdip_mail_tick()
+ fire('llmdip39_mail_click','llmdip39_mail_button')
+ fire('llmdip39_mail_click','llmdip_hub_tab_contacts')
+ fire('llmdip39_mail_click','llmdip_hub_row_1')
+ assert(widgets.llmdip_hub_row_1.children.button_txt.text=='Dark 01'..'  ['..llmdip_t('contact_on')..']')
+ assert(widgets.llmdip39_mail_next.visible and not widgets.llmdip39_mail_prev.visible)
+ fire('llmdip39_mail_click','llmdip39_mail_next')
+ assert(widgets.llmdip_hub_row_1.children.button_txt.text=='Dark 08'..'  ['..llmdip_t('contact_off')..']')
+ assert(widgets.llmdip39_mail_prev.visible and not widgets.llmdip39_mail_next.visible)
+ assert(not widgets.llmdip_hub_row_5.visible, 'page two has four rows')
+ fire('llmdip39_mail_click','llmdip_hub_race_on')
+ assert(#toggled==10, 'turning a race on only flips the factions that were off')
+ assert(widgets.llmdip_hub_row_1.children.button_txt.text=='Dark 08'..'  ['..llmdip_t('contact_on')..']', 'the row shows the switch at once')
+ fire('llmdip39_mail_click','llmdip_hub_nav')
+ fire('llmdip39_mail_click','llmdip_hub_row_2')
+ assert(widgets.llmdip_hub_row_1.children.button_txt.text=='Kislev'..'  ['..llmdip_t('contact_off')..']' and not widgets.llmdip39_mail_next.visible)
+ callbacks={}
+ fire('llmdip39_mail_click','llmdip_hub_mark_1'); assert(toggled[#toggled]=='kislev')
+ fire('llmdip39_mail_click','llmdip39_mail_close')
+ for _,c in ipairs(callbacks) do c.fn() end
+ assert(not widgets.llmdip_hub_shell.visible, 'a queued refresh must not reopen a closed window')
 `));
 
 // El valor de actitud sale del tooltip de diplomacia vanilla, que esta traducido.
@@ -288,9 +322,8 @@ test('los nombres de raza salen de la localizacion del juego',()=>run(bridge,`
    return {name=function() return 'dark_1' end,subculture=function() return 'wh2_main_sc_def_dark_elves' end,
     is_dead=function() return false end,is_human=function() return false end}
   end} end} end
- fire('llmdip_ui_clicks','llmdip_menu_button')
- local text=widgets.llmdip_race_wh2_main_sc_def_dark_elves.children.button_txt.text
- assert(string.sub(text,1,11)=='Dunkelelfen', text)
+ local name=llmdip_contact_groups()[1].name
+ assert(name=='Dunkelelfen', name)
 `));
 
 test('el valor de actitud se lee del tooltip en cualquier idioma',()=>run(read('llm_diplomacy_ui.lua'),`
@@ -568,18 +601,15 @@ test('changing factions or losing target clears previous reply, deal and identit
  assert(capture_target()==nil and state.target==nil and state.request_id==nil and state.proposal==nil)
 `));
 
-test('faction entry has its own visible label and cannot overlap the mail entry',()=>run(bridge,`
- local create
- for i=1,100 do
-  local name,value=debug.getupvalue(first[#first],i)
-  if name=='create_menu_button' then create=value; break end
- end
- assert(create); create()
- local b=widgets.llmdip_menu_button
- assert(b.parent==root and b.dock==1 and b.x==20 and b.y==123 and b.priority==200)
- assert(b.children.button_txt.text==llmdip_t('ai_factions_button') and b.visible)
- assert(b.x+b.width<190)
-`));
+test('a single entry button: the old floating faction button is gone',()=>{
+ assert.doesNotMatch(bridge,/llmdip_menu_button|create_menu_button|llmdip_ui_clicks/);
+ assert.match(mailbox,/b:SetDockingPoint\(1\); b:SetDockOffset\(20, 123\)/);
+ // The window registers its controls on events only, like the chat; the
+ // one-second tick just updates the button's counter.
+ const tick = mailbox.slice(mailbox.indexOf('function llmdip_mail_tick'), mailbox.indexOf('local function toggle_contacts'));
+ assert.match(tick, /b:SetVisible\(true\); refresh_button\(\)/);
+ assert.doesNotMatch(tick, /[^_]refresh\(\)/);
+});
 
 test('bridge defers responses outside player phase and rejects stale load responses',()=>run(bridge,`
  set_up(llmdip_player_phase,'player_phase',false)
@@ -834,10 +864,86 @@ test('cerrar la ventana antes de tiempo no deja el aviso armado', () => run(read
  assert(not string.find(table.concat(history_body_lines('ai'), ' '), 'living%-diplomacy', 1), 'ni aparece al reabrir')
 `));
 
+// Steam actualiza el mod solo. El companion viejo se niega a arrancar, pero el
+// fichero del inbox de la sesion anterior sigue en disco y el juego lo vuelve a
+// ejecutar cada segundo. Esas lineas viejas no pueden pasar por un companion vivo.
+test('una senal vieja del inbox no tapa el aviso de companion ausente', () => run(bridge, String.raw`
+ cm.get_local_faction=function() return {name=function() return 'player' end,is_null_interface=function() return false end} end
+ local function upvalue(fn, wanted)
+  for i=1,200 do local n,v=debug.getupvalue(fn,i); if not n then return nil end; if n==wanted then return v end end
+ end
+ local watch=upvalue(upvalue(llmdip_send_request,'new_request'),'watch_companion')
+ assert(watch, 'new_request vigila cada peticion')
+ saved.llmdip_last_player_request_player_ai='r5_1_200_7_1'
+ callbacks={}
+ watch('r5_1_200_7_1')
+ llmdip_companion_alive('r4_1_100_3_9')
+ llmdip_companion_alive()
+ assert(not llmdip_companion_answered_target('ai'), 'una linea de otra sesion no es una respuesta')
+ callbacks[1].fn()
+ assert(llmdip_companion_silent(), 'nadie la recogio: la ventana de cartas lo dira')
+ llmdip_companion_alive('r4_1_100_3_9')
+ assert(llmdip_companion_silent(), 'la linea vieja, repetida cada segundo, no borra el aviso')
+ llmdip_companion_alive('r5_1_200_7_1')
+ assert(llmdip_companion_answered_target('ai') and not llmdip_companion_silent(), 'el companion nuevo responde')
+`));
+
+test('si el companion no responde, la ventana de cartas lo dice primero y las cartas bajan un puesto', () => run(mailbox, String.raw`
+ local silent=true
+ llmdip_companion_silent=function() return silent end
+ first[1](); llmdip_mail_tick()
+ for i=1,3 do llmdip_mail_receive('r'..i,{interlocutor='ai'..i,faction_name='F'..i,leader='L'..i,turn=i},'Carta '..i,'reject') end
+ fire('llmdip39_mail_click','llmdip39_mail_button')
+ local first_card=widgets.llmdip_hub_card_1.children.bubble_text.text
+ assert(string.find(first_card,'github.com/ashleyia2c',1), first_card)
+ assert(not widgets.llmdip39_mail_reply_1.visible, 'el aviso no tiene boton de responder')
+ assert(string.find(widgets.llmdip_hub_card_2.children.bubble_text.text,'L3',1), 'la carta mas nueva baja al segundo puesto')
+ assert(widgets.llmdip39_mail_next.visible, 'con el aviso caben dos cartas por pagina')
+ fire('llmdip39_mail_click','llmdip39_mail_reply_2')
+ assert(opens==1, 'responder abre la carta que se ve en ese puesto')
+ silent=false
+ fire('llmdip39_mail_click','llmdip39_mail_button')
+ assert(string.find(widgets.llmdip_hub_card_1.children.bubble_text.text,'L3',1), 'sin aviso, todo vuelve a su sitio')
+`));
+
+test('un companion viejo que responde se marca como desactualizado; uno al dia no', () => run(bridge, String.raw`
+ local function upvalue(fn, wanted)
+  for i=1,200 do local n,v=debug.getupvalue(fn,i); if not n then return nil end; if n==wanted then return v end end
+ end
+ local watch=upvalue(upvalue(llmdip_send_request,'new_request'),'watch_companion')
+ watch('r1_1_100_1_1'); watch('r2_1_100_1_2')
+ llmdip_companion_alive('r1_1_100_1_1', 0)
+ assert(llmdip_companion_outdated(), 'protocol 0 is older than this pack accepts')
+ llmdip_companion_alive('r2_1_100_1_2', 1)
+ assert(not llmdip_companion_outdated(), 'a current companion clears it')
+ llmdip_companion_alive('r9_old_session', 0)
+ assert(not llmdip_companion_outdated(), 'a stale line never marks anything')
+`));
+
+test('si el companion esta desactualizado, el chat lo dice aunque ya haya respondido', () => run(read('llm_diplomacy_ui.lua'), redoUi + String.raw`
+ state.inbox.ai={history={you..'hola', 'Player2: Katarin responde'}}
+ callbacks={}
+ llmdip_companion_answered_target=function() return true end
+ llmdip_companion_outdated=function() return true end
+ watch_for_companion('ai')
+ callbacks[1].fn()
+ assert(state.notice and state.notice.text==llmdip_t('companion_outdated'))
+ assert(#state.inbox.ai.history==2, 'the history is untouched')
+`));
+
+test('la ventana de cartas avisa de un companion desactualizado', () => run(mailbox, String.raw`
+ llmdip_companion_silent=function() return false end
+ llmdip_companion_outdated=function() return true end
+ first[1](); llmdip_mail_tick()
+ fire('llmdip39_mail_click','llmdip39_mail_button')
+ local text=widgets.llmdip_hub_card_1.children.bubble_text.text
+ assert(string.find(text,'github.com/ashleyia2c',1), text)
+`));
+
 test('el companion vivo impide el aviso aunque el modelo tarde', () => run(read('llm_diplomacy_ui.lua'), redoUi + String.raw`
  state.inbox.ai={history={you..'hola', 'Player2: '..llmdip_t('thinking')}}
  callbacks={}
- llmdip_companion_is_alive=function() return true end
+ llmdip_companion_answered_target=function() return true end
  watch_for_companion('ai')
  callbacks[1].fn()
  assert(state.notice==nil, 'si el companion contesta, no se acusa a nadie')
@@ -905,4 +1011,178 @@ test('redo finds the player line in Spanish even with WH3 character-indexed stri
  state.inbox.ai={history={you..'katarin','Player2: Vlad. Tus mensajes suelen ser breves...',llmdip_t('speaker_result')..': nada'}, request='r69'}
  regenerate_last()
  assert(#calls==1 and calls[1].text=='katarin' and calls[1].id=='r69')
+`));
+
+test('the World tab draws chronicle and gossip cards inside the frame, with nothing to answer',()=>run(mailbox,`
+ llmdip_world_entries=function() return {
+  {turn=4,kind='news',text='The Empire and Kislev have sealed a military alliance.',new=true},
+  {turn=3,kind='gossip',text='Too many letters pass between them for this to be mere politics.',new=false}} end
+ local seen=0
+ llmdip_world_unseen=function() return seen==0 and 1 or 0 end
+ llmdip_world_mark_seen=function() seen=seen+1 end
+ first[1](); llmdip_mail_tick()
+ llmdip_mail_receive('r1',{interlocutor='ai',turn=1,faction_name='Kislev',leader='Katarin'},'Carta','reject')
+ fire('llmdip39_mail_click','llmdip39_mail_button')
+ local shell, tab=widgets.llmdip_hub_shell, widgets.llmdip_hub_tab_world
+ assert(tab.parent==root and tab.children.button_txt.text==llmdip_t('tab_world')..' (1)')
+ for _,id in ipairs({'llmdip_hub_tab_letters','llmdip_hub_tab_contacts','llmdip_hub_tab_world'}) do
+  local b=widgets[id]; assert(b.x>=shell.x+20 and b.x+b.width<=shell.x+680-20, id..' leaves the frame')
+ end
+ assert(widgets.llmdip39_mail_reply_1.visible, 'the letter can be answered')
+ fire('llmdip39_mail_click','llmdip_hub_tab_world')
+ assert(seen==1, 'opening the tab marks the news as seen')
+ local first_card=widgets.llmdip_hub_card_1.children.bubble_text.text
+ assert(string.find(first_card,llmdip_t('world_news'),1) and string.find(first_card,'Kislev',1) and string.find(first_card,'yellow',1))
+ assert(string.find(widgets.llmdip_hub_card_2.children.bubble_text.text,llmdip_t('world_gossip'),1))
+ assert(not widgets.llmdip_hub_card_3.visible)
+ assert(not widgets.llmdip39_mail_reply_1.visible, 'news cannot be answered')
+ fire('llmdip39_mail_click','llmdip39_mail_reply_1'); assert(opens==0)
+ fire('llmdip39_mail_click','llmdip_hub_tab_letters'); assert(widgets.llmdip39_mail_reply_1.visible)
+`));
+
+test('the World tab explains itself when empty and survives a broken world module',()=>run(mailbox,`
+ llmdip_world_entries=function() error('broken') end
+ llmdip_world_unseen=function() error('broken') end
+ first[1](); llmdip_mail_tick()
+ fire('llmdip39_mail_click','llmdip39_mail_button')
+ fire('llmdip39_mail_click','llmdip_hub_tab_world')
+ assert(widgets.llmdip_hub_shell.visible, 'the window stays open')
+ assert(widgets.llmdip_hub_tab_world.children.button_txt.text==llmdip_t('tab_world'))
+ assert(string.find(widgets.llmdip_hub_card_1.children.bubble_text.text,string.sub(llmdip_t('world_empty'),1,12),1), 'the empty hint')
+`));
+
+test('the court report card grows to show every line, and the chronicle fits under it',()=>run(mailbox,`
+ local topics={}
+ for i=1,4 do topics[i]='Topic '..i..': '..string.rep('Kislev ',9)..'END'..i end
+ llmdip_world_report=function() return {turn=84,lines=topics,text=table.concat(topics,' ')} end
+ local list={}
+ for i=1,6 do list[i]={turn=84,kind='news',text='Entry '..i,new=true} end
+ llmdip_world_entries=function() return list end
+ first[1](); llmdip_mail_tick()
+ fire('llmdip39_mail_click','llmdip39_mail_button')
+ fire('llmdip39_mail_click','llmdip_hub_tab_world')
+ local shell, report=widgets.llmdip_hub_shell, widgets.llmdip_hub_card_1
+ local text=report.children.bubble_text.text
+ for i=1,4 do assert(string.find(text,'END'..i,1), 'topic '..i..' was cut') end
+ assert(report.height>96, 'the report needs more room than a normal card')
+ local last=report
+ for i=2,3 do
+  local card=widgets['llmdip_hub_card_'..i]
+  if card.visible then
+   assert(card.y>=last.y+last.height, 'cards overlap')
+   assert(card.y+card.height<=shell.y+500-48, 'card '..i..' runs under the page arrows')
+   last=card
+  end
+ end
+ local first_page=0
+ for i=2,3 do if widgets['llmdip_hub_card_'..i].visible then first_page=first_page+1 end end
+ assert(string.find(widgets.llmdip_hub_card_2.children.bubble_text.text,'Entry 1',1), 'the newest entry follows the report')
+ assert(widgets.llmdip39_mail_next.visible)
+ fire('llmdip39_mail_click','llmdip39_mail_next')
+ assert(not string.find(widgets.llmdip_hub_card_1.children.bubble_text.text,'END1',1), 'the report is only on the first page')
+ assert(string.find(widgets.llmdip_hub_card_1.children.bubble_text.text,'Entry '..(first_page+1),1), 'page two continues where page one stopped')
+`));
+
+test('the World tab shows both switches with their state in words, and they switch at once',()=>run(mailbox,`
+ local opts={treaties=true, romance=true}
+ llmdip_world_options=function() return {treaties=opts.treaties, romance=opts.romance} end
+ llmdip_world_toggle=function(name) opts[name]=not opts[name]; return opts[name] end
+ llmdip_world_entries=function() return {} end
+ first[1](); llmdip_mail_tick()
+ fire('llmdip39_mail_click','llmdip39_mail_button')
+ assert(widgets.llmdip_hub_opt_treaties==nil or not widgets.llmdip_hub_opt_treaties.visible, 'not on the letters tab')
+ fire('llmdip39_mail_click','llmdip_hub_tab_world')
+ local shell, treaties, romance=widgets.llmdip_hub_shell, widgets.llmdip_hub_opt_treaties, widgets.llmdip_hub_opt_romance
+ assert(treaties.visible and romance.visible and treaties.parent==root)
+ assert(treaties.children.button_txt.text==llmdip_t('opt_treaties')..': '..llmdip_t('opt_on'))
+ assert(romance.x>=treaties.x+treaties.width and romance.x+romance.width<=shell.x+680-100, 'clear of the page arrows')
+ assert(treaties.y+treaties.height<=shell.y+500)
+ fire('llmdip39_mail_click','llmdip_hub_opt_treaties')
+ assert(opts.treaties==false and treaties.children.button_txt.text==llmdip_t('opt_treaties')..': '..llmdip_t('opt_off'))
+ fire('llmdip39_mail_click','llmdip_hub_tab_contacts')
+ assert(not treaties.visible and not romance.visible, 'switches belong to the World tab')
+`));
+
+test('each faction in the list shows the game\'s own attitude next to its switch',()=>run(mailbox,`
+ llmdip_toggle_contact=function() return true end
+ llmdip_contact_groups=function() return {{key='ksl',name='Kislev',count=1,enabled=1,
+  factions={{key='ai',name='Katarin',enabled=true,attitude='Amigos de confianza'}}}} end
+ first[1](); llmdip_mail_tick()
+ fire('llmdip39_mail_click','llmdip39_mail_button')
+ fire('llmdip39_mail_click','llmdip_hub_tab_contacts')
+ fire('llmdip39_mail_click','llmdip_hub_row_1')
+ assert(widgets.llmdip_hub_row_1.children.button_txt.text=='Katarin  ['..llmdip_t('contact_on')..']  Amigos de confianza')
+`));
+
+test('the court view: open it from the World tab, write, send, and the input leaves with it',()=>run(mailbox,`
+ local sent, history={}, {}
+ llmdip_world_entries=function() return {} end
+ llmdip_council_history=function() return history end
+ llmdip_council_waiting=function() return #sent>#history/2 and #sent>0 and history[#history].who=='you' end
+ llmdip_council_send=function(text) sent[#sent+1]=text; history[#history+1]={who='you',text=text}; return true end
+ first[1](); llmdip_mail_tick()
+ fire('llmdip39_mail_click','llmdip39_mail_button')
+ fire('llmdip39_mail_click','llmdip_hub_tab_world')
+ local open=widgets.llmdip_hub_council_open
+ assert(open and open.visible and open.parent==root, 'the court icon sits beside the first card')
+ fire('llmdip39_mail_click','llmdip_hub_council_open')
+ local shell, input=widgets.llmdip_hub_shell, widgets.llmdip_hub_council_input
+ assert(input and input.visible and input.parent==root and input.template=='llmdip_ui/llmdip_chat')
+ assert(input.y+input.height<=shell.y+500 and input.x>=shell.x+20)
+ assert(string.find(widgets.llmdip_hub_card_1.children.bubble_text.text,string.sub(llmdip_t('council_hint'),1,12),1), 'an empty court explains itself')
+ assert(shell.children.header_title.text==llmdip_t('hub_title') and shell.children.header_meta.text==llmdip_t('council_title'))
+ input.GetStateText=function() return 'Should I help Kislev?' end
+ fire('llmdip39_mail_click','llmdip_hub_council_send')
+ assert(sent[1]=='Should I help Kislev?')
+ assert(string.find(widgets.llmdip_hub_card_2.children.bubble_text.text,llmdip_t('council_thinking'),1), 'the court is thinking under your words')
+ history[#history+1]={who='court',text='Help them, my lord, but send gold, not armies.'}
+ llmdip_mail_redraw()
+ local last=widgets.llmdip_hub_card_2.children.bubble_text.text
+ assert(string.find(last,'send gold',1) and string.find(last,llmdip_t('council_speaker'),1))
+ fire('llmdip39_mail_click','llmdip_hub_tab_letters')
+ assert(not input.visible and not widgets.llmdip_hub_council_send.visible, 'the input belongs to the court view')
+`));
+
+test('a long court report takes the whole first page and is never cut',()=>run(mailbox,`
+ local long=string.rep('Kislev ',95)..'LAST_WORDS'
+ llmdip_world_report=function() return {turn=84,lines={long},text=long} end
+ llmdip_world_entries=function() return {{turn=84,kind='news',text='Entry 1',new=true}} end
+ first[1](); llmdip_mail_tick()
+ fire('llmdip39_mail_click','llmdip39_mail_button')
+ fire('llmdip39_mail_click','llmdip_hub_tab_world')
+ local card=widgets.llmdip_hub_card_1
+ assert(string.find(card.children.bubble_text.text,'LAST_WORDS',1), 'the end of the report is shown')
+ assert(card.y+card.height<=widgets.llmdip_hub_shell.y+500-48, 'above the switches')
+`));
+
+test('rumours and deeds are shown whole, each card as tall as its text, and pages never overflow',()=>run(mailbox,`
+ local rumour=string.rep('Miao Ying ',22)..'RUMOUR_END'
+ local deed=string.rep('Katarin ',24)..'DEED_END'
+ local list={{turn=85,kind='deed',text=deed,new=true},{turn=85,kind='rumour',text=rumour,new=true}}
+ for i=1,6 do list[#list+1]={turn=84,kind='news',text='Entry '..i,new=false} end
+ llmdip_world_report=function() return nil end
+ llmdip_world_entries=function() return list end
+ first[1](); llmdip_mail_tick()
+ fire('llmdip39_mail_click','llmdip39_mail_button')
+ fire('llmdip39_mail_click','llmdip_hub_tab_world')
+ local one, two=widgets.llmdip_hub_card_1, widgets.llmdip_hub_card_2
+ assert(string.find(one.children.bubble_text.text,'DEED_END',1), 'the whole deed')
+ assert(string.find(two.children.bubble_text.text,'RUMOUR_END',1), 'the whole rumour')
+ assert(one.height>96 and two.height>96, 'long cards grow')
+ assert(two.y>=one.y+one.height, 'cards do not overlap')
+ local shell=widgets.llmdip_hub_shell
+ for i=1,3 do
+  local card=widgets['llmdip_hub_card_'..i]
+  if card and card.visible then assert(card.y+card.height<=shell.y+500-48, 'card '..i..' above the switches') end
+ end
+ -- Every entry is on some page.
+ local seen={}
+ for page=1,6 do
+  for i=1,3 do
+   local card=widgets['llmdip_hub_card_'..i]
+   if card and card.visible then for n in string.gmatch(card.children.bubble_text.text,'Entry (%d)') do seen[n]=true end end
+  end
+  if widgets.llmdip39_mail_next and widgets.llmdip39_mail_next.visible then fire('llmdip39_mail_click','llmdip39_mail_next') end
+ end
+ for i=1,6 do assert(seen[tostring(i)], 'entry '..i..' reachable') end
 `));

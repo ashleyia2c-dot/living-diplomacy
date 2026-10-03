@@ -28,7 +28,9 @@ test("standalone companion retains curated lord lore without external JSON files
 });
 
 test("the executable build embeds JSON profiles and refuses an empty set", () => {
-  const build = fs.readFileSync(new URL("../scripts/build-companion-exe.js", import.meta.url), "utf8");
-  assert.match(build, /__LLMDIP_EMBEDDED_LORE__: JSON\.stringify\(embeddedLore\)/);
-  assert.match(build, /if \(!Object\.keys\(embeddedLore\)\.length\) throw/);
+  // The .exe and the companion inside the pack share the same defines (build-bundle.js).
+  const build = fs.readFileSync(new URL("../scripts/build-bundle.js", import.meta.url), "utf8");
+  assert.match(build, /__LLMDIP_EMBEDDED_LORE__: JSON\.stringify\(embeddedLore\(\)\)/);
+  assert.match(build, /if \(!Object\.keys\(lore\)\.length\) throw/);
+  assert.match(fs.readFileSync(new URL("../scripts/build-companion-exe.js", import.meta.url), "utf8"), /define: companionDefines\(\)/);
 });

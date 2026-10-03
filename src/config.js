@@ -19,6 +19,10 @@ function baseDir() {
   return process.cwd();
 }
 
+export function defaultDataDir(appData = process.env.APPDATA || "") {
+  return appData ? path.join(appData, "LivingDiplomacy", "data") : path.resolve(baseDir(), "data");
+}
+
 function loadDotEnv(file = path.join(baseDir(), ".env")) {
   if (!fs.existsSync(file)) return;
   for (const raw of fs.readFileSync(file, "utf8").split(/\r?\n/)) {
@@ -52,7 +56,7 @@ function steamRootsFromRegistry() {
         { encoding: "utf8", windowsHide: true, timeout: 2000, stdio: ["ignore", "pipe", "ignore"] });
       const match = out.match(/REG_SZ\s+(.+)/);
       if (match) roots.push(match[1].trim());
-    } catch { /* Steam no registrado por esa via. */ }
+    } catch { /* Steam is not registered that way. */ }
   }
   return roots;
 }
@@ -132,14 +136,9 @@ export function detectLanguage() {
   if (process.env.LLMDIP_LANGUAGE) return process.env.LLMDIP_LANGUAGE;
   const fromGame = GAME_LANGUAGE_CODES[gameLanguageCode()];
   if (fromGame) return fromGame;
-  try {
-    const locale = (Intl.DateTimeFormat().resolvedOptions().locale || "en").toLowerCase();
-    const primary = locale.split("-")[0];
-    if (primary === "zh") return locale.includes("tw") || locale.includes("hant")
-      ? "Traditional Chinese" : "Simplified Chinese";
-    if (primary === "pt") return locale.includes("br") ? "Brazilian Portuguese" : "Portuguese";
-    return LANGUAGE_NAMES[primary] || "English";
-  } catch { return "English"; }
+  // A Spanish Windows installation is not a request for Spanish product defaults.
+  // Preserve an explicit override and the game's language; otherwise use English.
+  return "English";
 }
 
 // Codes of the mod's text table (mod/script/campaign/mod/llm_diplomacy.lua).
@@ -177,7 +176,11 @@ export function getConfig() {
     uiLanguage: uiLanguageCode(detectLanguage()),
     scriptLog: process.env.WH3_SCRIPT_LOG || "",
     inboxFile: path.join(wh3Root, "exec", "llm_diplomacy_inbox.lua"),
-    dataDir: path.resolve(baseDir(), process.env.LLMDIP_DATA_DIR || "data"),
+    // What leaders remember lives in one fixed folder per Windows user, not next to
+    // the program, so a newer companion extracted anywhere keeps every conversation.
+    dataDir: process.env.LLMDIP_DATA_DIR ? path.resolve(baseDir(), process.env.LLMDIP_DATA_DIR) : defaultDataDir(),
+    // Where companions before 0.43 kept it; copied over once at start-up.
+    legacyDataDir: path.resolve(baseDir(), "data"),
     pollMs: Math.max(200, Number(process.env.LLMDIP_POLL_MS || 500)),
     betrayals: process.env.LLMDIP_BETRAYALS !== "0",
     betrayalTest: process.env.LLMDIP_BETRAYAL_TEST === "1",

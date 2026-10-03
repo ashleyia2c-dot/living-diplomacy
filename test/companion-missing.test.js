@@ -35,7 +35,7 @@ test('el aviso no se escribe en el historial ni se guarda con la partida', () =>
   // meterlo por add_history, el texto acabaria en el contexto del modelo.
   const uses = [...ui.matchAll(/companion_missing/g)];
   assert.equal(uses.length, 1);
-  const notice = /state\.notice = \{target = target, text = llmdip_t\("companion_missing"\)\}/;
+  const notice = /state\.notice = \{target = target, text = outdated and llmdip_t\("companion_outdated"\) or llmdip_t\("companion_missing"\)\}/;
   assert.match(ui, notice);
   const watchdog = ui.slice(ui.indexOf('local function watch_for_companion'), ui.indexOf('local function send_text'));
   assert.doesNotMatch(watchdog, /add_history/);
@@ -61,7 +61,9 @@ test('el aviso se retira al responder, al enviar de nuevo y al cerrar', () => {
 });
 
 test('solo se avisa si el companion no ha dado senales de vida', () => {
-  assert.match(ui, /if llmdip_companion_is_alive and llmdip_companion_is_alive\(\) then return end/);
+  // Only a pickup of THIS message counts, never a line left over in the inbox file.
+  assert.match(ui, /local answered = llmdip_companion_answered_target and llmdip_companion_answered_target\(target\)/);
+  assert.match(ui, /if answered and not outdated then return end/);
   // Un modelo lento no puede disparar el aviso mientras el companion conteste.
   assert.match(ui, /local COMPANION_WAIT_MS = (\d+)/);
   assert.ok(Number(/local COMPANION_WAIT_MS = (\d+)/.exec(ui)[1]) >= 5000);
@@ -69,9 +71,36 @@ test('solo se avisa si el companion no ha dado senales de vida', () => {
 
 test('el companion se anuncia al recoger la peticion, antes de hablar con el modelo', () => {
   const poll = companion.slice(companion.indexOf('if (request) {'), companion.indexOf('await handleRequest(request)'));
-  assert.match(poll, /enqueueInbox\("if llmdip_companion_alive then llmdip_companion_alive\(\) end/);
+  // The signal names the request: the usual acknowledgement removes it with the
+  // reply, and a stale copy in the file can never pass for a later request.
+  assert.match(poll, /enqueueInbox\(`if llmdip_companion_alive then llmdip_companion_alive\(\$\{luaString\(request\.requestId\)\}, \$\{COMPANION_PROTOCOL\}\) end/);
   // Y tambien al arrancar, para quien abre el companion con la partida ya puesta.
   assert.match(companion, /"if llmdip_companion_alive then llmdip_companion_alive\(\) end\\n" \+/);
+});
+
+test('el companion ya no exige un pack exacto: comprueba que el mod este y explica lo que falta', () => {
+  const check = companion.slice(companion.indexOf('const PACKAGED'), companion.indexOf('const migratedFiles'));
+  assert.match(check, /checkInstalledPack\(config\.wh3Root\)/);
+  assert.doesNotMatch(companion, /EXPECTED_PACK_SHA256|Required pack SHA-256/);
+  // Only an interactive window waits for a key; a script or a test never hangs.
+  assert.match(check, /if \(process\.stdin\.isTTY\) \{ try \{ execFileSync\("cmd", \["\/c", "pause"\]/);
+  const launcher = fs.readFileSync(new URL('../scripts/start-workshop.js', import.meta.url), 'utf8');
+  assert.doesNotMatch(launcher, /EXPECTED_PACK_SHA256/);
+  assert.match(launcher, /checkInstalledPack\(getConfig\(\)\.wh3Root\)/);
+});
+
+test('el companion lee el protocolo del juego y avisa con el link si se ha quedado viejo', async () => {
+  const { COMPANION_PROTOCOL, MIN_PACK_PROTOCOL, protocolAdvice } = await import('../src/protocol.js');
+  assert.equal(protocolAdvice(COMPANION_PROTOCOL, COMPANION_PROTOCOL), '');
+  assert.equal(protocolAdvice(MIN_PACK_PROTOCOL, COMPANION_PROTOCOL), '', 'a 0.42 pack without the line still works');
+  assert.match(protocolAdvice(COMPANION_PROTOCOL + 1, COMPANION_PROTOCOL + 1), /github\.com\/ashleyia2c-dot\/living-diplomacy\/releases/);
+  assert.match(protocolAdvice(COMPANION_PROTOCOL + 1, COMPANION_PROTOCOL + 1), /conversations are kept/);
+  assert.match(companion, /const protocolLine = \/\^PROTOCOL\\\|\(\\d\+\)\\\|\(\\d\+\)\/\.exec\(value\)/);
+  // The game announces both numbers when the campaign is ready.
+  assert.match(bridge, /out\("\[LLMDIP\] PROTOCOL\|" \.\. PROTOCOL \.\. "\|" \.\. MIN_COMPANION_PROTOCOL\)/);
+  const lua = /local PROTOCOL, MIN_COMPANION_PROTOCOL = (\d+), (\d+)/.exec(bridge);
+  assert.ok(lua && Number(lua[1]) === COMPANION_PROTOCOL, 'both halves of the protocol move together');
+  assert.ok(Number(lua[2]) <= COMPANION_PROTOCOL, 'this companion is accepted by this pack');
 });
 
 // El puente se ejecuta de verdad, no solo se lee.

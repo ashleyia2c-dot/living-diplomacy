@@ -41,6 +41,7 @@ test("ignora el log de la partida anterior y si lee el de la nueva", async () =>
     cwd: ROOT,
     env: { ...process.env,
       WH3_ROOT: dir,
+      LLMDIP_TEST_GAME_RUNNING: "0",
       LLMDIP_DATA_DIR: path.join(dir, "data"),
       LLMDIP_PLAYER2_URL: `http://127.0.0.1:${mockPort}`,
       LLMDIP_PLAYER2_GAME_KEY: "test-attribution",

@@ -27,6 +27,19 @@ test("sin override devuelve un idioma real, nunca vacio", () => {
   withEnv(undefined, () => assert.ok(detectLanguage().length > 2));
 });
 
+test("English is the fallback even on a Spanish Windows locale when game language is unavailable", () => {
+  const previous=process.env.APPDATA;
+  const original=Intl.DateTimeFormat;
+  try {
+    process.env.APPDATA="C:/llmdip-test-no-game-preferences";
+    Intl.DateTimeFormat=function(){return {resolvedOptions:()=>({locale:"es-ES"})};};
+    withEnv(undefined,()=>assert.equal(detectLanguage(),"English"));
+  } finally {
+    Intl.DateTimeFormat=original;
+    if(previous===undefined)delete process.env.APPDATA;else process.env.APPDATA=previous;
+  }
+});
+
 test("el idioma se inyecta y no queda ningun marcador suelto", () => {
   for (const language of ["English", "French", "Simplified Chinese", "Brazilian Portuguese"]) {
     const prompt = systemPromptFor(language);

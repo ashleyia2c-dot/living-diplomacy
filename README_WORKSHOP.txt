@@ -22,13 +22,14 @@ and an internet connection for AI responses. No other mods are required.
    the small hand icon next to the question mark.
 
 Do not install another llm_diplomacy.pack manually if using Workshop.
-If Steam has not downloaded the compatible version yet, wait for its update.
+
+UPDATES: since 0.43 the mod carries the companion of its own release. When Steam
+updates the mod, the companion (the EXE or START_PLAYER2.bat) runs the newer code
+from it, so you do not download the companion again for each update. Only if the
+companion itself says that it needs a newer version, download it again.
 
 Read-only check: node scripts\start-workshop.js --check
 
-Required Workshop pack SHA-256:
-560958E6C72974AE9D3201DFFD32FED357FB3C5B92D0B396F022F9062892F245
-
-The companion stores conversation data in its local data folder. Player2
+The companion stores conversations in %APPDATA%\LivingDiplomacy\data. Player2
 processes AI requests. Review Player2's privacy settings and terms before
 using it. The source code is available in src/ and scripts/.

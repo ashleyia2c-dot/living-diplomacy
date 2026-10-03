@@ -4,6 +4,15 @@ import { buildPersonality, buildSocialStyle, applyTemperament, applySocialStyle 
 
 const SAFE = /^[a-z0-9_]{1,160}$/;
 
+// A long correspondence is folded into a written record (src/memory-digest.js) so a
+// letter carries the record plus the last few letters instead of every old one. Fold
+// when the letters since the last record pass either limit; keep the newest raw.
+export const DIGEST_LIMIT_MESSAGES = 14;
+export const DIGEST_LIMIT_CHARS = 3500;
+export const DIGEST_KEEP_RAW = 6;
+const DIGEST_MAX_FOLD = 40;
+const RECENT_AFTER_DIGEST = 14;
+
 function segment(value, field) {
   if (!SAFE.test(value || "")) throw new Error(`${field} is not a safe key`);
   return value;
@@ -51,6 +60,10 @@ export class MemoryStore {
     return path.join(this.factionDir(request), "players", segment(request.sender, "sender"), "memory.json");
   }
 
+  digestFile(request) {
+    return path.join(this.factionDir(request), "players", segment(request.sender, "sender"), "digests.json");
+  }
+
   ledgerFile(request) {
     return path.join(this.factionDir(request), "players", segment(request.sender, "sender"), "favor-ledger.json");
   }
@@ -82,7 +95,9 @@ export class MemoryStore {
     return Boolean(node);
   }
 
-  history(request) {
+  // Every message of this pair in the loaded save branch, oldest first, each with the
+  // node it belongs to.
+  pairMessages(request) {
     // memoryParent is read from cm:get_saved_value(), so it represents the
     // exact conversation head contained in the loaded WH3 save. Walking that
     // parent chain keeps alternate save branches isolated from one another.
@@ -101,14 +116,77 @@ export class MemoryStore {
         // carry an explicit triple so accidental cross-conversation copies are
         // rejected instead of silently entering the prompt.
         .filter(message => !message.scope || (message.scope.campaignId === request.campaignId && message.scope.sender === request.sender && message.scope.interlocutor === request.interlocutor))
-        .map(message => ({...message, mode:message.mode || node.mode,
+        .map(message => ({...message, mode:message.mode || node.mode, nodeId:node.requestId,
+          ...(node.execution ? { execution: node.execution } : {}),
           scope:{campaignId:request.campaignId,sender:request.sender,interlocutor:node.interlocutor}})) : []);
+    return all;
+  }
+
+  history(request) {
+    const all = this.pairMessages(request);
     // Preserve some actual player exchanges when many unanswered letters arrive.
     // Both windows come ONLY from this save lineage, never from memory.json or a
     // cross-branch summary. Historical offers remain offers, not executed facts.
     const recentStart = Math.max(0, all.length - 12);
     const anchors = all.slice(0, recentStart).filter(message => message.mode === 'player').slice(-8);
     return [...anchors, ...all.slice(recentStart)];
+  }
+
+  readDigests(request) {
+    const data = readJson(this.digestFile(request), null);
+    return data && typeof data.items === "object" && data.items ? data.items : {};
+  }
+
+  // The latest record in this save branch and the letters after it. A record is keyed by
+  // the last node it covers, so it only applies to branches that contain that node: an
+  // older save never sees a record of letters it does not have.
+  digestState(request) {
+    const all = this.pairMessages(request);
+    const items = this.readDigests(request);
+    let cut = -1, digest = null;
+    for (let i = all.length - 1; i >= 0; i--) {
+      const item = items[all[i].nodeId];
+      if (item && typeof item.text === "string" && item.text.trim()) {
+        digest = item;
+        cut = i;
+        while (cut + 1 < all.length && all[cut + 1].nodeId === all[i].nodeId) cut++;
+        break;
+      }
+    }
+    return { all, digest, after: all.slice(cut + 1) };
+  }
+
+  // What a letter is built from: the record (if any) and the recent letters. Without a
+  // record this is exactly history(), so nothing changes until a record exists.
+  recall(request) {
+    const { digest, after } = this.digestState(request);
+    if (!digest) return { digest: null, recent: this.history(request) };
+    return { digest: { text: digest.text, throughTurn: digest.throughTurn }, recent: after.slice(-RECENT_AFTER_DIGEST) };
+  }
+
+  // The letters to fold next, or null when the record is still short enough.
+  digestPlan(request) {
+    const { digest, after } = this.digestState(request);
+    const chars = after.reduce((sum, message) => sum + String(message.content || "").length, 0);
+    if (after.length <= DIGEST_LIMIT_MESSAGES && chars <= DIGEST_LIMIT_CHARS) return null;
+    let end = Math.min(after.length - DIGEST_KEEP_RAW, DIGEST_MAX_FOLD);
+    // A node (the player's words and the reply) is folded whole or not at all.
+    while (end > 0 && end < after.length && after[end].nodeId === after[end - 1].nodeId) end--;
+    if (end <= 0) return null;
+    const fold = after.slice(0, end);
+    const last = fold.at(-1);
+    return { previous: digest?.text || "", fold, throughNode: last.nodeId, throughTurn: last.turn };
+  }
+
+  saveDigest(request, plan, text) {
+    const file = this.digestFile(request);
+    const data = readJson(file, null) || {};
+    const items = data.items && typeof data.items === "object" ? data.items : {};
+    items[plan.throughNode] = { text, throughTurn: plan.throughTurn, folded: plan.fold.length, createdAt: new Date().toISOString() };
+    // Old branches keep their own records; only the oldest are dropped.
+    const keys = Object.keys(items).sort((a, b) => String(items[a].createdAt).localeCompare(String(items[b].createdAt)));
+    for (const key of keys.slice(0, Math.max(0, keys.length - 60))) delete items[key];
+    writeJson(file, { version: 1, items });
   }
 
   append(request, narrative, action, reaction) {
@@ -190,6 +268,14 @@ export class MemoryStore {
     }
     this.pendingLedgerFiles.delete(requestId);
     return true;
+  }
+
+  // Curated lore for a lord, without creating anything: the court's adviser uses it to
+  // know its own ruler.
+  curatedLore(subtype, factionKey) {
+    const key = SAFE.test(subtype || "") ? subtype : "";
+    return (key && (this.embeddedLore[key] || readJson(path.join(this.loreRoot, `${key}.json`), null))) ||
+      (SAFE.test(factionKey || "") && (this.embeddedLore[factionKey] || readJson(path.join(this.loreRoot, `${factionKey}.json`), null))) || {};
   }
 
   ensureProfile(request, identity) {
