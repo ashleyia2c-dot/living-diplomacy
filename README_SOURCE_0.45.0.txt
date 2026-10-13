@@ -1,4 +1,4 @@
-LIVING DIPLOMACY 0.43.0 - READABLE SOURCE ALTERNATIVE
+LIVING DIPLOMACY 0.45.0 - READABLE SOURCE ALTERNATIVE
 
 This archive is for people who prefer not to run an unsigned EXE. It contains
 the companion source and the same source used for the WARHAMMER III pack. No

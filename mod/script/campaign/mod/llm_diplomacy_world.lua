@@ -57,14 +57,16 @@ local function fresh() return {v = 1, turn = -1, snap = nil, e = {}, hist = {}, 
 local function save() cm:set_saved_value(KEY, clone(world)) end
 -- The player's switches, saved with the campaign. Both start ON: real AI treaties
 -- (the user's choice: real consequences by default, with limits) and romance gossip.
+-- Voice (0.45) starts OFF: it uses the player's Player2 credits.
+local OPTION_DEFAULTS = {treaties = true, romance = true, voice = false}
 local function option(name)
     local value = world and world.opt and world.opt[name]
-    if value == nil then return true end
+    if value == nil then return OPTION_DEFAULTS[name] == true end
     return value == true
 end
-function llmdip_world_options() return {treaties = option("treaties"), romance = option("romance")} end
+function llmdip_world_options() return {treaties = option("treaties"), romance = option("romance"), voice = option("voice")} end
 function llmdip_world_toggle(name)
-    if not world or (name ~= "treaties" and name ~= "romance") then return nil end
+    if not world or OPTION_DEFAULTS[name] == nil then return nil end
     world.opt = world.opt or {}
     world.opt[name] = not option(name)
     -- Turning treaties off ends any talks under way: nothing gets signed later.

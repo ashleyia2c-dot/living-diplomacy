@@ -2,6 +2,8 @@ import { validateAction, validateReaction } from "./protocol.js";
 
 const TAG_RE = /\[diplo:([a-z_]+)(?::([^\]]+))?\]/gi;
 const REACTION_RE = /\[relation:delta=(-?\d+);reason=([^\]\s;]+)\]/giu;
+// The ruler ends the audience for the rest of the turn (0.45).
+const TALK_END_RE = /\[talk:\s*end\]/gi;
 
 // The model sometimes writes the reason in the player's language ("credibilidad",
 // 03-10-2026), which used to fail the whole letter. Known words are mapped back; an
@@ -42,11 +44,14 @@ export function parseDiplomacyResponse(text) {
   const type = matches[0][1].toLowerCase();
   const args = parseArgs(matches[0][2]);
   const allowedArgs = {
-    reject: [], declare_war: [], make_peace: [], trade_agreement: [], non_aggression_pact: [], betray_war: [],
-    alliance: ["level"], military_access: ["direction"],
+    reject: [], declare_war: [], betray_war: [],
+    // A treaty the player pays for carries its price on the same tag.
+    make_peace: ["price"], trade_agreement: ["price"], non_aggression_pact: ["price"],
+    alliance: ["level", "price"], military_access: ["direction", "price"],
     transfer_region: ["region", "recipient"], vassalize: ["master"],
     offer_gold: ["amount"], request_gold: ["amount"],
-    favor: ["favor", "amount", "target"]
+    favor: ["favor", "amount", "target"],
+    broker: ["act", "target", "price"]
   };
   if (!(type in allowedArgs)) throw new Error(`Unknown action: ${type}`);
   for (const key of Object.keys(args)) {
@@ -61,8 +66,10 @@ export function parseDiplomacyResponse(text) {
     ? validateReaction({ delta: reactionMatches[0][1], reason: reasonFor(reactionMatches[0][2], reactionMatches[0][1]) })
     : validateReaction();
   // The game's text fields show markdown literally ("**Hueste de los Trillizos**", 03-10-2026).
-  const narrative = text.replace(matches[0][0], "").replace(reactionMatches[0]?.[0] || "", "")
+  const endsTalk = TALK_END_RE.test(text);
+  TALK_END_RE.lastIndex = 0;
+  const narrative = text.replace(matches[0][0], "").replace(reactionMatches[0]?.[0] || "", "").replace(TALK_END_RE, "")
     .replace(/\*\*(.+?)\*\*/g, "$1").replace(/__(.+?)__/g, "$1").replace(/\*\*/g, "").trim();
   if (!narrative || narrative.length > 2400) throw new Error("Narrative is empty or too long");
-  return { narrative, action, reaction };
+  return { narrative, action, reaction, endsTalk };
 }

@@ -9,7 +9,7 @@ local KEY = "llmdip39_mailbox"
 local BUTTON, SHELL = "llmdip39_mail_button", "llmdip_hub_shell"
 local CLOSE, PREV, NEXT = "llmdip39_mail_close", "llmdip39_mail_prev", "llmdip39_mail_next"
 local TAB_LETTERS, TAB_CONTACTS, TAB_WORLD = "llmdip_hub_tab_letters", "llmdip_hub_tab_contacts", "llmdip_hub_tab_world"
-local OPT_TREATIES, OPT_ROMANCE = "llmdip_hub_opt_treaties", "llmdip_hub_opt_romance"
+local OPT_TREATIES, OPT_ROMANCE, OPT_VOICE = "llmdip_hub_opt_treaties", "llmdip_hub_opt_romance", "llmdip_hub_opt_voice"
 local COUNCIL_OPEN, COUNCIL_INPUT, COUNCIL_SEND = "llmdip_hub_council_open", "llmdip_hub_council_input", "llmdip_hub_council_send"
 local CARD_PREFIX, REPLY_PREFIX = "llmdip_hub_card_", "llmdip39_mail_reply_"
 local ROW_PREFIX, MARK_PREFIX = "llmdip_hub_row_", "llmdip_hub_mark_"
@@ -243,7 +243,7 @@ local function hide_hub()
     local input = find("llmdip_hub_council_input")
     if input then pcall(function() input:StealInputFocus(false) end) end
     hide_ids({"llmdip_hub_council_open", "llmdip_hub_council_input", "llmdip_hub_council_send"})
-    hide_ids({CLOSE, PREV, NEXT, TAB_LETTERS, TAB_CONTACTS, TAB_WORLD, OPT_TREATIES, OPT_ROMANCE}); hide_ids(letter_ids()); hide_ids(contact_ids())
+    hide_ids({CLOSE, PREV, NEXT, TAB_LETTERS, TAB_CONTACTS, TAB_WORLD, OPT_TREATIES, OPT_ROMANCE, OPT_VOICE}); hide_ids(letter_ids()); hide_ids(contact_ids())
 end
 
 -- Letters tab: three cards per page, newest first; unread names in yellow. When
@@ -446,21 +446,28 @@ local function render_world(root, left, top, u)
         local reply = find(REPLY_PREFIX .. i); if reply then reply:SetVisible(false) end
         if block then y = y + block.height + CARD_GAP end
     end
-    -- The two switches of the World, along the bottom edge, left of the page arrows.
-    -- Each says its state in words; the tooltip says what it does.
+    -- The switches of the World, along the bottom edge, left of the page arrows.
+    -- Each says its state in words; the tooltip says what it does. Three fit since 0.45.
     local ok_opt, opts = pcall(function() return llmdip_world_options and llmdip_world_options() or nil end)
-    local specs = {{OPT_TREATIES, "treaties", "opt_treaties", "opt_treaties_tip"}, {OPT_ROMANCE, "romance", "opt_romance", "opt_romance_tip"}}
+    -- Widths add up to the 560px between the frame's edge and the page arrows.
+    local specs = {{OPT_TREATIES, "treaties", "opt_treaties", "opt_treaties_tip", 210}, {OPT_ROMANCE, "romance", "opt_romance", "opt_romance_tip", 166},
+        {OPT_VOICE, "voice", "opt_voice", "opt_voice_tip", 166}}
+    -- No Voice switch in a game language Player2 cannot speak properly.
+    local ok_voice, voice_ok = pcall(function() return llmdip_voice_supported and llmdip_voice_supported() end)
+    local x = CONTENT_LEFT
     for i, spec in ipairs(specs) do
-        local b = text_button(root, spec[1], 230)
+        local b = text_button(root, spec[1], spec[5])
         if b then
             local visible = ok_opt and type(opts) == "table"
+            if spec[1] == OPT_VOICE and not (ok_voice and voice_ok) then visible = false end
             b:SetVisible(visible)
             if visible then
                 set_label(b, llmdip_t(spec[3]) .. ": " .. (opts[spec[2]] and llmdip_t("opt_on") or llmdip_t("opt_off")))
                 b:SetTooltipText(llmdip_t(spec[4]), true)
-                b:MoveTo(left + CONTENT_LEFT + (i - 1) * 238, top + HUB_HEIGHT - 48); topmost(b, 250)
+                b:MoveTo(left + x, top + HUB_HEIGHT - 48); topmost(b, 250)
             end
         end
+        x = x + spec[5] + 8
     end
     -- Talk to your court: beside the first card, where letters keep their reply icon.
     local open = icon_button(root, COUNCIL_OPEN, "ui/skins/default/icon_diplomacy.png", llmdip_t("council_open_tip"))
@@ -626,7 +633,7 @@ local function refresh()
         local close = icon_button(root, CLOSE, "ui/skins/default/icon_cross.png", llmdip_t("close_mailbox"))
         if close then close:MoveTo(left + HUB_WIDTH - 54, top + 14); close:SetVisible(true); topmost(close, 250) end
         local current, pages
-        if tab ~= "world" then hide_ids({OPT_TREATIES, OPT_ROMANCE, COUNCIL_OPEN}) end
+        if tab ~= "world" then hide_ids({OPT_TREATIES, OPT_ROMANCE, OPT_VOICE, COUNCIL_OPEN}) end
         if tab ~= "council" then council_focus(false); hide_ids({COUNCIL_INPUT, COUNCIL_SEND}) end
         if tab == "letters" then
             hide_ids(contact_ids())
@@ -753,8 +760,9 @@ core:add_listener("llmdip39_mail_click", "ComponentLClickUp", true, function(con
         cm:real_callback(function() if shown and tab == "council" then council_focus(true) end end, 40)
     elseif id == "entry_box" and tab == "council" then
         council_focus(true)
-    elseif (id == OPT_TREATIES or id == OPT_ROMANCE) and tab == "world" then
-        if llmdip_world_toggle then pcall(llmdip_world_toggle, id == OPT_TREATIES and "treaties" or "romance") end
+    elseif (id == OPT_TREATIES or id == OPT_ROMANCE or id == OPT_VOICE) and tab == "world" then
+        local name = id == OPT_TREATIES and "treaties" or (id == OPT_ROMANCE and "romance" or "voice")
+        if llmdip_world_toggle then pcall(llmdip_world_toggle, name) end
         refresh()
     elseif id == TAB_WORLD then
         tab = "world"; refresh()

@@ -30,15 +30,49 @@ function writeJson(file, value) {
   fs.renameSync(temp, file);
 }
 
+// The player's own versions of the lords (0.45). A JSON in custom/lords/ named after the
+// lord's agent subtype or faction key replaces, field by field, the curated profile
+// of that lord; "instructions" adds the player's own direction for him or her, and
+// custom/instructions.txt applies to every lord. Nothing here can change the reply
+// format or the game rules: the prompt says so.
+const CUSTOM_TEXT_LIMIT = 1500;
+const CUSTOM_FIELDS = ["canonNotes", "voiceNotes", "temperament", "socialStyle", "voiceGender", "voiceIds", "ttsInstructions"];
+const CUSTOM_README = `LIVING DIPLOMACY - YOUR OWN LORDS
+
+Put a JSON file in the "lords" folder to change how a lord is played. Name it after the
+lord's agent subtype (for example wh3_main_ksl_katarin.json) or the faction key
+(wh3_main_ksl_the_ice_court.json). Every field is optional; a field you leave out
+keeps the mod's own version. See lords/_example.json.
+
+  canonNotes      list of facts about the character
+  voiceNotes      list: how the lord talks, what they care about, what they never say
+  temperament     0-100 values: aggression, caution, pride, greed, honour
+  socialStyle     0-100 values: warmth, sociability, generosity, vanity, spite, opportunism
+  voiceGender     "male", "female" or "other"
+  instructions    your own direction for this lord, up to 1500 characters
+
+instructions.txt in this folder applies to every lord (style, length, tone...).
+Changes apply to the next message; no restart needed. A broken JSON is ignored and
+the companion window says so.
+`;
+const CUSTOM_EXAMPLE = {
+  canonNotes: ["Katarin is the Ice Queen of Kislev, a powerful ice witch who rules from the Bokha Palace."],
+  voiceNotes: ["Speaks coldly and briefly to strangers, warmly to proven allies.", "Never forgives an insult to Kislev."],
+  temperament: { aggression: 45, caution: 70, pride: 80, greed: 30, honour: 75 },
+  instructions: "Rule this lord's voice as you like, for example: answer in short, regal sentences."
+};
+
 export class MemoryStore {
   // The standalone executable carries the curated lord profiles inside it, so a fresh
   // install never loses their lore or depends on the folder it was launched from.
   constructor(dataDir, {
     loreRoot = path.resolve("lore-profiles"),
-    embeddedLore = typeof __LLMDIP_EMBEDDED_LORE__ === "object" ? __LLMDIP_EMBEDDED_LORE__ : {}
+    embeddedLore = typeof __LLMDIP_EMBEDDED_LORE__ === "object" ? __LLMDIP_EMBEDDED_LORE__ : {},
+    customRoot = path.join(path.dirname(path.resolve(dataDir)), "custom")
   } = {}) {
     this.root = path.join(dataDir, "campaigns");
     this.loreRoot = loreRoot;
+    this.customRoot = customRoot;
     this.embeddedLore = embeddedLore;
     this.pendingLedgerFiles = new Map();
     fs.mkdirSync(this.root, { recursive: true });
@@ -197,7 +231,8 @@ export class MemoryStore {
     const speaker = identity => ({leader:identity?.leader || 'unknown', leaderSubtype:identity?.leaderSubtype || 'unknown'});
     const answer = { role: "assistant", content: narrative, turn: request.turn, mode:request.mode,
       speakerIdentity:speaker(request.identity), action, reaction };
-    const messages = !narrative ? [] : request.mode === 'proactive' ? [
+    // Letters and greetings are the ruler speaking first: there are no player words to keep.
+    const messages = !narrative ? [] : (request.mode === 'proactive' || request.mode === 'greeting') ? [
       answer
     ] : [
       { role: "user", content: request.message, turn: request.turn, mode: request.mode, speakerIdentity:speaker(request.playerIdentity) },
@@ -270,12 +305,57 @@ export class MemoryStore {
     return true;
   }
 
+  // Creates custom/ with its README and an example the first time; never overwrites.
+  ensureCustomFolder() {
+    const lords = path.join(this.customRoot, "lords");
+    fs.mkdirSync(lords, { recursive: true });
+    const readme = path.join(this.customRoot, "README.txt");
+    if (!fs.existsSync(readme)) fs.writeFileSync(readme, CUSTOM_README, "utf8");
+    const example = path.join(lords, "_example.json");
+    if (!fs.existsSync(example)) writeJson(example, CUSTOM_EXAMPLE);
+    return this.customRoot;
+  }
+
+  // The player's file for this lord (subtype first, then faction), or null.
+  customLord(subtype, factionKey) {
+    for (const key of [subtype, factionKey]) {
+      if (!SAFE.test(key || "")) continue;
+      const file = path.join(this.customRoot, "lords", `${key}.json`);
+      if (!fs.existsSync(file)) continue;
+      try {
+        const value = JSON.parse(fs.readFileSync(file, "utf8"));
+        if (value && typeof value === "object" && !Array.isArray(value)) return value;
+      } catch (error) {
+        console.warn(`[CUSTOM] ${file} is not valid JSON and is ignored: ${error.message}`);
+      }
+    }
+    return null;
+  }
+
+  // The curated profile with the player's fields laid over it.
+  withCustom(curated, subtype, factionKey) {
+    const custom = this.customLord(subtype, factionKey);
+    if (!custom) return curated;
+    const merged = { ...curated };
+    for (const field of CUSTOM_FIELDS) if (custom[field] !== undefined) merged[field] = custom[field];
+    return merged;
+  }
+
+  // The player's own direction: for every lord, and for this one.
+  customInstructions(subtype, factionKey) {
+    const clip = value => typeof value === "string" ? value.trim().slice(0, CUSTOM_TEXT_LIMIT) : "";
+    let general = "";
+    try { general = clip(fs.readFileSync(path.join(this.customRoot, "instructions.txt"), "utf8")); } catch { general = ""; }
+    return { general, lord: clip(this.customLord(subtype, factionKey)?.instructions) };
+  }
+
   // Curated lore for a lord, without creating anything: the court's adviser uses it to
   // know its own ruler.
   curatedLore(subtype, factionKey) {
     const key = SAFE.test(subtype || "") ? subtype : "";
-    return (key && (this.embeddedLore[key] || readJson(path.join(this.loreRoot, `${key}.json`), null))) ||
+    const curated = (key && (this.embeddedLore[key] || readJson(path.join(this.loreRoot, `${key}.json`), null))) ||
       (SAFE.test(factionKey || "") && (this.embeddedLore[factionKey] || readJson(path.join(this.loreRoot, `${factionKey}.json`), null))) || {};
+    return this.withCustom(curated, key, factionKey);
   }
 
   ensureProfile(request, identity) {
@@ -284,10 +364,10 @@ export class MemoryStore {
     const current = readJson(file, null);
     // The lord's own profile comes first: a faction file would keep speaking as Karl Franz
     // after his successor took the throne.
-    const curated = this.embeddedLore[leaderKey] ||
+    const curated = this.withCustom(this.embeddedLore[leaderKey] ||
       readJson(path.join(this.loreRoot, `${leaderKey}.json`), null) ||
       this.embeddedLore[request.interlocutor] ||
-      readJson(path.join(this.loreRoot, `${request.interlocutor}.json`), {});
+      readJson(path.join(this.loreRoot, `${request.interlocutor}.json`), {}), leaderKey, request.interlocutor);
     // Curated lore wins over the copy saved at first contact. That copy used to win,
     // so every lord met before a profile existed kept empty lore forever.
     const notes = field => Array.isArray(curated[field]) && curated[field].length ? curated[field]

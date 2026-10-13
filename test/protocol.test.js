@@ -43,7 +43,7 @@ test("renders only a whitelisted bridge call", () => {
   });
   assert.match(lua, /llmdip_publish_response/);
   assert.match(lua, /alliance,defensive/);
-  assert.match(lua, /, 1, "respect"\)/);
+  assert.match(lua, /, 1, "respect", false\)/);
   assert.doesNotMatch(lua, /cm:force_alliance/);
 });
 

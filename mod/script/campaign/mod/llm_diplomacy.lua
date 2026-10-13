@@ -20,7 +20,8 @@ local COMPANION_WAIT_MS = 9000
 -- other half). PROTOCOL rises only when an older companion could no longer cope;
 -- MIN_COMPANION_PROTOCOL is the oldest companion this pack still accepts. Keeping
 -- them is what lets players update the mod without downloading a new companion.
-local PROTOCOL, MIN_COMPANION_PROTOCOL = 1, 1
+-- 2 (0.45): greetings, [talk:end] and brokered deals.
+local PROTOCOL, MIN_COMPANION_PROTOCOL = 2, 2
 local companion_outdated = false
 local companion_seen, companion_watched, companion_answered, companion_silent = false, {}, {}, false
 local function copy_data(value)
@@ -55,6 +56,8 @@ local function localised_value(value)
     if type(value) ~= "string" or value == "" then return "" end
     local ok, translated = pcall(function() return common.get_localised_string(value) end)
     if ok and type(translated) == "string" and translated ~= "" and translated ~= value then return translated end
+    -- A name key with no text (a lord without a surname) is an empty name, not the key.
+    if string.sub(value, 1, 11) == "names_name_" then return "" end
     return value
 end
 
@@ -105,6 +108,26 @@ local function region_keys(faction, limit)
     local list, values = faction:region_list(), {}
     for i = 0, math.min(list:num_items(), limit) - 1 do values[#values + 1] = list:item_at(i):name() end
     return table.concat(values, ":")
+end
+
+-- The settlements a ruler would never sign away: the capital and every province
+-- capital. Province capitals are found over the whole list, not only the 12 sent.
+local function key_region_keys(faction, limit)
+    local values, seen = {}, {}
+    local home = safe_value(nil, function()
+        if faction:has_home_region() then return faction:home_region():name() end
+    end)
+    if home then values[1] = home; seen[home] = true end
+    local list = faction:region_list()
+    for i = 0, list:num_items() - 1 do
+        if #values >= limit then break end
+        local region = list:item_at(i)
+        local key = region:name()
+        if not seen[key] and safe_value(false, function() return region:is_province_capital() end) then
+            values[#values + 1] = key; seen[key] = true
+        end
+    end
+    return home or "", table.concat(values, ":")
 end
 
 local function total_force_strength(faction)
@@ -345,6 +368,7 @@ local function campaign_snapshot(player, interlocutor, ui_attitude, ui_personali
         local attitude = math.floor(tonumber(ui_attitude) or model_attitude_value(interlocutor, player))
         local player_strength, ai_strength = total_force_strength(player), total_force_strength(interlocutor)
         local ratio = player_strength / math.max(ai_strength, 1)
+        local ai_capital, ai_key_regions = key_region_keys(interlocutor, 40)
         local relative_power = ratio >= 1.8 and "player_overwhelming" or (ratio >= 1.2 and "player_stronger" or (ratio <= 0.55 and "ai_overwhelming" or (ratio <= 0.83 and "ai_stronger" or "similar")))
         return table.concat({
             "turn=" .. tostring(cm:model():turn_number()),
@@ -395,6 +419,11 @@ local function campaign_snapshot(player, interlocutor, ui_attitude, ui_personali
             "shared_border_regions=" .. tostring(shared_border_count(player, interlocutor)),
             "player_regions=" .. region_keys(player, 12),
             "ai_regions=" .. region_keys(interlocutor, 12),
+            "ai_capital=" .. clean_value(ai_capital),
+            -- The player's Voice switch (World tab): the companion speaks only then.
+            "voice=" .. ((llmdip_world_options and safe_value(false, function() return llmdip_world_options().voice end)
+                and safe_value(false, function() return llmdip_voice_supported and llmdip_voice_supported() end)) and "1" or "0"),
+            "ai_key_regions=" .. clean_value(ai_key_regions),
             -- The lists above stop at 12; these are the real totals.
             "player_settlements=" .. tostring(safe_value("unknown", function() return player:region_list():num_items() end)),
             "ai_settlements=" .. tostring(safe_value("unknown", function() return interlocutor:region_list():num_items() end)),
@@ -585,8 +614,35 @@ local function new_request(player, interlocutor, mode, seed, ui_attitude, ui_per
     return true
 end
 
+-- 0.45: a ruler can end the audience for the rest of the turn ([talk:end]), and greets
+-- the player once a turn when the audience opens before the player has written.
+local function talk_closed_key(player_key, ai_key) return "llmdip_talk_closed_" .. player_key .. "_" .. ai_key end
+local function greeted_key(player_key, ai_key) return "llmdip_greeted_" .. player_key .. "_" .. ai_key end
+function llmdip_talk_closed(ai_key)
+    local player = local_faction()
+    if not valid_key(ai_key) or not player or player:is_null_interface() then return false end
+    return cm:get_saved_value(talk_closed_key(player:name(), ai_key)) == cm:model():turn_number()
+end
+function llmdip_request_greeting(interlocutor_key, ui_attitude, ui_personality)
+    if not player_phase or not valid_key(interlocutor_key) then return false end
+    if cm:is_processing_battle() or cm:is_pending_battle_active() then return false end
+    local sender, interlocutor = local_faction(), cm:get_faction(interlocutor_key)
+    if not sender or sender:is_null_interface() or not interlocutor or interlocutor:is_null_interface() then return false end
+    if interlocutor:is_human() or interlocutor:is_dead() then return false end
+    local turn = cm:model():turn_number()
+    if cm:get_saved_value(greeted_key(sender:name(), interlocutor_key)) == turn then return false end
+    if llmdip_talk_closed(interlocutor_key) then return false end
+    -- A ruler who already wrote to the player this turn has said hello in that letter.
+    if cm:get_saved_value("llmdip_last_" .. sender:name() .. "_" .. interlocutor_key) == turn then return false end
+    cm:set_saved_value(greeted_key(sender:name(), interlocutor_key), turn)
+    local sent = new_request(sender, interlocutor, "greeting", "greeting", ui_attitude, ui_personality)
+    out("[LLMDIP] GREETING|" .. interlocutor_key .. "|" .. tostring(sent))
+    return sent
+end
+
 function llmdip_send_request(interlocutor_key, player_text, ui_attitude, ui_personality)
     if not player_phase then return false end
+    if llmdip_talk_closed(interlocutor_key) then out("[LLMDIP] SEND_REJECT|talk_closed|" .. tostring(interlocutor_key)); return false end
     if not valid_key(interlocutor_key) or type(player_text) ~= "string" or #player_text < 1 or #player_text > 1200 then
         out("[LLMDIP] SEND_REJECT|invalid_input|" .. tostring(interlocutor_key)); return false
     end
@@ -596,6 +652,8 @@ function llmdip_send_request(interlocutor_key, player_text, ui_attitude, ui_pers
     if interlocutor:is_human() then out("[LLMDIP] SEND_REJECT|human_target|" .. interlocutor_key); return false end
     if interlocutor:is_dead() then out("[LLMDIP] SEND_REJECT|dead_target|" .. interlocutor_key); return false end
     local sent = new_request(sender, interlocutor, "player", player_text, ui_attitude, ui_personality)
+    -- Once the player has spoken this turn, opening the audience again brings no greeting.
+    if sent then cm:set_saved_value(greeted_key(sender:name(), interlocutor_key), cm:model():turn_number()) end
     out("[LLMDIP] SEND_RESULT|" .. interlocutor_key .. "|" .. tostring(sent))
     return sent
 end
@@ -631,12 +689,14 @@ function llmdip_regenerate(interlocutor_key, previous_id, player_text, applied_d
         if llmdip_mail_supersede then llmdip_mail_supersede(previous_id) end
     end
     undo_relation(sender, interlocutor, applied_delta)
+    -- The reply being redone may be the one that ended the audience.
+    cm:set_saved_value(talk_closed_key(sender:name(), interlocutor_key), -1)
     local sent = new_request(sender, interlocutor, "player", player_text, ui_attitude, ui_personality, previous_id)
     out("[LLMDIP] REGENERATE|" .. tostring(previous_id) .. "|" .. tostring(sent))
     return sent
 end
 
-function llmdip_publish_response(request_id, narrative, compact_action, relation_delta, relation_reason)
+function llmdip_publish_response(request_id, narrative, compact_action, relation_delta, relation_reason, ends_talk)
     if not player_phase then return false end
     if published[request_id] then out("[LLMDIP] RESPONSE_ACK|" .. request_id); return false end
     relation_delta = tonumber(relation_delta)
@@ -659,6 +719,12 @@ function llmdip_publish_response(request_id, narrative, compact_action, relation
     save_pending()
     out("[LLMDIP] RESPONSE|" .. request_id .. "|" .. narrative)
     if llmdip_ui_on_response then llmdip_ui_on_response(request_id, narrative, proposal.interlocutor) end
+    -- A greeting is words only: no proposal, no relation change, nothing pending.
+    if proposal.mode == "greeting" then
+        pending[request_id] = nil; save_pending()
+        out("[LLMDIP] GREETED|" .. request_id)
+        return true
+    end
     -- A betrayal is the only action that is not a proposal: it happens at once.
     -- The companion only grants it in background letters; anything else is a plain letter.
     if proposal.action[1] == "betray_war" then
@@ -673,6 +739,12 @@ function llmdip_publish_response(request_id, narrative, compact_action, relation
     local shown_delta = deferred and relation_delta or applied_delta
     out("[LLMDIP] PROPOSAL|" .. request_id .. "|" .. compact_action .. "|" .. tostring(shown_delta) .. "|" .. relation_reason .. "|" .. (deferred and "deferred" or "applied"))
     if llmdip_ui_on_proposal then llmdip_ui_on_proposal(request_id, compact_action, shown_delta, relation_reason, proposal.interlocutor, deferred) end
+    -- The ruler ended the audience: no more words from this player until next turn.
+    if ends_talk == true and proposal.mode == "player" then
+        cm:set_saved_value(talk_closed_key(proposal.player, proposal.interlocutor), cm:model():turn_number())
+        out("[LLMDIP] TALK_CLOSED|" .. request_id .. "|" .. proposal.interlocutor)
+        if llmdip_ui_on_talk_closed then llmdip_ui_on_talk_closed(proposal.interlocutor) end
+    end
     if proposal.mode == "proactive" and llmdip_mail_receive then
         -- A delayed letter arriving next turn consumes that turn's opportunity,
         -- so the same ruler cannot deliver old + new letters in one player turn.
@@ -742,7 +814,7 @@ function llmdip_accept(request_id)
     if proposal.mode == "proactive" and cm:model():turn_number() > proposal.turn + 2 then
         pending[request_id] = nil; save_pending(); return false
     end
-    local ok = execute_action(proposal)
+    local ok = execute_action(proposal, request_id)
     if ok and proposal.action[1] ~= "reject" then
         record_diplomatic_event("llm_deal_" .. proposal.action[1], cm:get_faction(proposal.player), cm:get_faction(proposal.interlocutor))
     end
@@ -813,10 +885,62 @@ local function transfer_gold(source, target, amount)
     return true
 end
 
-execute_action = function(proposal)
+-- A treaty the player pays for ends with price_N (0.44): the price is part of the
+-- same deal, so the player never pays first for a treaty promised for later.
+local function action_price(action)
+    for i = 2, #action do
+        local amount = string.match(tostring(action[i]), "^price_(%d+)$")
+        if amount then return tonumber(amount) end
+    end
+    return nil
+end
+
+local function treaty_in_force(action, player, ai)
+    local kind = action[1]
+    if kind == "make_peace" then return not ai:at_war_with(player) end
+    if kind == "alliance" then
+        if action[2] == "military" then return ai:military_allies_with(player) end
+        return ai:defensive_allies_with(player) or ai:military_allies_with(player)
+    end
+    if kind == "trade_agreement" then return ai:trade_agreement_with(player) end
+    if kind == "non_aggression_pact" then return ai:non_aggression_pact_with(player) end
+    if kind == "military_access" then return ai:military_access_pact_with(player) or player:military_access_pact_with(ai) end
+    if kind == "broker" then
+        local target = valid_key(action[3]) and cm:get_faction(action[3]) or nil
+        if not target or target:is_null_interface() then return false end
+        if action[2] == "peace" then return not ai:at_war_with(target) end
+        if action[2] == "war" then return ai:at_war_with(target) end
+    end
+    return false
+end
+
+-- The game may show a forced treaty a moment later (see llmdip_world_check_deeds),
+-- so the price is taken once the treaty is really there, checked for a few seconds.
+-- If the game never signs it, nothing is taken and the player is told so.
+local PRICE_CHECKS, PRICE_CHECK_MS = 8, 500
+local function settle_price(request_id, proposal, price, attempt)
+    local player, ai = cm:get_faction(proposal.player), cm:get_faction(proposal.interlocutor)
+    if not player or player:is_null_interface() or not ai or ai:is_null_interface() then return end
+    local signed = safe_value(false, function() return treaty_in_force(proposal.action, player, ai) end) == true
+    if not signed and attempt < PRICE_CHECKS then
+        cm:real_callback(function() settle_price(request_id, proposal, price, attempt + 1) end, PRICE_CHECK_MS)
+        return
+    end
+    -- Only in the player's own turn; a treaty signed as the turn ends is left unpaid.
+    local paid = signed and player_phase and transfer_gold(player, ai, price) or false
+    out("[LLMDIP] PRICE|" .. request_id .. "|" .. tostring(price) .. "|signed=" .. tostring(signed) .. "|paid=" .. tostring(paid))
+    if llmdip_ui_on_price then llmdip_ui_on_price(request_id, proposal.interlocutor, price, paid) end
+end
+
+execute_action = function(proposal, request_id)
     local player, ai = cm:get_faction(proposal.player), cm:get_faction(proposal.interlocutor)
     local action = proposal.action
     if not player or player:is_null_interface() or not player:is_human() or not ai or ai:is_null_interface() or ai:is_human() then return false end
+    local price = action_price(action)
+    if price then
+        -- The player must be able to pay before anything is signed.
+        if price < 100 or price > 20000 or math.floor(price) ~= price or player:treasury() < price then return false end
+    end
     if action[1] == "reject" then return true
     elseif action[1] == "declare_war" then cm:force_declare_war(ai:name(), player:name(), false, false)
     elseif action[1] == "make_peace" then cm:force_make_peace(ai:name(), player:name())
@@ -832,6 +956,14 @@ execute_action = function(proposal)
         if not recipient or not region or region:is_null_interface() then return false end
         local owner = region:owning_faction():name()
         if owner ~= player:name() and owner ~= ai:name() then return false end
+        -- Last line of defence: a ruler never signs away its capital or a province
+        -- capital, whatever the letter said (the companion already checks this).
+        if owner == ai:name() and recipient == player:name() then
+            local _, keys = key_region_keys(ai, 40)
+            for key in string.gmatch(keys, "[^:]+") do
+                if key == action[2] then return false end
+            end
+        end
         cm:transfer_region_to_faction(action[2], recipient)
     elseif action[1] == "vassalize" then
         if action[2] == "player" then cm:force_make_vassal(player:name(), ai:name())
@@ -848,7 +980,21 @@ execute_action = function(proposal)
         if not transfer_gold(ai, player, tonumber(action[3])) then return false end
         cm:set_saved_value("llmdip_favor_" .. player:name() .. "_" .. ai:name(), table.concat({action[2] or "unknown", action[4] or "none", tostring(cm:model():turn_number()), "open"}, ","))
         if war_target then cm:force_declare_war(player:name(), war_target:name(), false, false) end
+    elseif action[1] == "broker" and (action[2] == "peace" or action[2] == "war") and valid_key(action[3]) then
+        -- 0.45: the ruler makes peace with, or goes to war against, a third realm at the
+        -- player's request. Never against the player or the player's allies.
+        local target = cm:get_faction(action[3])
+        if not target or target:is_null_interface() or target:is_dead() or target:is_human() then return false end
+        if target:name() == player:name() or target:name() == ai:name() then return false end
+        if action[2] == "peace" then
+            if not ai:at_war_with(target) then return false end
+            cm:force_make_peace(ai:name(), target:name())
+        else
+            if ai:at_war_with(target) or ai:allied_with(target) or target:allied_with(player) then return false end
+            cm:force_declare_war(ai:name(), target:name(), false, false)
+        end
     else return false end
+    if price then settle_price(request_id or "unknown", proposal, price, 1) end
     return true
 end
 
@@ -939,7 +1085,7 @@ core:add_listener("llmdip_mp_events", "UITrigger", function(context) return stri
         out("[LLMDIP] PROPOSAL|" .. id .. "|" .. (parts[4] or "") .. "|" .. tostring(shown_delta) .. "|" .. pending[id].relation_reason .. "|" .. (deferred and "deferred" or "applied"))
         if llmdip_ui_on_proposal then llmdip_ui_on_proposal(id, parts[4] or "reject", shown_delta, pending[id].relation_reason, pending[id].interlocutor, deferred) end
     elseif kind == "A" and pending[id] and pending[id].action and pending[id].sender_cqi == context:faction_cqi() then
-        local ok = execute_action(pending[id])
+        local ok = execute_action(pending[id], id)
         if ok and pending[id].action[1] ~= "reject" then
             record_diplomatic_event("llm_deal_" .. pending[id].action[1], cm:get_faction(pending[id].player), cm:get_faction(pending[id].interlocutor))
         end

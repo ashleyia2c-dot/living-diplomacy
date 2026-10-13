@@ -912,9 +912,9 @@ test('un companion viejo que responde se marca como desactualizado; uno al dia n
  end
  local watch=upvalue(upvalue(llmdip_send_request,'new_request'),'watch_companion')
  watch('r1_1_100_1_1'); watch('r2_1_100_1_2')
- llmdip_companion_alive('r1_1_100_1_1', 0)
- assert(llmdip_companion_outdated(), 'protocol 0 is older than this pack accepts')
- llmdip_companion_alive('r2_1_100_1_2', 1)
+ llmdip_companion_alive('r1_1_100_1_1', 1)
+ assert(llmdip_companion_outdated(), 'protocol 1 (before 0.45) is older than this pack accepts')
+ llmdip_companion_alive('r2_1_100_1_2', 2)
  assert(not llmdip_companion_outdated(), 'a current companion clears it')
  llmdip_companion_alive('r9_old_session', 0)
  assert(not llmdip_companion_outdated(), 'a stale line never marks anything')
@@ -1185,4 +1185,117 @@ test('rumours and deeds are shown whole, each card as tall as its text, and page
   if widgets.llmdip39_mail_next and widgets.llmdip39_mail_next.visible then fire('llmdip39_mail_click','llmdip39_mail_next') end
  end
  for i=1,6 do assert(seen[tostring(i)], 'entry '..i..' reachable') end
+`));
+
+// 0.45: greetings, ending the audience, brokered deals and the Voice switch.
+test('0.45: a ruler who ends the audience is not heard again this turn; a redo reopens it', () => run(bridge, betrayalSetup + String.raw`
+ local p=cm:get_faction('player')
+ cm.get_local_faction=function() return p end
+ set_up(llmdip_publish_response,'pending',{r1={player='player',interlocutor='ai',mode='player',turn=1}})
+ closed=nil; llmdip_ui_on_talk_closed=function(t) closed=t end
+ cm.apply_dilemma_diplomatic_bonus=function() end
+ assert(llmdip_publish_response('r1','Fuera de mi vista.','reject',-1,'insult',true))
+ assert(closed=='ai' and saved.llmdip_talk_closed_player_ai==1)
+ assert(llmdip_talk_closed('ai'))
+ assert(not llmdip_send_request('ai','perdon',0,'unknown'), 'no words reach a ruler who ended the audience')
+ set_up(llmdip_regenerate,'new_request',function() return true end)
+ assert(llmdip_regenerate('ai',nil,'hola',0))
+ assert(not llmdip_talk_closed('ai'), 'redoing the closing reply reopens the audience')
+ saved.llmdip_talk_closed_player_ai=1; round=2
+ assert(not llmdip_talk_closed('ai'), 'the next turn the ruler listens again')
+`));
+test('0.45: only a ruler answering the player can end the audience', () => run(bridge, betrayalSetup + String.raw`
+ set_up(llmdip_publish_response,'pending',{r1={player='player',interlocutor='ai',mode='proactive',turn=1}})
+ llmdip_ui_on_talk_closed=function() error('a letter must not close the audience') end
+ assert(llmdip_publish_response('r1','Carta','reject',0,'neutral',true))
+ assert(saved.llmdip_talk_closed_player_ai==nil)
+`));
+test('0.45: the audience opens with one greeting a turn, never after the player wrote or a letter came', () => run(bridge, betrayalSetup + String.raw`
+ local p=cm:get_faction('player')
+ cm.get_local_faction=function() return p end
+ local sent=0
+ set_up(llmdip_request_greeting,'new_request',function(s,i,mode) assert(mode=='greeting'); sent=sent+1; return true end)
+ assert(llmdip_request_greeting('ai') and sent==1)
+ assert(not llmdip_request_greeting('ai'), 'once a turn')
+ round=2; saved.llmdip_last_player_ai=2
+ assert(not llmdip_request_greeting('ai'), 'a letter this turn already said hello')
+ round=3; saved.llmdip_talk_closed_player_ai=3
+ assert(not llmdip_request_greeting('ai'), 'not when the audience is closed')
+ round=4; set_up(llmdip_send_request,'new_request',function() return true end)
+ assert(llmdip_send_request('ai','hola',0,'unknown'))
+ assert(not llmdip_request_greeting('ai'), 'not after the player has spoken this turn')
+ assert(sent==1)
+`));
+test('0.45: a greeting is shown as words only, with no proposal and nothing pending', () => run(bridge, betrayalSetup + String.raw`
+ set_up(llmdip_publish_response,'pending',{g1={player='player',interlocutor='ai',mode='greeting',turn=1}})
+ local shown=nil; llmdip_ui_on_response=function(id,n) shown=n end
+ assert(llmdip_publish_response('g1','Bienvenido, Vlad.','reject',0,'neutral'))
+ assert(shown=='Bienvenido, Vlad.' and #proposals==0 and saved.llmdip39_pending.g1==nil)
+`));
+const brokerSetup = betrayalSetup + String.raw`
+ peaces={}
+ cm.force_make_peace=function(self,a,b) peaces[#peaces+1]=a..'='..b end
+ local p=cm:get_faction('player')
+ atwar=true; allied=false
+ ai.at_war_with=function(self,o) return o:name()=='enemy' and atwar end
+ ai.allied_with=function() return false end
+ enemy={name=function() return 'enemy' end,is_null_interface=function() return false end,is_human=function() return false end,
+  is_dead=function() return false end,allied_with=function(self,o) return allied end}
+ cm.get_faction=function(self,key) if key=='player' then return p elseif key=='enemy' then return enemy end return ai end
+ function offer(act) set_up(llmdip_accept,'pending',{b1={player='player',interlocutor='ai',mode='player',turn=1,action={'broker',act,'enemy'}}}) end
+`;
+test('0.45: a brokered peace is made with the third realm', () => run(bridge, brokerSetup + String.raw`
+ offer('peace'); assert(llmdip_accept('b1')); assert(peaces[1]=='ai=enemy' and #wars==0)
+ atwar=false; offer('peace'); assert(not llmdip_accept('b1'), 'no peace with a realm they are not fighting')
+`));
+test('0.45: a brokered war is declared, never on the player\'s ally', () => run(bridge, brokerSetup + String.raw`
+ atwar=false; offer('war'); assert(llmdip_accept('b1')); assert(wars[1]=='ai>enemy')
+ allied=true; offer('war'); assert(not llmdip_accept('b1') and #wars==1, 'the player\'s ally is never the target')
+`));
+test('0.45: the World tab shows three switches, Voice starts off, and all fit before the arrows',()=>run(mailbox,`
+ local opts={treaties=true, romance=true, voice=false}
+ llmdip_world_options=function() return {treaties=opts.treaties, romance=opts.romance, voice=opts.voice} end
+ llmdip_world_toggle=function(name) opts[name]=not opts[name]; return opts[name] end
+ llmdip_world_entries=function() return {} end
+ first[1](); llmdip_mail_tick()
+ fire('llmdip39_mail_click','llmdip39_mail_button')
+ fire('llmdip39_mail_click','llmdip_hub_tab_world')
+ local shell, romance, voice=widgets.llmdip_hub_shell, widgets.llmdip_hub_opt_romance, widgets.llmdip_hub_opt_voice
+ assert(voice.visible and voice.children.button_txt.text==llmdip_t('opt_voice')..': '..llmdip_t('opt_off'))
+ assert(voice.x>=romance.x+romance.width and voice.x+voice.width<=shell.x+680-100, 'clear of the page arrows')
+ fire('llmdip39_mail_click','llmdip_hub_opt_voice')
+ assert(opts.voice==true and voice.children.button_txt.text==llmdip_t('opt_voice')..': '..llmdip_t('opt_on'))
+ fire('llmdip39_mail_click','llmdip_hub_tab_contacts')
+ assert(not voice.visible)
+`));
+test('0.45: closing the audience is said in the chat, and sending then explains why and clears the words', () => run(read('llm_diplomacy_ui.lua'), redoUi + String.raw`
+ state.inbox.ai={history={}}
+ llmdip_ui_on_talk_closed('ai')
+ local h=history_for('ai'); assert(h[#h]==llmdip_t('speaker_system')..': '..llmdip_t('talk_closed'))
+ llmdip_talk_closed=function() return true end
+ local sent=false; llmdip_send_request=function() sent=true; return true end
+ local cleared=false; clear_input_text=function() cleared=true end
+ capture_target=function() return 'ai' end; read_input_text=function() return 'perdon' end
+ send_text()
+ assert(not sent and state.notice and state.notice.text==llmdip_t('talk_closed_send'))
+ assert(cleared, 'the shared input must not carry the words into the next audience')
+`));
+test('0.45: a lord without a surname is shown by name, never by the raw name key', () => run(read('llm_diplomacy_ui.lua'), redoUi + String.raw`
+ common={}; common.get_localised_string=function(key) if key=='names_name_1' then return 'Morathi' end; return '' end
+ assert(localised_ui_value('names_name_1')=='Morathi')
+ assert(localised_ui_value('names_name_2147360508')=='', 'an empty surname is empty')
+ assert(localised_ui_value('some_other_key')=='some_other_key')
+`));
+test('0.45: the Voice switch is hidden in a game language Player2 cannot speak, and the request says voice=0',()=>run(mailbox,`
+ local opts={treaties=true, romance=true, voice=true}
+ llmdip_world_options=function() return {treaties=opts.treaties, romance=opts.romance, voice=opts.voice} end
+ llmdip_world_toggle=function(name) opts[name]=not opts[name]; return opts[name] end
+ llmdip_world_entries=function() return {} end
+ local lang='de'; llmdip_language=function() return lang end
+ first[1](); llmdip_mail_tick()
+ fire('llmdip39_mail_click','llmdip39_mail_button')
+ fire('llmdip39_mail_click','llmdip_hub_tab_world')
+ assert(not widgets.llmdip_hub_opt_voice.visible and widgets.llmdip_hub_opt_romance.visible)
+ for _,code in ipairs({'fr','ru','pl','cs','tr','ko'}) do lang=code; assert(not llmdip_voice_supported(), code) end
+ for _,code in ipairs({'en','es','it','pt','zh','tw'}) do lang=code; assert(llmdip_voice_supported(), code) end
 `));

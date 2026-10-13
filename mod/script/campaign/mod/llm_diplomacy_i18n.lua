@@ -93,6 +93,9 @@ UI_TEXT.en = {
     diplo_improved = " Diplomatic improvement applied (level +",
     diplo_worsened = " Diplomatic worsening applied (level ",
     deal_failed = "The deal could not be carried out.",
+    price_label = "you pay %s gold",
+    price_paid = "Treaty signed: you paid %s gold.",
+    price_refused = "The game did not sign the treaty, so you paid nothing.",
     close_mailbox = "Close inbox",
     prev_page = "Previous page",
     next_page = "Next page",
@@ -177,6 +180,11 @@ UI_TEXT.en = {
     council_thinking = "Your court is considering your words…",
     council_no_answer = "Your court did not answer. Is the companion window open?",
     council_send = "Speak to your court",
+    -- 0.45: ending the audience and the Voice switch
+    talk_closed = "The ruler has ended the audience. You can speak again next turn.",
+    talk_closed_send = "This ruler will not hear you again until your next turn.",
+    opt_voice = "Voice",
+    opt_voice_tip = "When ON, rulers speak their replies aloud in your audiences through the Player2 app (this uses your Player2 credits). Letters are never read aloud. Click to switch.",
 }
 
 UI_TEXT.es = {
@@ -257,6 +265,9 @@ UI_TEXT.es = {
     diplo_improved = " Mejora diplomática aplicada (nivel +",
     diplo_worsened = " Empeoramiento diplomático aplicado (nivel ",
     deal_failed = "No se pudo ejecutar el acuerdo.",
+    price_label = "pagas %s de oro",
+    price_paid = "Tratado firmado: has pagado %s de oro.",
+    price_refused = "El juego no firmó el tratado, así que no has pagado nada.",
     close_mailbox = "Cerrar bandeja",
     prev_page = "Página anterior",
     next_page = "Página siguiente",
@@ -341,6 +352,11 @@ UI_TEXT.es = {
     council_thinking = "Tu corte medita tus palabras…",
     council_no_answer = "Tu corte no ha respondido. ¿Está abierta la ventana del companion?",
     council_send = "Hablar a tu corte",
+    -- 0.45: ending the audience and the Voice switch
+    talk_closed = "El gobernante ha dado por terminada la audiencia. Podrás volver a hablarle el próximo turno.",
+    talk_closed_send = "Este gobernante no volverá a escucharte hasta tu próximo turno.",
+    opt_voice = "Voz",
+    opt_voice_tip = "Si está en SÍ, los gobernantes dicen en voz alta sus respuestas en tus audiencias mediante la app Player2 (gasta tus créditos de Player2). Las cartas nunca se leen en voz alta. Haz clic para cambiarlo.",
 }
 
 
@@ -422,6 +438,9 @@ UI_TEXT.fr = {
     diplo_improved = " Amélioration diplomatique appliquée (niveau +",
     diplo_worsened = " Dégradation diplomatique appliquée (niveau ",
     deal_failed = "L'accord n'a pas pu être appliqué.",
+    price_label = "vous payez %s or",
+    price_paid = "Traité signé : vous avez payé %s or.",
+    price_refused = "Le jeu n'a pas signé le traité : vous n'avez rien payé.",
     close_mailbox = "Fermer la boîte",
     prev_page = "Page précédente",
     next_page = "Page suivante",
@@ -506,6 +525,11 @@ UI_TEXT.fr = {
     council_thinking = "Ta cour réfléchit à tes paroles…",
     council_no_answer = "Ta cour n'a pas répondu. La fenêtre du companion est-elle ouverte ?",
     council_send = "Parler à ta cour",
+    -- 0.45: ending the audience and the Voice switch
+    talk_closed = "Le souverain a mis fin à l'audience. Vous pourrez lui reparler au prochain tour.",
+    talk_closed_send = "Ce souverain ne vous écoutera plus avant votre prochain tour.",
+    opt_voice = "Voix",
+    opt_voice_tip = "Si OUI, les souverains disent leurs réponses à voix haute pendant vos audiences via l'application Player2 (cela utilise vos crédits Player2). Les lettres ne sont jamais lues. Cliquez pour changer.",
 }
 
 UI_TEXT.de = {
@@ -586,6 +610,9 @@ UI_TEXT.de = {
     diplo_improved = " Diplomatische Verbesserung angewandt (Stufe +",
     diplo_worsened = " Diplomatische Verschlechterung angewandt (Stufe ",
     deal_failed = "Das Abkommen konnte nicht ausgeführt werden.",
+    price_label = "du zahlst %s Gold",
+    price_paid = "Vertrag unterzeichnet: Du hast %s Gold gezahlt.",
+    price_refused = "Das Spiel hat den Vertrag nicht unterzeichnet, daher hast du nichts gezahlt.",
     close_mailbox = "Postfach schließen",
     prev_page = "Vorherige Seite",
     next_page = "Nächste Seite",
@@ -670,6 +697,11 @@ UI_TEXT.de = {
     council_thinking = "Dein Hof wägt deine Worte ab…",
     council_no_answer = "Dein Hof hat nicht geantwortet. Ist das Companion-Fenster offen?",
     council_send = "Zu deinem Hof sprechen",
+    -- 0.45: ending the audience and the Voice switch
+    talk_closed = "Der Herrscher hat die Audienz beendet. In deiner nächsten Runde kannst du wieder mit ihm sprechen.",
+    talk_closed_send = "Dieser Herrscher hört dich erst in deiner nächsten Runde wieder an.",
+    opt_voice = "Stimme",
+    opt_voice_tip = "Bei AN sprechen die Herrscher ihre Antworten in deinen Audienzen über die Player2-App laut aus (dies verbraucht deine Player2-Guthaben). Briefe werden nie vorgelesen. Klicken zum Umschalten.",
 }
 
 UI_TEXT.it = {
@@ -750,6 +782,9 @@ UI_TEXT.it = {
     diplo_improved = " Miglioramento diplomatico applicato (livello +",
     diplo_worsened = " Peggioramento diplomatico applicato (livello ",
     deal_failed = "L'accordo non è stato eseguito.",
+    price_label = "paghi %s oro",
+    price_paid = "Trattato firmato: hai pagato %s oro.",
+    price_refused = "Il gioco non ha firmato il trattato, quindi non hai pagato nulla.",
     close_mailbox = "Chiudi posta",
     prev_page = "Pagina precedente",
     next_page = "Pagina successiva",
@@ -834,6 +869,11 @@ UI_TEXT.it = {
     council_thinking = "La tua corte medita le tue parole…",
     council_no_answer = "La tua corte non ha risposto. La finestra del companion è aperta?",
     council_send = "Parla alla tua corte",
+    -- 0.45: ending the audience and the Voice switch
+    talk_closed = "Il sovrano ha posto fine all'udienza. Potrai parlargli di nuovo il prossimo turno.",
+    talk_closed_send = "Questo sovrano non ti ascolterà più fino al tuo prossimo turno.",
+    opt_voice = "Voce",
+    opt_voice_tip = "Se SÌ, i sovrani pronunciano ad alta voce le loro risposte nelle tue udienze tramite l'app Player2 (consuma i tuoi crediti Player2). Le lettere non vengono mai lette. Clicca per cambiare.",
 }
 
 UI_TEXT.ru = {
@@ -914,6 +954,9 @@ UI_TEXT.ru = {
     diplo_improved = " Дипломатическое улучшение применено (уровень +",
     diplo_worsened = " Дипломатическое ухудшение применено (уровень ",
     deal_failed = "Соглашение не удалось выполнить.",
+    price_label = "вы платите %s золота",
+    price_paid = "Договор подписан: вы заплатили %s золота.",
+    price_refused = "Игра не подписала договор, поэтому вы ничего не заплатили.",
     close_mailbox = "Закрыть почту",
     prev_page = "Предыдущая страница",
     next_page = "Следующая страница",
@@ -998,6 +1041,11 @@ UI_TEXT.ru = {
     council_thinking = "Твой двор обдумывает твои слова…",
     council_no_answer = "Двор не ответил. Окно companion открыто?",
     council_send = "Сказать двору",
+    -- 0.45: ending the audience and the Voice switch
+    talk_closed = "Правитель закончил аудиенцию. Вы сможете снова говорить с ним в следующий ход.",
+    talk_closed_send = "Этот правитель не станет вас слушать до вашего следующего хода.",
+    opt_voice = "Голос",
+    opt_voice_tip = "Если ВКЛ, правители произносят ответы вслух во время ваших аудиенций через приложение Player2 (расходует ваши кредиты Player2). Письма никогда не зачитываются. Нажмите, чтобы переключить.",
 }
 
 UI_TEXT.pl = {
@@ -1078,6 +1126,9 @@ UI_TEXT.pl = {
     diplo_improved = " Zastosowano poprawę dyplomatyczną (poziom +",
     diplo_worsened = " Zastosowano pogorszenie dyplomatyczne (poziom ",
     deal_failed = "Nie udało się zrealizować układu.",
+    price_label = "płacisz %s złota",
+    price_paid = "Traktat podpisany: zapłaciłeś %s złota.",
+    price_refused = "Gra nie podpisała traktatu, więc nic nie zapłaciłeś.",
     close_mailbox = "Zamknij skrzynkę",
     prev_page = "Poprzednia strona",
     next_page = "Następna strona",
@@ -1162,6 +1213,11 @@ UI_TEXT.pl = {
     council_thinking = "Twój dwór rozważa twoje słowa…",
     council_no_answer = "Dwór nie odpowiedział. Czy okno companiona jest otwarte?",
     council_send = "Powiedz dworowi",
+    -- 0.45: ending the audience and the Voice switch
+    talk_closed = "Władca zakończył audiencję. Będziesz mógł znów z nim rozmawiać w następnej turze.",
+    talk_closed_send = "Ten władca nie wysłucha cię aż do twojej następnej tury.",
+    opt_voice = "Głos",
+    opt_voice_tip = "Gdy TAK, władcy wypowiadają odpowiedzi na głos podczas twoich audiencji przez aplikację Player2 (zużywa to twoje kredyty Player2). Listy nigdy nie są czytane. Kliknij, aby przełączyć.",
 }
 
 UI_TEXT.cs = {
@@ -1242,6 +1298,9 @@ UI_TEXT.cs = {
     diplo_improved = " Diplomatické zlepšení použito (úroveň +",
     diplo_worsened = " Diplomatické zhoršení použito (úroveň ",
     deal_failed = "Dohodu se nepodařilo provést.",
+    price_label = "platíš %s zlata",
+    price_paid = "Smlouva podepsána: zaplatil jsi %s zlata.",
+    price_refused = "Hra smlouvu nepodepsala, takže jsi nic nezaplatil.",
     close_mailbox = "Zavřít schránku",
     prev_page = "Předchozí stránka",
     next_page = "Další stránka",
@@ -1326,6 +1385,11 @@ UI_TEXT.cs = {
     council_thinking = "Tvůj dvůr zvažuje tvá slova…",
     council_no_answer = "Dvůr neodpověděl. Je okno companionu otevřené?",
     council_send = "Promluvit k dvoru",
+    -- 0.45: ending the audience and the Voice switch
+    talk_closed = "Vládce ukončil audienci. Znovu s ním můžeš mluvit v příštím tahu.",
+    talk_closed_send = "Tento vládce tě do tvého příštího tahu nevyslechne.",
+    opt_voice = "Hlas",
+    opt_voice_tip = "Když ANO, vládci během tvých audiencí vyslovují odpovědi nahlas přes aplikaci Player2 (spotřebovává tvé kredity Player2). Dopisy se nikdy nečtou nahlas. Klikni pro přepnutí.",
 }
 
 UI_TEXT.tr = {
@@ -1406,6 +1470,9 @@ UI_TEXT.tr = {
     diplo_improved = " Diplomatik iyileşme uygulandı (seviye +",
     diplo_worsened = " Diplomatik kötüleşme uygulandı (seviye ",
     deal_failed = "Anlaşma uygulanamadı.",
+    price_label = "%s altın ödersin",
+    price_paid = "Antlaşma imzalandı: %s altın ödedin.",
+    price_refused = "Oyun antlaşmayı imzalamadı, bu yüzden hiçbir şey ödemedin.",
     close_mailbox = "Gelen kutusunu kapat",
     prev_page = "Önceki sayfa",
     next_page = "Sonraki sayfa",
@@ -1490,6 +1557,11 @@ UI_TEXT.tr = {
     council_thinking = "Sarayın sözlerini düşünüyor…",
     council_no_answer = "Sarayın cevap vermedi. Companion penceresi açık mı?",
     council_send = "Sarayına söyle",
+    -- 0.45: ending the audience and the Voice switch
+    talk_closed = "Hükümdar görüşmeyi sonlandırdı. Bir sonraki turunda onunla yeniden konuşabilirsin.",
+    talk_closed_send = "Bu hükümdar bir sonraki turuna kadar seni dinlemeyecek.",
+    opt_voice = "Ses",
+    opt_voice_tip = "AÇIK olduğunda hükümdarlar görüşmelerindeki yanıtlarını Player2 uygulaması üzerinden sesli söyler (Player2 kredilerini kullanır). Mektuplar asla sesli okunmaz. Değiştirmek için tıkla.",
 }
 
 UI_TEXT.ko = {
@@ -1570,6 +1642,9 @@ UI_TEXT.ko = {
     diplo_improved = " 외교 개선 적용 (단계 +",
     diplo_worsened = " 외교 악화 적용 (단계 ",
     deal_failed = "협정을 실행하지 못했습니다.",
+    price_label = "금 %s 지불",
+    price_paid = "조약 체결: 금 %s을(를) 지불했습니다.",
+    price_refused = "게임이 조약을 체결하지 않아 아무것도 지불하지 않았습니다.",
     close_mailbox = "수신함 닫기",
     prev_page = "이전 페이지",
     next_page = "다음 페이지",
@@ -1654,6 +1729,11 @@ UI_TEXT.ko = {
     council_thinking = "궁정이 당신의 말을 숙고하고 있습니다…",
     council_no_answer = "궁정이 답하지 않았습니다. companion 창이 열려 있나요?",
     council_send = "궁정에 말하기",
+    -- 0.45: ending the audience and the Voice switch
+    talk_closed = "통치자가 알현을 끝냈습니다. 다음 턴에 다시 이야기할 수 있습니다.",
+    talk_closed_send = "이 통치자는 다음 턴까지 당신의 말을 듣지 않습니다.",
+    opt_voice = "음성",
+    opt_voice_tip = "켜짐이면 통치자들이 알현 중 답변을 Player2 앱으로 소리 내어 말합니다(Player2 크레딧을 사용합니다). 서신은 읽어 주지 않습니다. 클릭하여 전환합니다.",
 }
 
 UI_TEXT.pt = {
@@ -1734,6 +1814,9 @@ UI_TEXT.pt = {
     diplo_improved = " Melhoria diplomática aplicada (nível +",
     diplo_worsened = " Piora diplomática aplicada (nível ",
     deal_failed = "O acordo não pôde ser executado.",
+    price_label = "você paga %s de ouro",
+    price_paid = "Tratado assinado: você pagou %s de ouro.",
+    price_refused = "O jogo não assinou o tratado, então você não pagou nada.",
     close_mailbox = "Fechar caixa",
     prev_page = "Página anterior",
     next_page = "Próxima página",
@@ -1818,6 +1901,11 @@ UI_TEXT.pt = {
     council_thinking = "Sua corte pondera suas palavras…",
     council_no_answer = "Sua corte não respondeu. A janela do companion está aberta?",
     council_send = "Falar à sua corte",
+    -- 0.45: ending the audience and the Voice switch
+    talk_closed = "O governante encerrou a audiência. Você poderá falar com ele de novo no próximo turno.",
+    talk_closed_send = "Este governante não vai ouvir você até o seu próximo turno.",
+    opt_voice = "Voz",
+    opt_voice_tip = "Se SIM, os governantes dizem as respostas em voz alta nas suas audiências pelo app Player2 (usa seus créditos do Player2). As cartas nunca são lidas em voz alta. Clique para alternar.",
 }
 
 UI_TEXT.zh = {
@@ -1898,6 +1986,9 @@ UI_TEXT.zh = {
     diplo_improved = " 已应用外交改善（等级 +",
     diplo_worsened = " 已应用外交恶化（等级 ",
     deal_failed = "协议无法执行。",
+    price_label = "你支付 %s 金币",
+    price_paid = "条约已签订：你支付了 %s 金币。",
+    price_refused = "游戏没有签订该条约，所以你没有支付任何费用。",
     close_mailbox = "关闭收件箱",
     prev_page = "上一页",
     next_page = "下一页",
@@ -1982,6 +2073,11 @@ UI_TEXT.zh = {
     council_thinking = "你的宫廷正在斟酌你的话……",
     council_no_answer = "你的宫廷没有回应。companion 窗口是否打开？",
     council_send = "对宫廷说话",
+    -- 0.45: ending the audience and the Voice switch
+    talk_closed = "统治者结束了这次会见。你可以在下个回合再与其交谈。",
+    talk_closed_send = "在你的下个回合之前，这位统治者不会再听你说话。",
+    opt_voice = "语音",
+    opt_voice_tip = "开启时，统治者会在你们的会见中通过 Player2 应用朗读回复（会消耗你的 Player2 额度）。信件永远不会被朗读。点击切换。",
 }
 
 UI_TEXT.tw = {
@@ -2062,6 +2158,9 @@ UI_TEXT.tw = {
     diplo_improved = " 已套用外交改善（等級 +",
     diplo_worsened = " 已套用外交惡化（等級 ",
     deal_failed = "協議無法執行。",
+    price_label = "你支付 %s 金幣",
+    price_paid = "條約已簽訂：你支付了 %s 金幣。",
+    price_refused = "遊戲沒有簽訂該條約，所以你沒有支付任何費用。",
     close_mailbox = "關閉收件匣",
     prev_page = "上一頁",
     next_page = "下一頁",
@@ -2146,6 +2245,11 @@ UI_TEXT.tw = {
     council_thinking = "你的宮廷正在斟酌你的話……",
     council_no_answer = "你的宮廷沒有回應。companion 視窗是否開啟？",
     council_send = "對宮廷說話",
+    -- 0.45: ending the audience and the Voice switch
+    talk_closed = "統治者結束了這次會見。你可以在下個回合再與其交談。",
+    talk_closed_send = "在你的下個回合之前，這位統治者不會再聽你說話。",
+    opt_voice = "語音",
+    opt_voice_tip = "開啟時，統治者會在你們的會見中透過 Player2 應用程式朗讀回覆（會消耗你的 Player2 額度）。信件永遠不會被朗讀。點擊切換。",
 }
 
 -- Nombres visibles de las acciones. El protocolo sigue usando sus claves
@@ -2155,24 +2259,25 @@ local PROPOSAL_ORDER = {
     "trade_agreement", "military_access_mutual",
     "military_access_interlocutor_to_player", "military_access_player_to_interlocutor",
     "transfer_region", "vassalize_player", "vassalize_interlocutor",
-    "offer_gold", "request_gold", "favor", "betray_war", "non_aggression_pact"
+    "offer_gold", "request_gold", "favor", "betray_war", "non_aggression_pact",
+    "broker_peace", "broker_war"
 }
 local PROPOSAL_INDEX = {}
 for i = 1, #PROPOSAL_ORDER do PROPOSAL_INDEX[PROPOSAL_ORDER[i]] = i end
 local PROPOSAL_LABELS = {
-    en = {"Declaration of war", "Peace treaty", "Defensive alliance", "Military alliance", "Trade agreement", "Mutual military access", "They grant you military access", "You grant them military access", "Region transfer", "They become your vassal", "You become their vassal", "Gold gift", "Gold payment requested", "Paid favour", "Betrayal: declaration of war", "Non-aggression pact"},
-    es = {"Declaración de guerra", "Tratado de paz", "Alianza defensiva", "Alianza militar", "Acuerdo comercial", "Acceso militar mutuo", "Ellos te conceden acceso militar", "Tú les concedes acceso militar", "Cesión de región", "Ellos se convierten en tus vasallos", "Te conviertes en su vasallo", "Regalo de oro", "Pago de oro solicitado", "Favor remunerado", "Traición: declaración de guerra", "Pacto de no agresión"},
-    fr = {"Déclaration de guerre", "Traité de paix", "Alliance défensive", "Alliance militaire", "Accord commercial", "Accès militaire mutuel", "Ils vous accordent l'accès militaire", "Vous leur accordez l'accès militaire", "Transfert de région", "Ils deviennent vos vassaux", "Vous devenez leur vassal", "Don d'or", "Paiement en or demandé", "Service rémunéré", "Trahison : déclaration de guerre", "Pacte de non-agression"},
-    de = {"Kriegserklärung", "Friedensvertrag", "Defensivbündnis", "Militärbündnis", "Handelsabkommen", "Gegenseitiges Militärzugangsrecht", "Sie gewähren dir Militärzugang", "Du gewährst ihnen Militärzugang", "Regionsübertragung", "Sie werden deine Vasallen", "Du wirst ihr Vasall", "Goldgeschenk", "Geforderte Goldzahlung", "Bezahlter Gefallen", "Verrat: Kriegserklärung", "Nichtangriffspakt"},
-    it = {"Dichiarazione di guerra", "Trattato di pace", "Alleanza difensiva", "Alleanza militare", "Accordo commerciale", "Accesso militare reciproco", "Ti concedono l'accesso militare", "Concedi loro l'accesso militare", "Trasferimento di regione", "Diventano tuoi vassalli", "Diventi loro vassallo", "Dono in oro", "Pagamento in oro richiesto", "Favore retribuito", "Tradimento: dichiarazione di guerra", "Patto di non aggressione"},
-    ru = {"Объявление войны", "Мирный договор", "Оборонительный союз", "Военный союз", "Торговое соглашение", "Взаимный военный доступ", "Они дают вам военный доступ", "Вы даёте им военный доступ", "Передача региона", "Они становятся вашими вассалами", "Вы становитесь их вассалом", "Дар золотом", "Требование золота", "Оплаченная услуга", "Предательство: объявление войны", "Пакт о ненападении"},
-    pl = {"Wypowiedzenie wojny", "Traktat pokojowy", "Sojusz obronny", "Sojusz wojskowy", "Umowa handlowa", "Wzajemny dostęp wojskowy", "Udzielają ci dostępu wojskowego", "Udzielasz im dostępu wojskowego", "Przekazanie regionu", "Stają się twoimi wasalami", "Stajesz się ich wasalem", "Dar w złocie", "Żądana zapłata w złocie", "Płatna przysługa", "Zdrada: wypowiedzenie wojny", "Pakt o nieagresji"},
-    cs = {"Vyhlášení války", "Mírová smlouva", "Obranné spojenectví", "Vojenské spojenectví", "Obchodní dohoda", "Vzájemný vojenský přístup", "Udělují ti vojenský přístup", "Uděluješ jim vojenský přístup", "Předání regionu", "Stanou se tvými vazaly", "Staneš se jejich vazalem", "Dar ve zlatě", "Požadovaná platba ve zlatě", "Placená služba", "Zrada: vyhlášení války", "Pakt o neútočení"},
-    tr = {"Savaş ilanı", "Barış antlaşması", "Savunma ittifakı", "Askerî ittifak", "Ticaret anlaşması", "Karşılıklı askerî geçiş", "Sana askerî geçiş hakkı veriyorlar", "Onlara askerî geçiş hakkı veriyorsun", "Bölge devri", "Senin vasalın oluyorlar", "Onların vasalı oluyorsun", "Altın hediyesi", "Talep edilen altın ödemesi", "Ücretli iyilik", "İhanet: savaş ilanı", "Saldırmazlık paktı"},
-    ko = {"선전 포고", "평화 조약", "방어 동맹", "군사 동맹", "무역 협정", "상호 군사 통행권", "상대가 당신에게 군사 통행권 부여", "당신이 상대에게 군사 통행권 부여", "지역 양도", "상대가 당신의 봉신이 됨", "당신이 상대의 봉신이 됨", "금 선물", "요구한 금 지불", "대가를 받는 부탁", "배신: 선전 포고", "불가침 조약"},
-    pt = {"Declaração de guerra", "Tratado de paz", "Aliança defensiva", "Aliança militar", "Acordo comercial", "Acesso militar mútuo", "Eles concedem acesso militar a você", "Você concede acesso militar a eles", "Transferência de região", "Eles se tornam seus vassalos", "Você se torna vassalo deles", "Presente em ouro", "Pagamento em ouro solicitado", "Favor remunerado", "Traição: declaração de guerra", "Pacto de não agressão"},
-    zh = {"宣战", "和平条约", "防御同盟", "军事同盟", "贸易协定", "相互军事通行权", "对方授予你军事通行权", "你授予对方军事通行权", "地区转让", "对方成为你的附庸", "你成为对方的附庸", "赠送黄金", "要求支付黄金", "有偿请求", "背叛：宣战", "互不侵犯条约"},
-    tw = {"宣戰", "和平條約", "防禦同盟", "軍事同盟", "貿易協定", "相互軍事通行權", "對方授予你軍事通行權", "你授予對方軍事通行權", "地區轉讓", "對方成為你的附庸", "你成為對方的附庸", "贈送黃金", "要求支付黃金", "有償請求", "背叛：宣戰", "互不侵犯條約"}
+    en = {"Declaration of war", "Peace treaty", "Defensive alliance", "Military alliance", "Trade agreement", "Mutual military access", "They grant you military access", "You grant them military access", "Region transfer", "They become your vassal", "You become their vassal", "Gold gift", "Gold payment requested", "Paid favour", "Betrayal: declaration of war", "Non-aggression pact", "They make peace with", "They declare war on"},
+    es = {"Declaración de guerra", "Tratado de paz", "Alianza defensiva", "Alianza militar", "Acuerdo comercial", "Acceso militar mutuo", "Ellos te conceden acceso militar", "Tú les concedes acceso militar", "Cesión de región", "Ellos se convierten en tus vasallos", "Te conviertes en su vasallo", "Regalo de oro", "Pago de oro solicitado", "Favor remunerado", "Traición: declaración de guerra", "Pacto de no agresión", "Firman la paz con", "Declaran la guerra a"},
+    fr = {"Déclaration de guerre", "Traité de paix", "Alliance défensive", "Alliance militaire", "Accord commercial", "Accès militaire mutuel", "Ils vous accordent l'accès militaire", "Vous leur accordez l'accès militaire", "Transfert de région", "Ils deviennent vos vassaux", "Vous devenez leur vassal", "Don d'or", "Paiement en or demandé", "Service rémunéré", "Trahison : déclaration de guerre", "Pacte de non-agression", "Ils font la paix avec", "Ils déclarent la guerre à"},
+    de = {"Kriegserklärung", "Friedensvertrag", "Defensivbündnis", "Militärbündnis", "Handelsabkommen", "Gegenseitiges Militärzugangsrecht", "Sie gewähren dir Militärzugang", "Du gewährst ihnen Militärzugang", "Regionsübertragung", "Sie werden deine Vasallen", "Du wirst ihr Vasall", "Goldgeschenk", "Geforderte Goldzahlung", "Bezahlter Gefallen", "Verrat: Kriegserklärung", "Nichtangriffspakt", "Sie schließen Frieden mit", "Sie erklären den Krieg an"},
+    it = {"Dichiarazione di guerra", "Trattato di pace", "Alleanza difensiva", "Alleanza militare", "Accordo commerciale", "Accesso militare reciproco", "Ti concedono l'accesso militare", "Concedi loro l'accesso militare", "Trasferimento di regione", "Diventano tuoi vassalli", "Diventi loro vassallo", "Dono in oro", "Pagamento in oro richiesto", "Favore retribuito", "Tradimento: dichiarazione di guerra", "Patto di non aggressione", "Fanno la pace con", "Dichiarano guerra a"},
+    ru = {"Объявление войны", "Мирный договор", "Оборонительный союз", "Военный союз", "Торговое соглашение", "Взаимный военный доступ", "Они дают вам военный доступ", "Вы даёте им военный доступ", "Передача региона", "Они становятся вашими вассалами", "Вы становитесь их вассалом", "Дар золотом", "Требование золота", "Оплаченная услуга", "Предательство: объявление войны", "Пакт о ненападении", "Заключают мир с", "Объявляют войну"},
+    pl = {"Wypowiedzenie wojny", "Traktat pokojowy", "Sojusz obronny", "Sojusz wojskowy", "Umowa handlowa", "Wzajemny dostęp wojskowy", "Udzielają ci dostępu wojskowego", "Udzielasz im dostępu wojskowego", "Przekazanie regionu", "Stają się twoimi wasalami", "Stajesz się ich wasalem", "Dar w złocie", "Żądana zapłata w złocie", "Płatna przysługa", "Zdrada: wypowiedzenie wojny", "Pakt o nieagresji", "Zawierają pokój z", "Wypowiadają wojnę"},
+    cs = {"Vyhlášení války", "Mírová smlouva", "Obranné spojenectví", "Vojenské spojenectví", "Obchodní dohoda", "Vzájemný vojenský přístup", "Udělují ti vojenský přístup", "Uděluješ jim vojenský přístup", "Předání regionu", "Stanou se tvými vazaly", "Staneš se jejich vazalem", "Dar ve zlatě", "Požadovaná platba ve zlatě", "Placená služba", "Zrada: vyhlášení války", "Pakt o neútočení", "Uzavírají mír s", "Vyhlašují válku"},
+    tr = {"Savaş ilanı", "Barış antlaşması", "Savunma ittifakı", "Askerî ittifak", "Ticaret anlaşması", "Karşılıklı askerî geçiş", "Sana askerî geçiş hakkı veriyorlar", "Onlara askerî geçiş hakkı veriyorsun", "Bölge devri", "Senin vasalın oluyorlar", "Onların vasalı oluyorsun", "Altın hediyesi", "Talep edilen altın ödemesi", "Ücretli iyilik", "İhanet: savaş ilanı", "Saldırmazlık paktı", "Barış yaparlar:", "Savaş ilan ederler:"},
+    ko = {"선전 포고", "평화 조약", "방어 동맹", "군사 동맹", "무역 협정", "상호 군사 통행권", "상대가 당신에게 군사 통행권 부여", "당신이 상대에게 군사 통행권 부여", "지역 양도", "상대가 당신의 봉신이 됨", "당신이 상대의 봉신이 됨", "금 선물", "요구한 금 지불", "대가를 받는 부탁", "배신: 선전 포고", "불가침 조약", "다음 세력과 강화", "다음 세력에 선전 포고"},
+    pt = {"Declaração de guerra", "Tratado de paz", "Aliança defensiva", "Aliança militar", "Acordo comercial", "Acesso militar mútuo", "Eles concedem acesso militar a você", "Você concede acesso militar a eles", "Transferência de região", "Eles se tornam seus vassalos", "Você se torna vassalo deles", "Presente em ouro", "Pagamento em ouro solicitado", "Favor remunerado", "Traição: declaração de guerra", "Pacto de não agressão", "Fazem a paz com", "Declaram guerra a"},
+    zh = {"宣战", "和平条约", "防御同盟", "军事同盟", "贸易协定", "相互军事通行权", "对方授予你军事通行权", "你授予对方军事通行权", "地区转让", "对方成为你的附庸", "你成为对方的附庸", "赠送黄金", "要求支付黄金", "有偿请求", "背叛：宣战", "互不侵犯条约", "与其议和：", "向其宣战："},
+    tw = {"宣戰", "和平條約", "防禦同盟", "軍事同盟", "貿易協定", "相互軍事通行權", "對方授予你軍事通行權", "你授予對方軍事通行權", "地區轉讓", "對方成為你的附庸", "你成為對方的附庸", "贈送黃金", "要求支付黃金", "有償請求", "背叛：宣戰", "互不侵犯條約", "與其議和：", "向其宣戰："}
 }
 
 -- El idioma de la interfaz se le pregunta al propio juego: se pide una cadena vanilla
@@ -2221,6 +2326,11 @@ end
 
 function llmdip_language() detect_game_language(); return UI_LANG end
 
+-- Player2 has male and female voices only in these game languages (0.45). In the
+-- others the Voice switch is hidden: no voice is better than a foreign accent.
+local VOICE_LANGUAGES = {en = true, es = true, it = true, pt = true, zh = true, tw = true}
+function llmdip_voice_supported() return VOICE_LANGUAGES[llmdip_language()] == true end
+
 -- Solo el idioma que ha confirmado el juego; nil si todavia no lo sabemos. El puente
 -- lo manda en cada peticion para que el companion escriba las cartas en ese idioma.
 function llmdip_game_language()
@@ -2250,10 +2360,20 @@ function llmdip_t_lang(code, key)
 end
 
 function llmdip_action_label(compact)
-    local parts = {}
-    for part in string.gmatch(tostring(compact or ""), "[^,]+") do parts[#parts + 1] = part end
+    local parts, price = {}, nil
+    for part in string.gmatch(tostring(compact or ""), "[^,]+") do
+        -- A treaty the player pays for ends with price_N (0.44).
+        local amount = string.match(part, "^price_(%d+)$")
+        if amount then price = amount else parts[#parts + 1] = part end
+    end
+    local label = llmdip_action_label_terms(parts, compact)
+    if price then return label .. " (" .. string.format(llmdip_t("price_label"), price) .. ")" end
+    return label
+end
+
+function llmdip_action_label_terms(parts, compact)
     local action = parts[1]
-    if action == "alliance" or action == "military_access" or action == "vassalize" then
+    if action == "alliance" or action == "military_access" or action == "vassalize" or action == "broker" then
         action = action .. "_" .. tostring(parts[2] or "")
     end
     local labels = PROPOSAL_LABELS[llmdip_language()] or PROPOSAL_LABELS.en
@@ -2266,6 +2386,11 @@ function llmdip_action_label(compact)
         return label .. " (" .. tostring(parts[2] or "?") .. ")"
     elseif action == "favor" then
         return label .. " (" .. tostring(parts[2] or "?") .. ", " .. tostring(parts[3] or "?") .. ")"
+    elseif action == "broker_peace" or action == "broker_war" then
+        -- The third realm by its name in the game's language, its key if none.
+        local key = tostring(parts[3] or "?")
+        local ok, name = pcall(function() return common.get_localised_string("factions_screen_name_" .. key) end)
+        return label .. " " .. ((ok and type(name) == "string" and name ~= "") and name or key)
     end
     return label
 end

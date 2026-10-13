@@ -3,7 +3,8 @@
 // longer understand the other; releases that keep it work with the companion
 // players already have. The game announces its own number and the oldest companion
 // it accepts in a "PROTOCOL|<pack>|<min companion>" log line.
-export const COMPANION_PROTOCOL = 1;
+// 2 (0.45): greetings when an audience opens, [talk:end] and brokered deals.
+export const COMPANION_PROTOCOL = 2;
 // Packs older than the protocol line (0.42.x) understand protocol 1 as well.
 export const MIN_PACK_PROTOCOL = 0;
 
@@ -18,8 +19,16 @@ export function protocolAdvice(packProtocol, minCompanion) {
 
 export const ACTION_TYPES = new Set([
   "reject", "declare_war", "make_peace", "alliance", "trade_agreement", "non_aggression_pact",
-  "military_access", "transfer_region", "vassalize", "offer_gold", "request_gold", "favor", "betray_war"
+  "military_access", "transfer_region", "vassalize", "offer_gold", "request_gold", "favor", "betray_war",
+  "broker"
 ]);
+
+// Treaties a ruler may sell: the player pays `price` gold when the treaty is signed,
+// in the same step. The game signs first, checks the treaty really exists and only
+// then takes the gold, so the player never pays for a pact the game refused.
+// A brokered deal (the ruler makes peace with, or goes to war against, a third realm
+// at the player's request) may carry a price the same way.
+export const PRICED_TREATIES = new Set(["make_peace", "alliance", "trade_agreement", "non_aggression_pact", "military_access", "broker"]);
 
 const SAFE_KEY = /^[a-z0-9_]{1,160}$/;
 const FAVOR_TYPES = new Set(["defend", "join_war", "non_aggression", "military_access"]);
@@ -57,6 +66,13 @@ export function validateAction(input) {
     result.amount = goldAmount(input.amount);
     if (result.favor === "join_war") result.target = safeKey(input.target, "target");
     else if (input.target !== undefined) throw new Error("target is only allowed for join_war");
+  } else if (type === "broker") {
+    result.act = enumValue(input.act, new Set(["peace", "war"]), "act");
+    result.target = safeKey(input.target, "target");
+  }
+  if (input.price !== undefined) {
+    if (!PRICED_TREATIES.has(type)) throw new Error(`price is not allowed for ${type}`);
+    result.price = goldAmount(input.price);
   }
   return result;
 }
@@ -70,13 +86,17 @@ export function validateReaction(input = {}) {
 
 export function compactAction(action) {
   const value = validateAction(action);
+  // A priced treaty ends with price_N; packs older than 0.44 ignore the extra field.
+  const price = value.price ? `,price_${value.price}` : "";
   switch (value.type) {
-    case "alliance": return `alliance,${value.level}`;
-    case "military_access": return `military_access,${value.direction}`;
+    case "alliance": return `alliance,${value.level}${price}`;
+    case "military_access": return `military_access,${value.direction}${price}`;
+    case "make_peace": case "trade_agreement": case "non_aggression_pact": return `${value.type}${price}`;
     case "transfer_region": return `transfer_region,${value.region},${value.recipient}`;
     case "vassalize": return `vassalize,${value.master}`;
     case "offer_gold": case "request_gold": return `${value.type},${value.amount}`;
     case "favor": return `favor,${value.favor},${value.amount},${value.target || "none"}`;
+    case "broker": return `broker,${value.act},${value.target}${price}`;
     default: return value.type;
   }
 }
@@ -89,7 +109,8 @@ export function parseBridgeRequest(line) {
   if (parts.length !== 7) throw new Error("Incomplete bridge REQUEST v2");
   const [requestId, campaignId, sender, interlocutor, mode, encodedState, encodedMessage] = parts;
   for (const [field, value] of [["requestId", requestId], ["campaignId", campaignId], ["sender", sender], ["interlocutor", interlocutor]]) safeKey(value, field);
-  enumValue(mode, new Set(["player", "proactive"]), "mode");
+  // greeting: the player opened an audience; the ruler speaks first (0.45).
+  enumValue(mode, new Set(["player", "proactive", "greeting"]), "mode");
   let message, state;
   try { message = decodeURIComponent(encodedMessage); state = decodeURIComponent(encodedState); }
   catch { throw new Error("REQUEST message has invalid percent-encoding"); }

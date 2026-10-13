@@ -48,6 +48,10 @@ By default it only connects to `127.0.0.1`: the local Player2 app, and its own s
 
 Conversation memory is stored as JSON in `%APPDATA%\LivingDiplomacy\data`; an older `data/` folder next to the companion is copied there on the first start.
 
+Players can direct the leaders themselves in `%APPDATA%\LivingDiplomacy\custom` (created on the first start, with a README): `instructions.txt` for every leader, and `lords/<leader subtype or faction key>.json` to change one leader field by field (`src/memory-store.js`). These directions never change the reply tags or what the game allows.
+
+With the optional **Voice** switch (World tab, off by default), the reply to the player's own audience is also sent to Player2's local text-to-speech (`/v1/tts/speak`) in the game's language. The game hides the switch in languages without both male and female Player2 voices.
+
 ## Building the older executable (developer reference)
 
 Requirements: Windows and **Node.js 22 or newer**.

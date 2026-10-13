@@ -240,5 +240,7 @@ test('the reply is the ruler speaking, not a description of how the ruler answer
   // 25-09: to "hola" Katarin answered "Zarina Katarin ... responde con amabilidad seca ...
   // La actitud Muy amistosa justifica la apertura. 'Vlad ...'".
   assert.match(SYSTEM_PROMPT, /only the ruler's own words to the player, in the first person/);
-  assert.match(SYSTEM_PROMPT, /Never narrate the ruler in the third person, describe their tone or traits, or explain how or why you are going to answer/);
+  assert.match(SYSTEM_PROMPT, /never narrate the ruler in the third person, describe their tone or traits, or explain how or why you are going to answer/);
+  // 0.45: roleplay actions are allowed, but only brief, subjectless and between asterisks.
+  assert.match(SYSTEM_PROMPT, /Write your actions without a subject, in the present tense, at most one or two short ones per reply/);
 });

@@ -13,6 +13,7 @@ import { Codex, parseCodexLine } from "./codex.js";
 import { parseCourtsRequest, buildCourtsMessages, extractJson, validateCourts, renderCourtsInbox, renderCourtsFailed, courtGroups, COURTS_MAX_TOKENS, COURTS_TIMEOUT_MS } from "./court-council.js";
 import { parseBridgeRequest, COMPANION_PROTOCOL, protocolAdvice } from "./protocol.js";
 import { parseDiplomacyResponse } from "./tag-parser.js";
+import { dealViolation } from "./deal-limits.js";
 import { renderInbox, luaString } from "./lua-renderer.js";
 import { connectPlayer2, player2Heartbeat, player2Speak } from "./player2-client.js";
 import { checkInstalledPack } from "./pack-compat.js";
@@ -48,6 +49,9 @@ console.log(`Conversation memory: ${config.dataDir}`);
 // Player2 asks for one health ping per minute to measure the mod's time spent.
 const HEARTBEAT_MS = 60_000;
 const memory = new MemoryStore(config.dataDir);
+// The player's own versions of the lords (0.45): created on first start, never overwritten.
+try { console.log(`Your own lords and instructions: ${memory.ensureCustomFolder()}`); }
+catch (error) { console.warn(`The custom lords folder could not be created: ${error.message}`); }
 const betrayals = new BetrayalStore(config.dataDir);
 const codex = new Codex(config.dataDir, memory);
 const handled = new Set();
@@ -184,14 +188,40 @@ async function handleRequest(request) {
     request.mode === "player" ? request.message : "", ...lastWords.reverse(),
     request.fields?.court_dispatch, request.fields?.court_gossip, request.fields?.world_news
   ], { exclude: [request.interlocutor, request.sender] });
+  // The player's own direction for this lord (custom/ next to the data folder).
+  request.custom = memory.customInstructions(profile.leaderSubtype, request.interlocutor);
   const raw = await callLlm(config, request, history, profile, betrayal, digest, codexText);
-  if (request.mode === 'proactive' && raw.trim() === '[NO_CONTACT]') {
+  if ((request.mode === 'proactive' || request.mode === 'greeting') && raw.trim() === '[NO_CONTACT]') {
     memory.append(request, '', {type:'reject'}, {delta:0,reason:'neutral'});
     await enqueueInbox(`llmdip_no_contact(${luaString(request.requestId)})\n`);
     return;
   }
-  const parsed = enforceBetrayal(parseDiplomacyResponse(raw), betrayal);
+  // A reply the game cannot read (two deal tags, a broken tag) gets one second draft
+  // that says what was wrong, instead of failing the player's message (0.45).
+  let parsed;
+  try { parsed = enforceBetrayal(parseDiplomacyResponse(raw), betrayal); }
+  catch (error) {
+    console.warn(`[FORMAT] ${request.interlocutor}: ${error.message}; asking for a second draft. First draft ended: ${raw.replace(/\s+/g, " ").slice(-240)}`);
+    parsed = enforceBetrayal(parseDiplomacyResponse(await callLlm(config, { ...request, formatCorrection: error.message }, history, profile, betrayal, digest, codexText)), betrayal);
+  }
+  // A friendly model gives away whatever it is asked for. Land and gold beyond what
+  // this ruler would really give (src/deal-limits.js) get one second draft; if that is
+  // still beyond it, the letter stands without the deal.
+  const violation = parsed.action.type === "betray_war" ? null : dealViolation(parsed.action, request.fields || {});
+  if (violation) {
+    console.log(`[DEAL_LIMIT] ${request.interlocutor}: ${violation}; asking for a second draft`);
+    try {
+      const retry = enforceBetrayal(parseDiplomacyResponse(await callLlm(config, { ...request, dealCorrection: violation }, history, profile, betrayal, digest, codexText)), betrayal);
+      parsed = dealViolation(retry.action, request.fields || {}) ? { ...retry, action: { type: "reject" } } : retry;
+    } catch (error) {
+      console.warn(`[DEAL_LIMIT] second draft failed: ${error.message}`);
+      parsed = { ...parsed, action: { type: "reject" } };
+    }
+  }
   if (request.mode === 'proactive') parsed.reaction = {delta:0,reason:'neutral'};
+  // A greeting is words only, and only a ruler answering the player can end the audience.
+  if (request.mode === 'greeting') parsed = { ...parsed, action: { type: 'reject' }, reaction: { delta: 0, reason: 'neutral' } };
+  if (request.mode !== 'player') parsed.endsTalk = false;
   if (parsed.action.type === "betray_war") {
     try {
       const letter = parseDiplomacyResponse(await callLlm(config, { ...request, message: BETRAYAL_LETTER_REQUEST }, history, profile, null, digest, codexText));
@@ -202,7 +232,14 @@ async function handleRequest(request) {
   }
   memory.append(request, parsed.narrative, parsed.action, parsed.reaction);
   await enqueueInbox(renderInbox({ requestId: request.requestId, ...parsed }));
-  if (config.provider === "player2") player2Speak(config, parsed.narrative, profile).catch(error => console.warn(`Player2 TTS: ${error.message}`));
+  // Voice (0.45): the player switches it on in the World tab; only the audience itself is
+  // spoken, never background letters. Actions between asterisks are not read aloud.
+  if (config.provider === "player2" && request.fields?.voice === "1" && (request.mode === "player" || request.mode === "greeting")) {
+    const spoken = parsed.narrative.replace(/\*[^*]+\*/g, " ").replace(/\s+/g, " ").trim();
+    if (spoken) player2Speak({ ...config, player2Tts: true }, spoken, profile, fetch, { language: languageForRequest(request, config) })
+      .catch(error => console.warn(`Player2 TTS: ${error.message}`));
+  }
+  if (parsed.endsTalk) console.log(`[TALK_END] ${request.interlocutor} ends the audience for this turn`);
   console.log(`${request.interlocutor}: ${parsed.narrative}`);
   console.log(`Proposal: ${JSON.stringify(parsed.action)}`);
   console.log(`Diplomatic reaction: ${parsed.reaction.delta} (${parsed.reaction.reason})`);

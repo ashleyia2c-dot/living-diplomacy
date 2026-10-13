@@ -10,6 +10,11 @@ const MAX_DIGEST_CHARS = 1400;
 // What a lord's letter proposed, said in words with who gives what to whom: as raw JSON
 // the record got the direction of a region transfer wrong (02-10-2026).
 export function describeAction(action = {}, lord = "the lord", player = "the player") {
+  const base = describeTerms(action, lord, player);
+  return action.price ? `${base}, for which ${player} pays ${action.price} gold to ${lord}` : base;
+}
+
+function describeTerms(action, lord, player) {
   const to = recipient => recipient === "player" ? player : lord;
   const from = recipient => recipient === "player" ? lord : player;
   switch (action.type) {
@@ -44,7 +49,7 @@ export function foldedLetters(fold = [], names = {}) {
       return `${turn}, ${who} (the player) wrote: ${JSON.stringify(String(message.content || "").slice(0, 900))}`;
     }
     const who = message.speakerIdentity?.leader && message.speakerIdentity.leader !== "unknown" ? shortName(message.speakerIdentity.leader) : lord;
-    const kind = message.mode === "proactive" ? "wrote unprompted" : "answered";
+    const kind = message.mode === "proactive" ? "wrote unprompted" : message.mode === "greeting" ? "greeted them" : "answered";
     return `${turn}, ${who} (${names.faction || "the lord's realm"}) ${kind}: ${JSON.stringify(String(message.content || "").slice(0, 900))}${offerText(message, who, player)}`;
   }).join("\n");
 }

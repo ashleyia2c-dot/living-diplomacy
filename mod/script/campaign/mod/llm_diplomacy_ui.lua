@@ -395,6 +395,8 @@ local function localised_ui_value(value)
     if type(value) ~= "string" or value == "" then return "" end
     local ok, translated = pcall(function() return common.get_localised_string(value) end)
     if ok and type(translated) == "string" and translated ~= "" and translated ~= value then return translated end
+    -- A name key with no text (a lord without a surname) is an empty name, not the key.
+    if string.sub(value, 1, 11) == "names_name_" then return "" end
     return value
 end
 
@@ -964,6 +966,8 @@ local function hide_dialog()
     hide_history_bubbles()
     out("[LLMDIP UI] CHAT_CLOSED")
 end
+-- Set below, once watch_for_companion exists: asks the ruler to greet the player (0.45).
+local greet_on_open
 local function show_dialog()
     local target = capture_target()
     if target then
@@ -977,6 +981,7 @@ local function show_dialog()
     state.visible = true; state.history_offset = 0
     if target and llmdip_mail_read then llmdip_mail_read(target) end
     position_owned_ui(); refresh_owned_ui()
+    if target and greet_on_open then greet_on_open(target) end
     cm:real_callback(function() if state.visible then set_input_focus(true) end end, 40)
 end
 
@@ -1051,13 +1056,34 @@ local function send_text()
     if type(text) ~= "string" or #text < 1 or #text > 1200 then
         state.response = llmdip_t("message_too_long"); refresh_owned_ui(); return
     end
+    -- The ruler ended the audience this turn: say so in the chat. The words are cleared,
+    -- or the shared input would carry them into the next ruler's audience.
+    if llmdip_talk_closed and llmdip_talk_closed(target) then
+        state.notice = {target = target, text = llmdip_t("talk_closed_send")}
+        clear_input_text(); render_history_bubbles(target); return
+    end
     out("[LLMDIP UI] SEND_BEGIN")
     local ok, sent = pcall(function() return llmdip_send_request(target, text, state.attitude_value, state.personality_attributes) end)
     out("[LLMDIP UI] SEND_END|" .. tostring(ok) .. "|" .. tostring(sent))
     if not ok or not sent then state.response = llmdip_t("send_failed"); refresh_owned_ui(); return end
     state.notice = nil
+    -- A greeting still on its way is replaced by the answer to these words.
+    local messages = history_for(target)
+    if #messages > 0 and messages[#messages] == "Player2: " .. llmdip_t("thinking") then table.remove(messages) end
     add_history(target, llmdip_t("you"), text); add_history(target, "Player2", llmdip_t("thinking"))
     state.response = llmdip_t("waiting"); clear_input_text(); render_history_bubbles(target)
+    watch_for_companion(target)
+end
+
+-- 0.45: once a turn, opening an audience before the player has written brings the
+-- ruler's greeting. The game decides whether one is due (llmdip_request_greeting).
+greet_on_open = function(target)
+    if not llmdip_request_greeting then return end
+    local messages = history_for(target)
+    if #messages > 0 and messages[#messages] == "Player2: " .. llmdip_t("thinking") then return end
+    local ok, sent = pcall(llmdip_request_greeting, target, state.attitude_value, state.personality_attributes)
+    if not ok or not sent then return end
+    add_history(target, "Player2", llmdip_t("thinking")); render_history_bubbles(target)
     watch_for_companion(target)
 end
 
@@ -1205,6 +1231,12 @@ function llmdip_ui_on_proposal(request_id, compact_action, relation_delta, relat
     end
     persist_history()
 end
+-- The ruler ended the audience ([talk:end], 0.45).
+function llmdip_ui_on_talk_closed(target)
+    if not valid_key(target) then return end
+    add_history(target, llmdip_t("speaker_system"), llmdip_t("talk_closed"))
+    if state.target == target and state.visible then render_history_bubbles(target) end
+end
 function llmdip_ui_on_betrayal(request_id, target, ok)
     if not valid_key(target) or not ok then return end
     local entry = state.inbox[target] or {}; entry.request = request_id; entry.proposal = nil; state.inbox[target] = entry
@@ -1224,6 +1256,15 @@ function llmdip_ui_on_executed(request_id, ok, relation_delta, relation_reason)
     local reaction = delta > 0 and (llmdip_t("diplo_improved") .. tostring(delta) .. ").") or (delta < 0 and (llmdip_t("diplo_worsened") .. tostring(delta) .. ").") or "")
     if ok then entry.executed_request = request_id end
     state.proposal = nil; entry.proposal = nil; add_history(state.target, llmdip_t("speaker_system"), ok and (llmdip_t("deal_done") .. reaction) or llmdip_t("deal_failed"))
+    if state.visible then refresh_owned_ui() end
+end
+
+-- A treaty sold for a price is paid a moment after it is signed (or not at all, if
+-- the game never signed it). The chat of that ruler says which.
+function llmdip_ui_on_price(request_id, target, price, paid)
+    if not target then return end
+    local text = paid and string.format(llmdip_t("price_paid"), tostring(price)) or llmdip_t("price_refused")
+    add_history(target, llmdip_t("speaker_system"), text)
     if state.visible then refresh_owned_ui() end
 end
 
